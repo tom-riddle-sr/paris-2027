@@ -1,5 +1,17 @@
 {
  "version": 1,
- "updatedAt": "2026-07-31T06:52:40.971Z",
- "expenses": []
+ "updatedAt": "2026-07-31T06:53:06.478Z",
+ "expenses": [
+  {
+   "id": "ms8l5rms-ahprks",
+   "name": "test",
+   "amount": 2,
+   "currency": "EUR",
+   "status": "已付款",
+   "category": "事前花費",
+   "payer": "漂亮西西",
+   "note": "",
+   "createdAt": "2026-07-31T06:53:05.956Z"
+  }
+ ]
 }
