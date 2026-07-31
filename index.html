@@ -463,11 +463,15 @@
   .prep-add-form{border:1px solid var(--line-soft);padding:12px 14px;margin:12px 0 4px;}
   .prep-hint{font-size:.85rem;color:var(--soft);margin-top:8px;}
 
-  /* ===== 旅伴成員卡（公開資訊＋鎖定的證件欄位） ===== */
-  .mem-card{border:1px solid var(--line-soft);padding:12px 14px 10px;margin-bottom:12px;}
-  .mem-card:last-child{margin-bottom:0;}
-  .mem-card .mem-name{font-weight:600;letter-spacing:.05em;margin-bottom:6px;}
-  .mem-card .kv{font-size:.88rem;}
+  /* ===== 旅伴大頭貼展示（Google 頭像；未登入過→字母圓點） ===== */
+  .mem-grid{display:flex;flex-wrap:wrap;gap:18px 10px;justify-content:space-around;padding:8px 0 4px;}
+  .mem-person{display:flex;flex-direction:column;align-items:center;gap:9px;flex:0 0 42%;}
+  .mem-ava{width:72px;height:72px;border-radius:50%;object-fit:cover;border:1px solid var(--line);}
+  .mem-ava-letter{
+    display:flex;align-items:center;justify-content:center;
+    background:var(--blue);color:#fff;font-size:1.55rem;font-weight:600;line-height:1;
+  }
+  .mem-pname{font-size:.85rem;letter-spacing:.06em;font-weight:600;text-align:center;}
 
   /* ===== 記帳手機卡片式列表（<640px 以卡片取代橫向捲動表格） ===== */
   .exp-cards{display:none;}
@@ -1818,7 +1822,8 @@ const TRIP_DATA = {
       box.innerHTML = SEC.data.travelers.map(t =>
         '<div style="padding:6px 0;border-bottom:1px solid var(--line-soft);">'
         + '<div style="font-weight:600;">' + esc(t.name || "") + ' <span class="muted">' + esc(t.passportName || "") + '</span></div>'
-        + '<div class="muted">護照號碼 ' + esc(t.passportNo || "") + '　效期至 ' + esc(t.expiry || "") + '</div></div>').join("");
+        + '<div class="muted">護照號碼 ' + esc(t.passportNo || "—") + '　效期至 ' + esc(t.expiry || "—") + '</div>'
+        + '<div class="muted">台胞證號碼 ' + esc(t.tbzNo || "—") + '　效期至 ' + esc(t.tbzExpiry || "—") + '</div></div>').join("");
     } else if (TRIP_DATA.secure) {
       box.innerHTML = '<div class="sec-block sec-locked" title="點擊解鎖">' + ic("lock", "sm")
         + ' 旅伴護照資料已加密，點擊解鎖查看'
@@ -1829,31 +1834,44 @@ const TRIP_DATA = {
     }
   }
 
-  /* 旅伴成員卡：公開資訊直接顯示；證件欄位鎖定時模糊、解鎖後帶入 secure.travelers。
-     舊版 blob（無台胞證欄位或無 travelers）缺什麼就顯示「—」，不報錯。 */
+  /* 旅伴大頭貼：Google 頭像自動收集於 Firestore meta/members（登入時 upsert），
+     以「姓名字母重組相同」比對 TRIP_DATA.membersPublic（如 CHANG RONG JIA ↔ Rongjia Chang）；
+     未登入過（或未登入看不到 Firestore）→ 字母圓點＋英文名；收集到但不在名單的 profile 也一併展示。 */
+  const MEM = { profiles: {}, unsub: null };
+  function memWatch() {
+    if (MEM.unsub) { MEM.unsub(); MEM.unsub = null; }
+    MEM.profiles = {};
+    renderMembers();
+    if (!FB.user) return;
+    MEM.unsub = FB.fs.onSnapshot(
+      FB.fs.doc(FB.db, "trips", TRIP_DATA.id, "meta", "members"),
+      s => { const dd = s.data() || {}; MEM.profiles = dd.profiles || {}; renderMembers(); },
+      () => {}
+    );
+  }
   function renderMembers() {
     const box = $("#members-box");
     if (!box) return;
     const pub = TRIP_DATA.membersPublic || [];
-    if (!pub.length) { box.innerHTML = '<p class="muted">成員資料待補</p>'; return; }
-    const secT = (SEC.data && Array.isArray(SEC.data.travelers)) ? SEC.data.travelers : null;
-    const lockedVal = TRIP_DATA.secure
-      ? '<span class="sec-locked" title="點擊解鎖">' + ic("lock", "sm") + ' <span class="dots">●●●●●●●●</span></span>'
-      : '<span class="muted">—</span>';
-    const val = v => (v == null || String(v).trim() === "") ? "—" : esc(v);
-    box.innerHTML = pub.map((m, i) => {
-      const t = secT ? (secT[i] || {}) : null;
-      const sv = k => t ? val(t[k]) : lockedVal;
-      return '<div class="mem-card">'
-        + '<div class="mem-name">' + esc(m.name) + '</div>'
-        + '<div class="kv"><span class="k">國籍</span><span class="v">' + val(m.nationality) + '</span></div>'
-        + '<div class="kv"><span class="k">性別</span><span class="v">' + val(m.gender) + '</span></div>'
-        + '<div class="kv"><span class="k">護照號碼</span><span class="v">' + sv("passportNo") + '</span></div>'
-        + '<div class="kv"><span class="k">護照效期</span><span class="v">' + sv("expiry") + '</span></div>'
-        + '<div class="kv"><span class="k">台胞證號碼</span><span class="v">' + sv("tbzNo") + '</span></div>'
-        + '<div class="kv"><span class="k">台胞證效期</span><span class="v">' + sv("tbzExpiry") + '</span></div>'
-        + '</div>';
-    }).join('');
+    const profs = Object.values(MEM.profiles || {}).filter(p => p && p.name);
+    if (!pub.length && !profs.length) { box.innerHTML = '<p class="muted">成員資料待補</p>'; return; }
+    const canon = s => String(s || "").toLowerCase().replace(/[^a-z]/g, "").split("").sort().join("");
+    const used = new Set();
+    const cards = pub.map(m => {
+      const hit = profs.find(p => !used.has(p) && canon(p.name) === canon(m.name));
+      if (hit) used.add(hit);
+      return { name: m.name, picture: hit ? (hit.picture || "") : "" };
+    });
+    profs.filter(p => !used.has(p)).forEach(p => cards.push({ name: p.name, picture: p.picture || "" }));
+    box.innerHTML = '<div class="mem-grid">' + cards.map(c => {
+      const letter = esc(String(c.name || "?").trim().charAt(0).toUpperCase());
+      const avatar = c.picture
+        ? '<img class="mem-ava" src="' + esc(c.picture) + '" alt="" referrerpolicy="no-referrer"'
+          + ' onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\';">'
+          + '<span class="mem-ava mem-ava-letter" style="display:none;">' + letter + '</span>'
+        : '<span class="mem-ava mem-ava-letter">' + letter + '</span>';
+      return '<div class="mem-person">' + avatar + '<div class="mem-pname">' + esc(c.name) + '</div></div>';
+    }).join('') + '</div>';
   }
 
   function refreshSecure() {
@@ -1943,6 +1961,16 @@ const TRIP_DATA = {
         refreshAuth();
         expWatch();
         prepWatch();
+        memWatch();
+        /* 自動收集旅伴頭像：登入即 upsert {email,name,picture} 到 meta/members（email 正規化為 key） */
+        if (u && u.email) {
+          const prof = {};
+          prof[u.email.toLowerCase().replace(/[^a-z0-9]/g, "_")] = {
+            email: u.email, name: u.displayName || u.email, picture: u.photoURL || "", ts: Date.now()
+          };
+          FB.fs.setDoc(FB.fs.doc(FB.db, "trips", TRIP_DATA.id, "meta", "members"),
+            { profiles: prof }, { merge: true }).catch(e => {});
+        }
         const box = $(".auth-modal");
         if (u && box) box.remove();
         if (u && authPendingCb) { const cb = authPendingCb; authPendingCb = null; cb(); }
