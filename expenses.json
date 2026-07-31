@@ -1,17 +1,5 @@
 {
  "version": 1,
- "updatedAt": "2026-07-31T06:51:23.032Z",
- "expenses": [
-  {
-   "id": "ms8l3jsv-xnzc4v",
-   "name": "test",
-   "amount": 1,
-   "currency": "EUR",
-   "status": "已付款",
-   "category": "事前花費",
-   "payer": "",
-   "note": "",
-   "createdAt": "2026-07-31T06:51:22.496Z"
-  }
- ]
+ "updatedAt": "2026-07-31T06:52:40.971Z",
+ "expenses": []
 }
