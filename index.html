@@ -451,6 +451,24 @@
   .gsi-host{display:flex;justify-content:center;margin:14px 0 4px;min-height:44px;}
   .lock-btn{margin-left:4px;margin-right:4px;}
 
+  /* ===== 行前準備：打勾沉底＋自訂提醒 ===== */
+  label.prep-item{transition:opacity .18s ease,transform .18s ease;position:relative;}
+  label.prep-item.moving{opacity:.2;transform:translateX(6px);}
+  label.prep-item .prep-del{position:absolute;right:2px;top:50%;transform:translateY(-50%);}
+  .prep-done-sec{opacity:.78;margin-top:22px;}
+  .prep-done-sec h4{border-left:3px solid var(--sage);padding-left:10px;}
+  .prep-done-sec label.prep-item{animation:prepIn .25s ease;}
+  .prep-done-sec .txt .name{text-decoration:line-through;color:var(--soft);}
+  @keyframes prepIn{from{opacity:0;transform:translateY(-4px);}to{opacity:1;transform:none;}}
+  .prep-add-form{border:1px solid var(--line-soft);padding:12px 14px;margin:12px 0 4px;}
+  .prep-hint{font-size:.85rem;color:var(--soft);margin-top:8px;}
+
+  /* ===== 旅伴成員卡（公開資訊＋鎖定的證件欄位） ===== */
+  .mem-card{border:1px solid var(--line-soft);padding:12px 14px 10px;margin-bottom:12px;}
+  .mem-card:last-child{margin-bottom:0;}
+  .mem-card .mem-name{font-weight:600;letter-spacing:.05em;margin-bottom:6px;}
+  .mem-card .kv{font-size:.88rem;}
+
   /* ===== 記帳手機卡片式列表（<640px 以卡片取代橫向捲動表格） ===== */
   .exp-cards{display:none;}
   @media(max-width:639px){
@@ -569,6 +587,12 @@ const TRIP_DATA = {
 
   /* 旅伴護照資料屬敏感資訊，已移入 secure 加密區（見下方 secure 欄位說明） */
   travelers: [],
+
+  /* 旅伴公開資訊（使用者同意公開：英文姓名／國籍／性別）；證件號碼只存在 secure 加密區 */
+  membersPublic: [
+    { name: "HUANG YI CIH", nationality: "台灣", gender: "女" },
+    { name: "CHANG RONG JIA", nationality: "台灣", gender: "女" }
+  ],
 
   /* Google 登入用 OAuth Client ID（GIS 按鈕），登入後以 ID token 橋接 Firebase Auth */
   googleClientId: "875899276811-cnic2ah0usubru127q9c7jir5hgqjj8o.apps.googleusercontent.com",
@@ -1635,7 +1659,7 @@ const TRIP_DATA = {
       + '</div><aside class="ig-side">';
 
     html += '<div class="card"><h3>' + secTitle("02", "旅伴", "Members", "user") + '</h3>'
-      + '<p class="muted">成員資料待補</p></div>';
+      + '<div id="members-box"></div></div>';
 
     html += '<div class="card"><h3>' + secTitle("03", "護照資訊", "Passport", "idcard") + '</h3>'
       + '<div id="travelers-box"></div></div>';
@@ -1805,9 +1829,37 @@ const TRIP_DATA = {
     }
   }
 
+  /* 旅伴成員卡：公開資訊直接顯示；證件欄位鎖定時模糊、解鎖後帶入 secure.travelers。
+     舊版 blob（無台胞證欄位或無 travelers）缺什麼就顯示「—」，不報錯。 */
+  function renderMembers() {
+    const box = $("#members-box");
+    if (!box) return;
+    const pub = TRIP_DATA.membersPublic || [];
+    if (!pub.length) { box.innerHTML = '<p class="muted">成員資料待補</p>'; return; }
+    const secT = (SEC.data && Array.isArray(SEC.data.travelers)) ? SEC.data.travelers : null;
+    const lockedVal = TRIP_DATA.secure
+      ? '<span class="sec-locked" title="點擊解鎖">' + ic("lock", "sm") + ' <span class="dots">●●●●●●●●</span></span>'
+      : '<span class="muted">—</span>';
+    const val = v => (v == null || String(v).trim() === "") ? "—" : esc(v);
+    box.innerHTML = pub.map((m, i) => {
+      const t = secT ? (secT[i] || {}) : null;
+      const sv = k => t ? val(t[k]) : lockedVal;
+      return '<div class="mem-card">'
+        + '<div class="mem-name">' + esc(m.name) + '</div>'
+        + '<div class="kv"><span class="k">國籍</span><span class="v">' + val(m.nationality) + '</span></div>'
+        + '<div class="kv"><span class="k">性別</span><span class="v">' + val(m.gender) + '</span></div>'
+        + '<div class="kv"><span class="k">護照號碼</span><span class="v">' + sv("passportNo") + '</span></div>'
+        + '<div class="kv"><span class="k">護照效期</span><span class="v">' + sv("expiry") + '</span></div>'
+        + '<div class="kv"><span class="k">台胞證號碼</span><span class="v">' + sv("tbzNo") + '</span></div>'
+        + '<div class="kv"><span class="k">台胞證效期</span><span class="v">' + sv("tbzExpiry") + '</span></div>'
+        + '</div>';
+    }).join('');
+  }
+
   function refreshSecure() {
     $$("[data-sec]").forEach(el => { el.innerHTML = secDisplay(el.dataset.sec); });
     renderTravelers();
+    renderMembers();
     const btn = $("#lock-btn");
     if (btn) {
       if (!TRIP_DATA.secure) btn.innerHTML = ic("lock", "sm") + ' 敏感資料未設定';
@@ -1890,6 +1942,7 @@ const TRIP_DATA = {
         FB.user = u || null;
         refreshAuth();
         expWatch();
+        prepWatch();
         const box = $(".auth-modal");
         if (u && box) box.remove();
         if (u && authPendingCb) { const cb = authPendingCb; authPendingCb = null; cb(); }
@@ -2000,49 +2053,161 @@ const TRIP_DATA = {
   });
 
   /* ==================== 2. 行前準備 ==================== */
-  (function renderPrep() {
-    const p = panel("prep");
-    const storeKey = (ci, ii) => "trip::" + TRIP_DATA.id + "::prep::" + ci + "::" + ii;
-    const total = TRIP_DATA.prep.reduce((n, c) => n + c.items.length, 0);
+  /* ---------- 行前準備：Firestore 共用（trips/{id}/meta/prep）＋打勾沉底＋自訂提醒 ---------- */
+  const PREP = {
+    checked: {},   // { itemId: true/false } 旅伴共用勾選狀態
+    custom: [],    // 自訂提醒 [{id,name,category,note,deadline}]
+    loaded: false, unsub: null,
+    mergedKey: "trip::" + TRIP_DATA.id + "::prep-ls-merged" // 此裝置舊 localStorage 勾選已合併過的標記
+  };
+  const prepRef = () => FB.fs.doc(FB.db, "trips", TRIP_DATA.id, "meta", "prep");
+  /* 預設 13 項由 TRIP_DATA 種子化；id 固定為 d{分類序}-{項目序} */
+  const prepDefaults = () => {
+    const out = [];
+    TRIP_DATA.prep.forEach((cat, ci) => cat.items.forEach((it, ii) => out.push({
+      id: "d" + ci + "-" + ii, category: cat.category,
+      name: it.name, note: it.note || "", deadline: it.deadline || "",
+      isDefault: true, lsKey: "trip::" + TRIP_DATA.id + "::prep::" + ci + "::" + ii
+    })));
+    return out;
+  };
+  function prepWatch() {
+    if (PREP.unsub) { PREP.unsub(); PREP.unsub = null; }
+    PREP.checked = {}; PREP.custom = []; PREP.loaded = false;
+    if (!FB.user) { renderPrepList(); return; }
+    PREP.unsub = FB.fs.onSnapshot(prepRef(), s => {
+      const dd = s.data() || {};
+      PREP.checked = dd.checked || {};
+      PREP.custom = Array.isArray(dd.custom) ? dd.custom : [];
+      PREP.loaded = true;
+      prepMergeLS();
+      renderPrepList();
+    }, () => { PREP.loaded = true; renderPrepList(); });
+  }
+  /* 一次性：首次登入時把此裝置的舊 localStorage 勾選合併進 Firestore */
+  function prepMergeLS() {
+    try {
+      if (localStorage.getItem(PREP.mergedKey) === "1") return;
+      localStorage.setItem(PREP.mergedKey, "1");
+      const upd = {};
+      prepDefaults().forEach(it => {
+        if (localStorage.getItem(it.lsKey) === "1" && !PREP.checked[it.id]) upd[it.id] = true;
+      });
+      if (Object.keys(upd).length)
+        FB.fs.setDoc(prepRef(), { checked: upd }, { merge: true }).catch(e => {});
+    } catch (e) { /* 私密模式 */ }
+  }
+  function prepToggle(id, val) {
+    if (!FB.ready || !FB.user) return;
+    const upd = {}; upd[id] = !!val;
+    FB.fs.setDoc(prepRef(), { checked: upd }, { merge: true }).catch(e => {});
+  }
+  function prepAddItem(item) {
+    if (!FB.ready || !FB.user) return;
+    FB.fs.setDoc(prepRef(), { custom: FB.fs.arrayUnion(item) }, { merge: true }).catch(e => {});
+  }
+  function prepDelItem(id) {
+    if (!FB.ready || !FB.user) return;
+    const upd = {}; upd[id] = false;
+    FB.fs.setDoc(prepRef(), { custom: PREP.custom.filter(x => x.id !== id), checked: upd }, { merge: true }).catch(e => {});
+  }
+  function renderPrepList() {
+    const list = $("#prep-list");
+    if (!list) return;
+    const ro = !FB.user; // 未登入唯讀：顯示預設項目與此裝置舊勾選，不可操作
+    const lsChecked = it => { try { return localStorage.getItem(it.lsKey) === "1"; } catch (e) { return false; } };
+    const items = prepDefaults().concat(PREP.custom.map(c => Object.assign({ isDefault: false }, c)))
+      .map(it => Object.assign({}, it, { done: ro ? (it.isDefault && lsChecked(it)) : !!PREP.checked[it.id] }));
+    const fmtDl = d => /^\d{4}-\d{2}-\d{2}$/.test(d) ? fmtDate(d) : esc(d);
+    const itemHTML = it => '<label class="prep-item' + (it.done ? ' done' : '') + '" data-id="' + esc(it.id) + '">'
+      + '<input type="checkbox"' + (it.done ? ' checked' : '') + (ro ? ' disabled' : '') + '>'
+      + '<span class="txt"><span class="name">' + esc(it.name) + '</span>'
+      + (it.deadline ? '<span class="deadline">截止 ' + fmtDl(it.deadline) + '</span>' : '')
+      + (it.note ? '<br><span class="muted">' + esc(it.note) + '</span>' : '')
+      + '</span>'
+      + (!it.isDefault && !ro ? '<button type="button" class="row-act del prep-del" data-del="' + esc(it.id) + '" title="刪除自訂提醒">' + ic("trash", "sm") + '</button>' : '')
+      + '</label>';
 
-    let html = '<div class="card"><h3>' + secTitle("01", "行前準備清單", "Checklist", "checksq") + '</h3>'
+    let html = "";
+    TRIP_DATA.prep.forEach((cat, ci) => {
+      const group = items.filter(it => !it.done && it.category === cat.category);
+      if (!group.length) return;
+      html += '<div class="prep-cat c' + (ci % 4) + '"><h4>' + ic(catIcon(cat.category), "sm") + '<span class="no">(' + pad2(ci + 1) + ')</span>' + esc(cat.category) + '</h4>'
+        + group.map(itemHTML).join('') + '</div>';
+    });
+    const doneItems = items.filter(it => it.done);
+    if (doneItems.length) {
+      html += '<div class="prep-cat prep-done-sec"><h4>' + ic("check", "sm ic-sage") + '已完成 ✓（' + doneItems.length + '）</h4>'
+        + doneItems.map(itemHTML).join('') + '</div>';
+    }
+    list.innerHTML = html || '<p class="muted">尚無項目</p>';
+
+    const done = doneItems.length, total = items.length;
+    const cnt = $("#prep-count"), bar = $("#prep-bar"), hint = $("#prep-hint");
+    if (cnt) cnt.textContent = done + "/" + total + " 已完成";
+    if (bar) bar.style.width = (total ? Math.round(done / total * 100) : 0) + "%";
+    if (hint) hint.textContent = ro
+      ? "唯讀預覽：登入後可勾選與新增提醒，進度與旅伴即時同步"
+      : (PREP.loaded ? "勾選進度與旅伴即時同步；打勾的項目會移到最下方" : "同步載入中…");
+  }
+
+  (function initPrep() {
+    const p = panel("prep");
+    const cats = TRIP_DATA.prep.map(c => c.category);
+    p.innerHTML = '<div class="card"><h3>' + secTitle("01", "行前準備清單", "Checklist", "checksq") + '</h3>'
       + '<div class="progress-wrap"><div style="display:flex;justify-content:space-between;font-size:.82rem;margin-bottom:6px;">'
       + '<span class="muted" style="letter-spacing:.2em;">PROGRESS</span><b id="prep-count" style="font-weight:500;"></b></div>'
-      + '<div class="progress-bar"><div id="prep-bar" style="width:0%"></div></div></div>';
+      + '<div class="progress-bar"><div id="prep-bar" style="width:0%"></div></div></div>'
+      + '<div class="prep-hint" id="prep-hint"></div>'
+      + '<div style="margin:12px 0 4px;"><button type="button" class="ef-cancel" id="prep-add-btn">＋ 新增提醒</button></div>'
+      + '<form class="prep-add-form" id="prep-add-form" hidden><div class="ef-grid">'
+      + '<div class="ef-f ef-name"><label>提醒事項</label><input name="pname" required autocomplete="off"></div>'
+      + '<div class="ef-f"><label>分類</label><select name="pcat">' + cats.map(c => '<option>' + esc(c) + '</option>').join('') + '</select></div>'
+      + '<div class="ef-f"><label>截止日（選填）</label><input name="pdl" placeholder="2027-01-30" autocomplete="off"></div>'
+      + '<div class="ef-f ef-note"><label>備註（選填）</label><input name="pnote" autocomplete="off"></div>'
+      + '</div><div class="ef-actions">'
+      + '<button type="button" class="ef-cancel" id="prep-add-cancel">取消</button>'
+      + '<button type="submit" class="ef-submit">加入清單</button>'
+      + '</div></form>'
+      + '<div id="prep-list"></div></div>';
 
-    TRIP_DATA.prep.forEach((cat, ci) => {
-      html += '<div class="prep-cat c' + (ci % 4) + '"><h4>' + ic(catIcon(cat.category), "sm") + '<span class="no">(' + pad2(ci + 1) + ')</span>' + esc(cat.category) + '</h4>';
-      cat.items.forEach((it, ii) => {
-        html += '<label class="prep-item" data-key="' + storeKey(ci, ii) + '">'
-          + '<input type="checkbox">'
-          + '<span class="txt"><span class="name">' + esc(it.name) + '</span>'
-          + (it.deadline ? '<span class="deadline">截止 ' + fmtDate(it.deadline) + '</span>' : "")
-          + (it.note ? '<br><span class="muted">' + esc(it.note) + '</span>' : "")
-          + '</span></label>';
-      });
-      html += '</div>';
+    const form = $("#prep-add-form", p);
+    $("#prep-add-btn", p).addEventListener("click", () => {
+      if (!authProfile()) { openAuthModal(); return; }
+      form.hidden = !form.hidden;
+      if (!form.hidden) form.elements.pname.focus();
     });
-    html += '</div>';
-    p.innerHTML = html;
+    $("#prep-add-cancel", p).addEventListener("click", () => { form.reset(); form.hidden = true; });
+    form.addEventListener("submit", e => {
+      e.preventDefault();
+      const name = form.elements.pname.value.trim();
+      if (!name) return;
+      prepAddItem({
+        id: newId(), name: name,
+        category: form.elements.pcat.value,
+        note: form.elements.pnote.value.trim(),
+        deadline: form.elements.pdl.value.trim()
+      });
+      form.reset(); form.hidden = true;
+    });
 
-    function refresh() {
-      const done = $$("label.prep-item input", p).filter(c => c.checked).length;
-      $("#prep-count").textContent = done + "/" + total + " 已完成";
-      $("#prep-bar").style.width = (total ? Math.round(done / total * 100) : 0) + "%";
-    }
-    $$("label.prep-item", p).forEach(lb => {
-      const cb = $("input", lb), key = lb.dataset.key;
-      let saved = null;
-      try { saved = localStorage.getItem(key); } catch (e) { /* 私密模式可能不可用 */ }
-      cb.checked = saved === "1";
-      lb.classList.toggle("done", cb.checked);
-      cb.addEventListener("change", () => {
-        try { localStorage.setItem(key, cb.checked ? "1" : "0"); } catch (e) {}
-        lb.classList.toggle("done", cb.checked);
-        refresh();
-      });
+    $("#prep-list", p).addEventListener("click", e => {
+      const del = e.target.closest(".prep-del");
+      if (del) {
+        e.preventDefault();
+        const it = PREP.custom.find(x => x.id === del.dataset.del);
+        if (it && confirm("刪除自訂提醒「" + it.name + "」？")) prepDelItem(it.id);
+      }
     });
-    refresh();
+    $("#prep-list", p).addEventListener("change", e => {
+      const cb = e.target;
+      if (!cb || cb.type !== "checkbox") return;
+      const lb = cb.closest(".prep-item");
+      if (!lb) return;
+      lb.classList.add("moving"); // 淡出過渡，snapshot 重繪後在新位置以動畫進場
+      prepToggle(lb.dataset.id, cb.checked);
+    });
+    renderPrepList();
   })();
 
   /* ==================== 3. 每日行程 ==================== */
