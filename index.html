@@ -1195,9 +1195,8 @@ const TRIP_DATA = {
     ]
   },
 
-  /* 記帳資料已改存於 repo 根目錄的 expenses.json：
-     頁面載入時 fetch 讀取，並可在記帳頁直接新增／編輯／刪除，
-     透過 GitHub Contents API 寫回（需在「同步設定」貼入 fine-grained PAT）。 */
+  /* 記帳資料存於 Firebase Firestore（trips/{id}/expenses），登入 Google 後即時同步；
+     repo 根目錄的 expenses.json 僅保留作歷史備份，頁面不再寫入。 */
   expenses: null
 };
 </script>
