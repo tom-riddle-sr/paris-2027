@@ -1,6 +1,6 @@
 {
  "version": 1,
- "updatedAt": "2026-07-31T06:53:06.478Z",
+ "updatedAt": "2026-07-31T08:04:09.698Z",
  "expenses": [
   {
    "id": "ms8l5rms-ahprks",
@@ -12,6 +12,27 @@
    "payer": "漂亮西西",
    "note": "",
    "createdAt": "2026-07-31T06:53:05.956Z"
+  },
+  {
+   "id": "ms8np538-thifgr",
+   "name": "test",
+   "amountEUR": 1,
+   "amountTWD": 37,
+   "inputCurrency": "EUR",
+   "rate": 37.324462,
+   "rateDate": "2026-07-31",
+   "amount": 1,
+   "currency": "EUR",
+   "status": "已付款",
+   "category": "事前花費",
+   "payer": "Rongjia Chang",
+   "note": "",
+   "recordedBy": {
+    "name": "Rongjia Chang",
+    "email": "lotichang3980@gmail.com",
+    "picture": "https://lh3.googleusercontent.com/a/ACg8ocL_x12aLIWQqCE9QFS_j7E4TZ6cEJaPadllbBPmQngkRk3m4A=s96-c"
+   },
+   "createdAt": "2026-07-31T08:04:09.092Z"
   }
  ]
 }
