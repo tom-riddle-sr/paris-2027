@@ -2069,13 +2069,13 @@ const TRIP_DATA = {
       const recAv = rec && rec.name
         ? '<span title="記錄：' + esc(rec.name) + (rec.email ? "（" + esc(rec.email) + "）" : "") + '">' + authAv(rec, "rec-av") + '</span>'
         : '';
-      rows += '<tr><td>' + recAv + esc(e.name)
+      rows += '<tr><td>' + esc(e.name)
         + (queuedIds.has(e.id) ? ' <span class="exp-pending">●未同步</span>' : '') + '</td>'
         + '<td class="amt">' + (e.amountEUR != null ? "EUR " + fmtMoney(e.amountEUR) : '<span class="muted">—</span>')
         + '<br><span class="muted">' + (e.amountTWD != null ? "TWD " + fmtMoney(e.amountTWD) : "—") + '</span></td>'
         + '<td><span class="badge ' + badgeCls(e.status) + '">' + esc(e.status) + '</span></td>'
         + '<td><span class="chip">' + esc(e.category) + '</span></td>'
-        + '<td>' + ic("user", "sm ic-terra") + ' ' + esc(e.payer) + '</td>'
+        + '<td>' + (recAv || ic("user", "sm ic-terra") + ' ') + esc(e.payer) + '</td>'
         + '<td class="muted">' + esc(e.note) + '</td>'
         + '<td class="acts"><button type="button" class="row-act" data-edit="' + esc(e.id) + '" title="編輯">' + ic("edit", "sm") + '</button>'
         + '<button type="button" class="row-act del" data-del="' + esc(e.id) + '" title="刪除">' + ic("trash", "sm") + '</button></td></tr>';
