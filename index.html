@@ -442,6 +442,27 @@
   .gsi-host{display:flex;justify-content:center;margin:14px 0 4px;min-height:44px;}
   .lock-btn{margin-left:4px;margin-right:4px;}
 
+  /* ===== 記帳手機卡片式列表（<640px 以卡片取代橫向捲動表格） ===== */
+  .exp-cards{display:none;}
+  @media(max-width:639px){
+    #exp-table .table-wrap{display:none;}
+    .exp-cards{display:flex;flex-direction:column;gap:10px;}
+  }
+  .exp-card{
+    position:relative;border:1px solid var(--line-soft);background:#fff;
+    padding:12px 14px 11px;
+  }
+  .exp-card .xc-acts{position:absolute;top:9px;right:8px;}
+  .exp-card .xc-head{display:flex;align-items:center;flex-wrap:wrap;gap:8px;padding-right:64px;}
+  .exp-card .xc-name{font-weight:600;font-size:.95rem;line-height:1.45;}
+  .exp-card .xc-amt{margin-top:6px;font-size:1.02rem;font-weight:600;letter-spacing:.01em;}
+  .exp-card .xc-amt .sub{font-size:.8rem;font-weight:400;color:var(--soft);margin-left:8px;}
+  .exp-card .xc-meta{
+    display:flex;align-items:center;flex-wrap:wrap;gap:6px 10px;
+    margin-top:9px;padding-top:9px;border-top:1px solid var(--line-soft);
+    font-size:.85rem;color:var(--soft);
+  }
+
   /* ===== 敏感資料鎖定 ===== */
   .lock-btn{
     appearance:none;cursor:pointer;margin-top:12px;
@@ -1755,8 +1776,6 @@ const TRIP_DATA = {
       btn.innerHTML = ic("user", "sm") + ' 使用 Google 登入';
       btn.title = "";
     }
-    const f = $("#exp-form");
-    if (f && p && !f.elements.payer.value) f.elements.payer.value = p.name;
   }
   const authBtn = $("#auth-btn");
   if (authBtn) authBtn.addEventListener("click", () => {
@@ -1914,9 +1933,22 @@ const TRIP_DATA = {
   const EXP = {
     list: [],            // 目前快照（含本機樂觀更新）
     pendingIds: new Set(), // 尚未寫進伺服器的 doc id
-    loaded: false, error: "", unsub: null,
+    loaded: false, error: "", unsub: null, unsubCfg: null,
+    customCats: [],      // 自訂分類（Firestore trips/{id}/meta/config.categories，旅伴共用）
     migratable: null     // null=尚未檢查；[]=無可匯入；[...]=可一鍵匯入的舊 expenses.json 記錄
   };
+  /* 預設分類固定不可刪；自訂分類接在後面，最後永遠是「＋新增分類」 */
+  const CATS_DEFAULT = ["事前花費"].concat(TRIP_DATA.days.map((d, i) => "第" + (i + 1) + "天")).concat(["其他"]);
+  function rebuildCats() {
+    const f = $("#exp-form");
+    if (!f) return;
+    const sel = f.elements.category;
+    const cur = sel.value;
+    const all = CATS_DEFAULT.concat(EXP.customCats.filter(c => CATS_DEFAULT.indexOf(c) < 0));
+    sel.innerHTML = all.map(c => '<option>' + esc(c) + '</option>').join('')
+      + '<option value="__add__">＋新增分類</option>';
+    if (cur && all.indexOf(cur) >= 0) sel.value = cur;
+  }
   const lsGet = (k, d) => { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch (e) { return d; } };
   const lsSet = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} };
 
@@ -1981,8 +2013,21 @@ const TRIP_DATA = {
   /* 登入後掛 onSnapshot 即時監聽（含離線快取與樂觀更新）；登出即拆除並清畫面 */
   function expWatch() {
     if (EXP.unsub) { EXP.unsub(); EXP.unsub = null; }
+    if (EXP.unsubCfg) { EXP.unsubCfg(); EXP.unsubCfg = null; }
     EXP.list = []; EXP.pendingIds = new Set(); EXP.loaded = false; EXP.error = ""; EXP.migratable = null;
+    EXP.customCats = [];
+    rebuildCats();
     if (!FB.user) { refreshExpenses(); return; }
+    /* 自訂分類：共用設定文件即時同步（規則未開放 meta 路徑時靜默略過） */
+    EXP.unsubCfg = FB.fs.onSnapshot(
+      FB.fs.doc(FB.db, "trips", TRIP_DATA.id, "meta", "config"),
+      s => {
+        const dd = s.data();
+        EXP.customCats = (dd && Array.isArray(dd.categories)) ? dd.categories.filter(x => typeof x === "string" && x.trim()) : [];
+        rebuildCats();
+      },
+      () => {}
+    );
     EXP.unsub = FB.fs.onSnapshot(
       FB.fs.collection(FB.db, "trips", TRIP_DATA.id, "expenses"),
       { includeMetadataChanges: true },
@@ -2077,7 +2122,7 @@ const TRIP_DATA = {
       + '</div>';
 
     const badgeCls = s => s === "已付款" ? "paid" : s === "待付款" ? "pending" : s === "已退款" ? "refund" : "other";
-    let rows = "";
+    let rows = "", cards = "";
     list.forEach(e => {
       /* 記錄者頭像：新格式 recordedBy={name,email,picture}；舊字串格式僅取名字 */
       const rb = e.recordedBy;
@@ -2085,16 +2130,30 @@ const TRIP_DATA = {
       const recAv = rec && rec.name
         ? '<span title="記錄：' + esc(rec.name) + (rec.email ? "（" + esc(rec.email) + "）" : "") + '">' + authAv(rec, "rec-av") + '</span>'
         : '';
-      rows += '<tr><td>' + esc(e.name)
-        + (queuedIds.has(e.id) ? ' <span class="exp-pending">●未同步</span>' : '') + '</td>'
+      const pend = queuedIds.has(e.id) ? ' <span class="exp-pending">●未同步</span>' : '';
+      const actBtns = '<button type="button" class="row-act" data-edit="' + esc(e.id) + '" title="編輯">' + ic("edit", "sm") + '</button>'
+        + '<button type="button" class="row-act del" data-del="' + esc(e.id) + '" title="刪除">' + ic("trash", "sm") + '</button>';
+      rows += '<tr><td>' + esc(e.name) + pend + '</td>'
         + '<td class="amt">' + (e.amountEUR != null ? "EUR " + fmtMoney(e.amountEUR) : '<span class="muted">—</span>')
         + '<br><span class="muted">' + (e.amountTWD != null ? "TWD " + fmtMoney(e.amountTWD) : "—") + '</span></td>'
         + '<td><span class="badge ' + badgeCls(e.status) + '">' + esc(e.status) + '</span></td>'
         + '<td><span class="chip">' + esc(e.category) + '</span></td>'
         + '<td>' + (recAv || ic("user", "sm ic-terra") + ' ') + esc(e.payer) + '</td>'
         + '<td class="muted">' + esc(e.note) + '</td>'
-        + '<td class="acts"><button type="button" class="row-act" data-edit="' + esc(e.id) + '" title="編輯">' + ic("edit", "sm") + '</button>'
-        + '<button type="button" class="row-act del" data-del="' + esc(e.id) + '" title="刪除">' + ic("trash", "sm") + '</button></td></tr>';
+        + '<td class="acts">' + actBtns + '</td></tr>';
+      /* 手機卡片：項目＋分類 / 雙幣金額 / 付款人・狀態・日期 */
+      const dm = String(e.createdAt || "").match(/^\d{4}-(\d{2})-(\d{2})/);
+      const dstr = dm ? (+dm[1]) + "/" + (+dm[2]) : "";
+      cards += '<div class="exp-card">'
+        + '<div class="xc-acts">' + actBtns + '</div>'
+        + '<div class="xc-head"><span class="xc-name">' + esc(e.name) + '</span><span class="chip">' + esc(e.category) + '</span></div>'
+        + '<div class="xc-amt">' + (e.amountEUR != null ? "EUR " + fmtMoney(e.amountEUR) : '<span class="muted">EUR —</span>')
+        + '<span class="sub">TWD ' + (e.amountTWD != null ? fmtMoney(e.amountTWD) : "—") + '</span></div>'
+        + '<div class="xc-meta">' + (recAv || ic("user", "sm ic-terra") + ' ') + '<span>' + esc(e.payer) + '</span>'
+        + '<span class="badge ' + badgeCls(e.status) + '">' + esc(e.status) + '</span>'
+        + (dstr ? '<span>' + dstr + '</span>' : '')
+        + (e.note ? '<span>' + esc(e.note) + '</span>' : '') + pend + '</div>'
+        + '</div>';
     });
     /* 一次性遷移：Firestore 為空且舊 expenses.json 有記錄 → 提供匯入按鈕 */
     const migBar = (EXP.loaded && !list.length && EXP.migratable && EXP.migratable.length)
@@ -2109,7 +2168,10 @@ const TRIP_DATA = {
       + '</tr></thead><tbody>'
       + (rows || '<tr><td colspan="7" class="muted" style="text-align:center;padding:26px;white-space:normal;">' + emptyMsg + '</td></tr>')
       + '</tbody></table></div>'
-      + '<p class="muted" style="margin-top:10px;">＊表格可左右滑動；「已退款」不計入統計。</p>';
+      + '<div class="exp-cards">'
+      + (cards || '<div class="muted" style="text-align:center;padding:20px 8px;">' + emptyMsg + '</div>')
+      + '</div>'
+      + '<p class="muted" style="margin-top:10px;">＊「已退款」不計入統計。</p>';
 
     if (badge) {
       if (EXP.error) badge.innerHTML = ic("alert", "sm ic-terra") + ' ' + esc(EXP.error);
@@ -2123,7 +2185,6 @@ const TRIP_DATA = {
 
   (function renderMoney() {
     const p = panel("money");
-    const cats = ["事前花費"].concat(TRIP_DATA.days.map((d, i) => "第" + (i + 1) + "天")).concat(["其他"]);
     p.innerHTML =
       '<div class="card"><h3>' + secTitle("01", "新增花費", "Add Expense", "plus")
       + '<span class="en" id="exp-sync-badge" style="cursor:pointer;"></span></h3>'
@@ -2132,8 +2193,7 @@ const TRIP_DATA = {
       + '<div class="ef-f"><label>金額 EUR €</label><input name="amountEUR" type="number" step="0.01" min="0" inputmode="decimal"></div>'
       + '<div class="ef-f"><label>金額 TWD NT$</label><input name="amountTWD" type="number" step="1" min="0" inputmode="decimal"></div>'
       + '<div class="ef-f"><label>狀態</label><select name="status"><option>已付款</option><option>待付款</option><option>已退款</option></select></div>'
-      + '<div class="ef-f"><label>分類</label><select name="category">' + cats.map(c => '<option>' + c + '</option>').join('') + '</select></div>'
-      + '<div class="ef-f"><label>誰付的</label><input name="payer" autocomplete="off"></div>'
+      + '<div class="ef-f"><label>分類</label><select name="category"></select></div>'
       + '<div class="ef-f ef-note"><label>備註</label><input name="note" autocomplete="off"></div>'
       + '</div><div class="muted" id="fx-note" style="margin-top:8px;"></div>'
       + '<div class="ef-actions">'
@@ -2147,6 +2207,28 @@ const TRIP_DATA = {
     const form = $("#exp-form", p);
     const fe = n => form.elements[n];
     let editingId = null;
+    rebuildCats();
+    /* 「＋新增分類」：輸入即用並寫入共用設定（arrayUnion 併發安全），未登入先登入 */
+    let lastCat = CATS_DEFAULT[0];
+    fe("category").addEventListener("change", () => {
+      const v = fe("category").value;
+      if (v !== "__add__") { lastCat = v; return; }
+      const revert = () => { fe("category").value = lastCat; };
+      if (!authProfile()) { revert(); openAuthModal(); return; }
+      const name = (prompt("新分類名稱：") || "").trim();
+      if (!name || name === "__add__") { revert(); return; }
+      if (CATS_DEFAULT.indexOf(name) < 0 && EXP.customCats.indexOf(name) < 0) {
+        EXP.customCats.push(name); // 樂觀更新，snapshot 回來會覆蓋成伺服器版本
+        if (FB.ready && FB.user) {
+          FB.fs.setDoc(FB.fs.doc(FB.db, "trips", TRIP_DATA.id, "meta", "config"),
+            { categories: FB.fs.arrayUnion(name) }, { merge: true })
+            .catch(err => { EXP.error = String(err && err.code || err); refreshExpenses(); });
+        }
+      }
+      rebuildCats();
+      fe("category").value = name;
+      lastCat = name;
+    });
     /* 雙幣即時換算：輸入任一欄補另一欄；被手動改過的欄不再覆蓋 */
     const touched = { EUR: false, TWD: false };
     let lastInput = "EUR";
@@ -2163,10 +2245,10 @@ const TRIP_DATA = {
     const resetForm = () => {
       editingId = null; form.reset();
       touched.EUR = touched.TWD = false; lastInput = "EUR";
+      rebuildCats(); // form.reset 後回到第一個分類，並清掉可能殘留的 __add__ 選取
+      lastCat = fe("category").value;
       $("#exp-submit", p).textContent = "新增";
       $("#exp-cancel", p).style.display = "none";
-      const u = authProfile();
-      if (u) fe("payer").value = u.name;
     };
     const doSubmit = () => {
       const prev = editingId ? expNorm(expList().find(x => x.id === editingId) || {}) : null;
@@ -2187,8 +2269,9 @@ const TRIP_DATA = {
         amount: lastInput === "TWD" ? (isNaN(twd) ? null : Math.round(twd)) : (isNaN(eur) ? null : eur),
         currency: lastInput,
         status: fe("status").value,
-        category: fe("category").value,
-        payer: fe("payer").value.trim(),
+        category: fe("category").value === "__add__" ? lastCat : fe("category").value,
+        /* 誰付的＝登入者；編輯既有記錄時保留原付款人 */
+        payer: prev ? (prev.payer || (u ? u.name : "")) : (u ? u.name : ""),
         note: fe("note").value.trim(),
         recordedBy: u ? { name: u.name, email: u.email, picture: u.picture || "" } : null,
         createdAt: (prev && prev.createdAt) || new Date().toISOString()
@@ -2218,7 +2301,14 @@ const TRIP_DATA = {
         fe("amountEUR").value = item.amountEUR != null ? item.amountEUR : "";
         fe("amountTWD").value = item.amountTWD != null ? item.amountTWD : "";
         fe("status").value = item.status;
-        fe("category").value = item.category; fe("payer").value = item.payer; fe("note").value = item.note;
+        rebuildCats();
+        if (item.category && !Array.from(fe("category").options).some(o => o.value === item.category)) {
+          /* 舊記錄的分類已不在清單（例如自訂分類被移除）→ 臨時補一個選項讓編輯不跳類 */
+          const o = document.createElement("option"); o.textContent = item.category;
+          fe("category").insertBefore ? fe("category").insertBefore(o, fe("category").lastElementChild) : fe("category").appendChild(o);
+        }
+        fe("category").value = item.category; lastCat = item.category;
+        fe("note").value = item.note;
         $("#exp-submit", p).textContent = "更新";
         $("#exp-cancel", p).style.display = "";
         if (form.scrollIntoView) form.scrollIntoView({ behavior: "smooth", block: "center" });
