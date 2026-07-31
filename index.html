@@ -540,9 +540,19 @@ const TRIP_DATA = {
   /* 旅伴護照資料屬敏感資訊，已移入 secure 加密區（見下方 secure 欄位說明） */
   travelers: [],
 
-  /* Google 登入用 OAuth Client ID（Google Cloud Console 建立「網頁應用程式」憑證後填入字串）。
-     null 時登入按鈕顯示灰態「Google 登入尚未設定」，全站其他功能照常。 */
+  /* Google 登入用 OAuth Client ID（GIS 按鈕），登入後以 ID token 橋接 Firebase Auth */
   googleClientId: "875899276811-cnic2ah0usubru127q9c7jir5hgqjj8o.apps.googleusercontent.com",
+
+  /* Firebase 專案設定（web config 屬公開資訊，安全性由 Firestore 規則與 Auth 把關）：
+     記帳資料存 Firestore trips/{id}/expenses，離線持久化＋即時同步 */
+  firebase: {
+    apiKey: "AIzaSyBxhir4enuWAZ1ccRLa7Yopj6BGo7Sgohw",
+    authDomain: "paris-2027.firebaseapp.com",
+    projectId: "paris-2027",
+    storageBucket: "paris-2027.firebasestorage.app",
+    messagingSenderId: "875899276811",
+    appId: "1:875899276811:web:9c1a2e2d2fac1532f6c10e"
+  },
 
   /* 多段轉機：flights 為陣列，每段一筆 */
   flights: [
@@ -1632,11 +1642,45 @@ const TRIP_DATA = {
   });
   refreshSecure();
 
-  /* ---------- Google 帳號登入（Google Identity Services；僅身分識別用途，非安全驗證） ---------- */
-  const AUTH_K = "trip::" + TRIP_DATA.id + "::gprofile";
-  const authProfile = () => {
-    try { return JSON.parse(localStorage.getItem(AUTH_K)) || null; } catch (e) { return null; }
-  };
+  /* ---------- Google 帳號登入：GIS 按鈕取得 ID token → 橋接 Firebase Auth ---------- */
+  /* Firebase：動態 import CDN modular SDK（app/auth/firestore，不含 analytics）。
+     載入失敗（斷網、舊瀏覽器）時 FB.failed=true，登入按鈕轉灰態，其餘頁面照常。 */
+  const FB = { auth: null, authM: null, fs: null, db: null, user: null, ready: false, failed: false };
+  const authProfile = () => FB.user
+    ? { name: FB.user.displayName || FB.user.email || "旅伴", email: FB.user.email || "", picture: FB.user.photoURL || "" }
+    : null;
+  async function fbInit() {
+    try {
+      const V = "https://www.gstatic.com/firebasejs/12.17.0/";
+      const [appM, authM, fsM] = await Promise.all([
+        import(V + "firebase-app.js"),
+        import(V + "firebase-auth.js"),
+        import(V + "firebase-firestore.js")
+      ]);
+      const app = appM.initializeApp(TRIP_DATA.firebase);
+      FB.authM = authM;
+      FB.fs = fsM;
+      FB.auth = authM.getAuth(app);
+      try {
+        FB.db = fsM.initializeFirestore(app, { localCache: fsM.persistentLocalCache() });
+      } catch (e) {
+        FB.db = fsM.getFirestore(app); // 無痕模式等 IndexedDB 不可用 → 退回記憶體快取
+      }
+      FB.ready = true;
+      authM.onAuthStateChanged(FB.auth, u => {
+        FB.user = u || null;
+        refreshAuth();
+        expWatch();
+        const box = $(".auth-modal");
+        if (u && box) box.remove();
+        if (u && authPendingCb) { const cb = authPendingCb; authPendingCb = null; cb(); }
+      });
+    } catch (e) {
+      FB.failed = true;
+      refreshAuth();
+      refreshExpenses();
+    }
+  }
   /* 頭像 HTML：img 載入失敗時退回字母圓點 */
   const authAv = (p, cls) => {
     const letter = '<span class="' + cls + '">' + esc(String(p.name || "?").slice(0, 1).toUpperCase()) + '</span>';
@@ -1645,27 +1689,20 @@ const TRIP_DATA = {
       + ' onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'inline-flex\';">'
       + '<span class="' + cls + '" style="display:none;">' + esc(String(p.name || "?").slice(0, 1).toUpperCase()) + '</span>';
   };
-  const parseJwt = t => {
-    try {
-      const b = t.split(".")[1].replace(/-/g, "+").replace(/_/g, "/");
-      return JSON.parse(decodeURIComponent(Array.from(atob(b), c =>
-        "%" + ("0" + c.charCodeAt(0).toString(16)).slice(-2)).join("")));
-    } catch (e) { return null; }
-  };
   let gsiReady = false;
   let authPendingCb = null;
-  function onGoogleCred(resp) {
-    const p = resp && resp.credential ? parseJwt(resp.credential) : null;
-    if (!p || !p.email) return;
+  /* GIS 回呼：拿 ID token 換 Firebase 憑證登入（之後由 onAuthStateChanged 驅動 UI） */
+  async function onGoogleCred(resp) {
+    if (!resp || !resp.credential) return;
+    for (let i = 0; i < 50 && !FB.ready && !FB.failed; i++) await new Promise(r => setTimeout(r, 100));
+    if (!FB.ready) return;
     try {
-      localStorage.setItem(AUTH_K, JSON.stringify({
-        name: p.name || p.email, email: p.email, picture: p.picture || ""
-      }));
-    } catch (e) {}
-    const box = $(".auth-modal");
-    if (box) box.remove();
-    refreshAuth();
-    if (authPendingCb) { const cb = authPendingCb; authPendingCb = null; cb(); }
+      const cred = FB.authM.GoogleAuthProvider.credential(resp.credential);
+      await FB.authM.signInWithCredential(FB.auth, cred);
+    } catch (e) {
+      const box = $(".auth-modal .muted");
+      if (box) box.textContent = "登入失敗：" + String(e && e.code || e) + "，請再試一次。";
+    }
   }
   function gsiInit() {
     if (gsiReady || !TRIP_DATA.googleClientId) return gsiReady;
@@ -1695,9 +1732,8 @@ const TRIP_DATA = {
     });
   }
   function authLogout() {
-    try { localStorage.removeItem(AUTH_K); } catch (e) {}
     if (gsiReady) { try { google.accounts.id.disableAutoSelect(); } catch (e) {} }
-    refreshAuth();
+    if (FB.ready) { try { FB.authM.signOut(FB.auth); } catch (e) {} } // onAuthStateChanged 會刷新 UI
   }
   function refreshAuth() {
     const btn = $("#auth-btn");
@@ -1707,6 +1743,10 @@ const TRIP_DATA = {
       btn.classList.remove("auth-off");
       btn.innerHTML = authAv(p, "auth-av") + esc(p.name) + '・登出';
       btn.title = esc(p.email);
+    } else if (FB.failed) {
+      btn.classList.add("auth-off");
+      btn.innerHTML = ic("user", "sm") + ' 登入服務載入失敗';
+      btn.title = "";
     } else if (!TRIP_DATA.googleClientId) {
       btn.classList.add("auth-off");
       btn.innerHTML = ic("user", "sm") + ' Google 登入尚未設定';
@@ -1725,6 +1765,7 @@ const TRIP_DATA = {
     openAuthModal();
   });
   refreshAuth();
+  fbInit();
 
   /* ---------- Lightbox：點 .lb 圖片全螢幕放大，再點關閉 ---------- */
   document.addEventListener("click", e => {
@@ -1870,19 +1911,12 @@ const TRIP_DATA = {
     initCarousels(p);
   });
 
-  /* ==================== 4. 記帳（expenses.json ＋ GitHub Contents API 同步） ==================== */
+  /* ==================== 4. 記帳（Firebase Firestore：onSnapshot 即時同步＋內建離線持久化） ==================== */
   const EXP = {
-    repo: "tom-riddle-sr/paris-2027",
-    path: "expenses.json",
-    api: "https://api.github.com/repos/tom-riddle-sr/paris-2027/contents/expenses.json",
-    doc: { version: 1, updatedAt: "", expenses: [] }, // 最後一次已知的遠端內容
-    queue: [],                                        // 未同步操作：{type:"upsert",item} / {type:"delete",id}
-    offline: false, syncing: false, lastError: "",
-    K: {
-      token: "trip::" + TRIP_DATA.id + "::ghtoken",
-      cache: "trip::" + TRIP_DATA.id + "::expenses-cache",
-      queue: "trip::" + TRIP_DATA.id + "::expenses-queue"
-    }
+    list: [],            // 目前快照（含本機樂觀更新）
+    pendingIds: new Set(), // 尚未寫進伺服器的 doc id
+    loaded: false, error: "", unsub: null,
+    migratable: null     // null=尚未檢查；[]=無可匯入；[...]=可一鍵匯入的舊 expenses.json 記錄
   };
   const lsGet = (k, d) => { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch (e) { return d; } };
   const lsSet = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} };
@@ -1941,98 +1975,81 @@ const TRIP_DATA = {
     n.rateDate = FX.rate ? FX.date + "（自動補算）" : null;
     return n;
   }
-  const getToken = () => { try { return localStorage.getItem(EXP.K.token) || ""; } catch (e) { return ""; } };
   const newId = () => Date.now().toString(36) + "-" + Math.random().toString(36).slice(2, 8);
-  const utf8b64 = s => btoa(unescape(encodeURIComponent(s)));
-  const b64utf8 = s => decodeURIComponent(escape(atob(String(s).replace(/\n/g, ""))));
+  const expList = () => EXP.list;
+  const expDocRef = id => FB.fs.doc(FB.db, "trips", TRIP_DATA.id, "expenses", id);
 
-  /* 以 id 合併：把佇列中的操作套到清單上（衝突重試時對最新遠端內容重放） */
-  const expApply = (list, ops) => {
-    let out = (list || []).slice();
-    ops.forEach(op => {
-      if (op.type === "delete") out = out.filter(x => x.id !== op.id);
-      else {
-        const i = out.findIndex(x => x.id === op.item.id);
-        if (i >= 0) out[i] = op.item; else out.push(op.item);
-      }
-    });
-    return out;
-  };
-  const expList = () => expApply(EXP.doc.expenses, EXP.queue);
-
-  async function expLoad() {
-    const cached = lsGet(EXP.K.cache, null);
-    if (cached) EXP.doc = cached;
-    EXP.queue = lsGet(EXP.K.queue, []);
-    try {
-      const r = await fetch(EXP.path + "?ts=" + Date.now(), { cache: "no-store" });
-      if (!r.ok) throw new Error(r.status);
-      EXP.doc = await r.json();
-      EXP.offline = false;
-      lsSet(EXP.K.cache, EXP.doc);
-    } catch (e) {
-      EXP.offline = true; // file:// 或斷網 → 用快取
-    }
-    refreshExpenses();
-    if (EXP.queue.length && getToken()) expSync();
+  /* 登入後掛 onSnapshot 即時監聽（含離線快取與樂觀更新）；登出即拆除並清畫面 */
+  function expWatch() {
+    if (EXP.unsub) { EXP.unsub(); EXP.unsub = null; }
+    EXP.list = []; EXP.pendingIds = new Set(); EXP.loaded = false; EXP.error = ""; EXP.migratable = null;
+    if (!FB.user) { refreshExpenses(); return; }
+    EXP.unsub = FB.fs.onSnapshot(
+      FB.fs.collection(FB.db, "trips", TRIP_DATA.id, "expenses"),
+      { includeMetadataChanges: true },
+      snap => {
+        EXP.list = snap.docs.map(d => d.data())
+          .sort((a, b) => String(a.createdAt || "").localeCompare(String(b.createdAt || "")));
+        EXP.pendingIds = new Set(snap.docs.filter(d => d.metadata.hasPendingWrites).map(d => d.id));
+        EXP.loaded = true; EXP.error = "";
+        if (!snap.size && EXP.migratable === null) expCheckMigrate();
+        refreshExpenses();
+      },
+      err => { EXP.error = String(err && err.code || err); EXP.loaded = true; refreshExpenses(); }
+    );
   }
 
-  function expEnqueue(op, msg) {
-    EXP.queue.push(op);
-    lsSet(EXP.K.queue, EXP.queue);
-    refreshExpenses(); // 樂觀更新
-    expSync(msg);
+  /* Firestore 為空時檢查舊 expenses.json（repo 保留當歷史備份，頁面不再寫入） */
+  async function expCheckMigrate() {
+    EXP.migratable = [];
+    try {
+      const r = await fetch("expenses.json?ts=" + Date.now(), { cache: "no-store" });
+      if (r.ok) {
+        const j = await r.json();
+        if (j && Array.isArray(j.expenses) && j.expenses.length) EXP.migratable = j.expenses;
+      }
+    } catch (e) { /* 拿不到就不提供匯入 */ }
+    refreshExpenses();
+  }
+  async function expMigrate() {
+    if (!FB.user || !EXP.migratable || !EXP.migratable.length) return;
+    try {
+      const batch = FB.fs.writeBatch(FB.db);
+      EXP.migratable.forEach(e => {
+        const id = e.id || newId();
+        batch.set(expDocRef(id), Object.assign({}, e, { id: id }));
+      });
+      EXP.migratable = [];
+      refreshExpenses();
+      await batch.commit();
+    } catch (e) { EXP.error = "匯入失敗：" + String(e && e.code || e); refreshExpenses(); }
   }
 
-  async function expSync(msg) {
-    if (EXP.syncing) return;
-    if (!EXP.queue.length) { refreshExpenses(); return; }
-    const token = getToken();
-    if (!token) { refreshExpenses(); return; }
-    EXP.syncing = true; EXP.lastError = ""; refreshExpenses();
-    const H = { "Authorization": "Bearer " + token, "Accept": "application/vnd.github+json" };
-    try {
-      for (let attempt = 0; attempt < 3; attempt++) {
-        let sha = null, remote = { version: 1, updatedAt: "", expenses: [] };
-        const g = await fetch(EXP.api + "?ts=" + Date.now(), { headers: H, cache: "no-store" });
-        if (g.status === 200) {
-          const j = await g.json();
-          sha = j.sha;
-          try { remote = JSON.parse(b64utf8(j.content)); } catch (e) {}
-        } else if (g.status !== 404) throw new Error("讀取失敗 HTTP " + g.status);
-        const merged = {
-          version: 1,
-          updatedAt: new Date().toISOString(),
-          expenses: expApply(remote.expenses, EXP.queue)
-        };
-        const body = {
-          message: msg || ("expenses: sync " + EXP.queue.length + " change(s)"),
-          content: utf8b64(JSON.stringify(merged, null, 1))
-        };
-        if (sha) body.sha = sha;
-        const p = await fetch(EXP.api, { method: "PUT", headers: H, body: JSON.stringify(body) });
-        if (p.ok) {
-          EXP.doc = merged; EXP.queue = [];
-          lsSet(EXP.K.cache, EXP.doc); lsSet(EXP.K.queue, EXP.queue);
-          EXP.offline = false;
-          break;
-        }
-        if (p.status === 409 || p.status === 422) continue; // sha 衝突 → 重抓最新內容以 id 合併後重試
-        throw new Error("寫入失敗 HTTP " + p.status);
-      }
-      if (EXP.queue.length && !EXP.lastError) EXP.lastError = "同步衝突重試 3 次仍失敗，稍後再試";
-    } catch (e) {
-      EXP.lastError = String(e && e.message || e);
-    }
-    EXP.syncing = false;
-    refreshExpenses();
+  /* 寫入/刪除：不 await 伺服器回應（離線時由本機快取樂觀更新，回線自動送出） */
+  function expUpsert(item) {
+    if (!FB.ready || !FB.user) return;
+    FB.fs.setDoc(expDocRef(item.id), item).catch(e => { EXP.error = String(e && e.code || e); refreshExpenses(); });
+  }
+  function expDelete(id) {
+    if (!FB.ready || !FB.user) return;
+    FB.fs.deleteDoc(expDocRef(id)).catch(e => { EXP.error = String(e && e.code || e); refreshExpenses(); });
   }
 
   function refreshExpenses() {
     const stats = $("#exp-stats"), table = $("#exp-table");
     if (!stats || !table) return;
+    const badge = $("#exp-sync-badge");
+
+    /* 未登入：不顯示資料（Firestore 規則也會擋），提示先登入 */
+    if (!FB.user) {
+      stats.innerHTML = "";
+      table.innerHTML = '<div class="muted" style="text-align:center;padding:34px 12px;">'
+        + ic("user", "sm") + ' 登入後可記帳與查看</div>';
+      if (badge) badge.innerHTML = ic("key", "sm") + (FB.failed ? ' 登入服務載入失敗' : ' 未登入');
+      return;
+    }
     const list = expList().map(expNorm);
-    const queuedIds = new Set(EXP.queue.map(o => o.type === "delete" ? o.id : o.item.id));
+    const queuedIds = EXP.pendingIds;
 
     const addTo = (map, key, cur, amt) => {
       if (amt == null || isNaN(amt)) return;
@@ -2080,24 +2097,29 @@ const TRIP_DATA = {
         + '<td class="acts"><button type="button" class="row-act" data-edit="' + esc(e.id) + '" title="編輯">' + ic("edit", "sm") + '</button>'
         + '<button type="button" class="row-act del" data-del="' + esc(e.id) + '" title="刪除">' + ic("trash", "sm") + '</button></td></tr>';
     });
-    table.innerHTML = '<div class="table-wrap"><table class="expense"><thead><tr>'
+    /* 一次性遷移：Firestore 為空且舊 expenses.json 有記錄 → 提供匯入按鈕 */
+    const migBar = (EXP.loaded && !list.length && EXP.migratable && EXP.migratable.length)
+      ? '<div style="text-align:center;padding:16px 0 6px;">'
+        + '<button type="button" class="ef-submit" id="exp-migrate">匯入既有 ' + EXP.migratable.length + ' 筆記錄</button>'
+        + '<p class="muted" style="margin-top:8px;">把舊 expenses.json 的記錄一次寫入雲端資料庫（原檔保留作歷史備份）</p></div>'
+      : '';
+    const emptyMsg = EXP.loaded ? "尚無記帳資料，用上方表單記第一筆吧！" : "載入中…";
+    table.innerHTML = migBar
+      + '<div class="table-wrap"><table class="expense"><thead><tr>'
       + '<th>項目名稱</th><th>金額</th><th>Status</th><th>分類</th><th>誰付的</th><th>備註</th><th></th>'
       + '</tr></thead><tbody>'
-      + (rows || '<tr><td colspan="7" class="muted" style="text-align:center;padding:26px;white-space:normal;">尚無記帳資料，用上方表單記第一筆吧！</td></tr>')
+      + (rows || '<tr><td colspan="7" class="muted" style="text-align:center;padding:26px;white-space:normal;">' + emptyMsg + '</td></tr>')
       + '</tbody></table></div>'
       + '<p class="muted" style="margin-top:10px;">＊表格可左右滑動；「已退款」不計入統計。</p>';
 
-    const badge = $("#exp-sync-badge");
     if (badge) {
-      if (!getToken()) badge.innerHTML = ic("key", "sm")
-        + (EXP.queue.length ? ' ' + EXP.queue.length + ' 筆未同步（無 token）' : ' 無 token（變更僅存本機）');
-      else if (EXP.syncing) badge.innerHTML = ic("sync", "sm") + ' 同步中…';
-      else if (EXP.queue.length) badge.innerHTML = ic("alert", "sm ic-gold") + ' ' + EXP.queue.length + ' 筆未同步（點此重試）';
-      else if (EXP.lastError) badge.innerHTML = ic("alert", "sm ic-terra") + ' ' + esc(EXP.lastError);
-      else badge.innerHTML = ic("check", "sm ic-sage") + ' 已同步';
+      if (EXP.error) badge.innerHTML = ic("alert", "sm ic-terra") + ' ' + esc(EXP.error);
+      else if (queuedIds.size) badge.innerHTML = ic("sync", "sm") + ' ' + queuedIds.size + ' 筆待同步（回線自動送出）';
+      else if (EXP.loaded) badge.innerHTML = ic("check", "sm ic-sage") + ' 雲端即時同步';
+      else badge.innerHTML = ic("sync", "sm") + ' 連線中…';
     }
     const off = $("#exp-offline");
-    if (off) off.textContent = EXP.offline ? "離線資料（快取）" : "";
+    if (off) off.textContent = "";
   }
 
   (function renderMoney() {
@@ -2121,19 +2143,7 @@ const TRIP_DATA = {
       + '</div></form></div>'
       + '<div class="card"><h3>' + secTitle("02", "花費總覽", "Overview", "wallet")
       + '<span class="en" id="exp-offline"></span></h3>'
-      + '<div id="exp-stats" class="stats"></div><div id="exp-table"></div></div>'
-      + '<div class="card"><h3>' + secTitle("03", "同步設定", "GitHub Sync", "key") + '</h3>'
-      + '<p class="muted" style="margin-bottom:12px;">記帳資料存在 GitHub repo（' + esc(EXP.repo) + '）的 expenses.json。'
-      + '要從網頁直接寫入，需要一組只授權此 repo 的 fine-grained Personal Access Token（權限：Contents — Read and write）。'
-      + 'Token 只存在這台裝置的瀏覽器 localStorage，不會出現在網頁原始碼或任何伺服器。</p>'
-      + '<div class="ef-grid"><div class="ef-f ef-name"><label>GitHub Token</label>'
-      + '<input id="gh-token" type="password" placeholder="github_pat_..." autocomplete="off"></div></div>'
-      + '<div class="ef-actions">'
-      + '<span class="muted" id="token-status" style="margin-right:auto;"></span>'
-      + '<button type="button" class="ef-cancel" id="token-clear">清除</button>'
-      + '<button type="button" class="ef-cancel" id="token-test">測試連線</button>'
-      + '<button type="button" class="ef-submit" id="token-save">儲存</button>'
-      + '</div></div>';
+      + '<div id="exp-stats" class="stats"></div><div id="exp-table"></div></div>';
 
     const form = $("#exp-form", p);
     const fe = n => form.elements[n];
@@ -2184,21 +2194,20 @@ const TRIP_DATA = {
         recordedBy: u ? { name: u.name, email: u.email, picture: u.picture || "" } : null,
         createdAt: (prev && prev.createdAt) || new Date().toISOString()
       };
-      const amtStr = lastInput === "TWD" ? "TWD " + (item.amountTWD || 0) : "EUR " + (item.amountEUR || 0);
-      const msg = "expense: " + (prev ? "更新 " : "") + item.name + " " + amtStr + (u ? " by " + u.name : "");
       resetForm();
-      expEnqueue({ type: "upsert", item: item }, msg);
+      expUpsert(item);
     };
     form.addEventListener("submit", e => {
       e.preventDefault();
-      /* 已設定 Google 登入但尚未登入：提示先登入，登入成功後自動送出 */
-      if (!authProfile() && TRIP_DATA.googleClientId) { openAuthModal(doSubmit); return; }
+      /* 記帳一律需登入（Firestore 規則也要求 request.auth），登入成功後自動送出 */
+      if (!authProfile()) { openAuthModal(doSubmit); return; }
       doSubmit();
     });
     $("#exp-cancel", p).addEventListener("click", resetForm);
 
     $("#exp-table", p).addEventListener("click", e => {
       const eb = e.target.closest("[data-edit]"), db = e.target.closest("[data-del]");
+      if (e.target.closest("#exp-migrate")) { expMigrate(); return; }
       if (eb) {
         const raw = expList().find(x => x.id === eb.dataset.edit);
         if (!raw) return;
@@ -2216,42 +2225,13 @@ const TRIP_DATA = {
         if (form.scrollIntoView) form.scrollIntoView({ behavior: "smooth", block: "center" });
       } else if (db) {
         const item = expList().find(x => x.id === db.dataset.del);
-        if (item && confirm("刪除「" + item.name + "」？")) {
-          expEnqueue({ type: "delete", id: item.id }, "expense: 刪除 " + item.name);
-        }
+        if (item && confirm("刪除「" + item.name + "」？")) expDelete(item.id);
       }
     });
 
-    const tokStatus = t => { $("#token-status", p).textContent = t != null ? t : (getToken() ? "Token 已設定（僅存於此裝置）" : "尚未設定 Token"); };
-    $("#token-save", p).addEventListener("click", () => {
-      const v = $("#gh-token", p).value.trim();
-      if (!v) { tokStatus("請先貼入 Token 再按儲存"); return; }
-      try { localStorage.setItem(EXP.K.token, v); } catch (e) {}
-      $("#gh-token", p).value = "";
-      tokStatus(); refreshExpenses();
-      if (EXP.queue.length) expSync();
-    });
-    $("#token-clear", p).addEventListener("click", () => {
-      try { localStorage.removeItem(EXP.K.token); } catch (e) {}
-      tokStatus(); refreshExpenses();
-    });
-    $("#token-test", p).addEventListener("click", async () => {
-      const t = getToken();
-      if (!t) { tokStatus("尚未設定 Token"); return; }
-      tokStatus("測試中…");
-      try {
-        const r = await fetch("https://api.github.com/repos/" + EXP.repo,
-          { headers: { "Authorization": "Bearer " + t, "Accept": "application/vnd.github+json" } });
-        tokStatus(r.status === 200 ? "連線 OK（" + EXP.repo + "）" : "驗證失敗 HTTP " + r.status);
-      } catch (e) { tokStatus("連線失敗（離線？）"); }
-    });
-    tokStatus();
-
-    $("#exp-sync-badge", p).addEventListener("click", () => expSync());
-    window.addEventListener("online", () => expSync());
     resetForm();
     fxLoad();
-    expLoad();
+    refreshExpenses(); // 先畫未登入態；登入後由 onAuthStateChanged → expWatch 接手
   })();
 
   activate("info");
