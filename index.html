@@ -199,6 +199,15 @@
   .spot .stay .ic{margin-right:5px;}
   .spot .body{padding:14px 0 0;}
   .spot .intro{font-size:.95rem;}
+  .spot .intro p{margin:0 0 7px;}
+  .spot .intro p:last-child{margin-bottom:0;}
+  .wx-overall{font-size:.9rem;margin-bottom:14px;}
+  .wx-overall p{margin:0 0 5px;}
+  .ss-dress .dl{margin-bottom:7px;}
+  .ss-dress .dl:last-child{margin-bottom:0;}
+  .kv .v .vl{margin-bottom:5px;}
+  .kv .v .vl:last-child{margin-bottom:0;}
+  .tr-when > div{margin-bottom:3px;}
 
   /* ===== Carousel ===== */
   .carousel{position:relative;}
@@ -634,7 +643,12 @@ const TRIP_DATA = {
 
   /* 每日天氣概況（2 月平均預估：依巴黎歷年氣候，出發前請再查即時預報） */
   weather: {
-    overall: "（2 月平均預估）巴黎 2 月為冬季：均溫約 2–8°C、相對濕度約 81%、每月約 13 天有雨、偶有降雪，白天約 10 小時。以下為氣候平均值，非即時預報。",
+    overall: [
+      "巴黎 2 月為冬季（以下為氣候平均值，非即時預報）",
+      "均溫約 2–8°C，相對濕度約 81%",
+      "每月約 13 天有雨，偶有降雪",
+      "白天約 10 小時"
+    ],
     daily: [
       { date: "2027-02-03", desc: "多雲偶雨（預估）", tempMin: 2, tempMax: 8, humidity: "82%", rain: "45%" },
       { date: "2027-02-04", desc: "多雲偶雨（預估）", tempMin: 2, tempMax: 8, humidity: "82%", rain: "45%" },
@@ -652,7 +666,13 @@ const TRIP_DATA = {
 
   sun: { sunrise: "約 08:05（2 月上旬平均預估）", sunset: "約 18:05（2 月上旬平均預估）" },
 
-  clothing: "（依 2 月平均氣候預估）巴黎冬天濕冷、日夜都在 10 度以下：洋蔥式穿法，發熱衣＋毛衣＋防風保暖大衣，圍巾、手套、毛帽必備；常下小雨，帶摺疊傘並穿防水好走的鞋。博物館與商場室內暖氣強，外套選好穿脫的。",
+  clothing: [
+    "巴黎冬天濕冷，日夜都在 10 度以下（依 2 月平均氣候預估）",
+    "洋蔥式穿搭：發熱衣＋毛衣＋防風保暖大衣",
+    "必帶：圍巾、手套、毛帽",
+    "常下小雨：帶摺疊傘，穿防水好走的鞋",
+    "博物館與商場室內暖氣強：外套選好穿脫的"
+  ],
 
   /* 行前準備清單：Notion 未提供行前清單，以下為依巴黎行程產生的建議項目，可自行增刪 */
   prep: [
@@ -703,7 +723,11 @@ const TRIP_DATA = {
           mapQuery: "Cathédrale Notre-Dame de Paris",
           stay: "11:30–13:00",
           images: [ "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b4/Cath%C3%A9drale_Notre-Dame_de_Paris%2C_20_March_2014.jpg/960px-Cath%C3%A9drale_Notre-Dame_de_Paris%2C_20_March_2014.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7a/Paris%2C_Notre_Dame_--_2014_--_1477.jpg/960px-Paris%2C_Notre_Dame_--_2014_--_1477.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d8/North_rose_window_of_Notre-Dame_de_Paris%2C_Aug_2010.jpg/960px-North_rose_window_of_Notre-Dame_de_Paris%2C_Aug_2010.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d0/Notre-Dame_de_Paris_and_%C3%8Ele_de_la_Cit%C3%A9_at_dusk_140516_1.jpg/960px-Notre-Dame_de_Paris_and_%C3%8Ele_de_la_Cit%C3%A9_at_dusk_140516_1.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/1/18/Cathedrale_Notre-Dame_de_Paris_nef_nouvelles_cloches.jpg/960px-Cathedrale_Notre-Dame_de_Paris_nef_nouvelles_cloches.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c2/Cath%C3%A9drale_Notre-Dame_de_Paris_-_15.jpg/960px-Cath%C3%A9drale_Notre-Dame_de_Paris_-_15.jpg" ],
-          intro: "西堤島上的哥德式大教堂，巴黎的心臟。修復後重新開放，玫瑰花窗與飛扶壁是必看重點。當天清晨抵達 CDG，搭 RER B 進市區、飯店放行李後前往。",
+          intro: [
+            "西堤島上的哥德式大教堂，巴黎的心臟",
+            "修復後重新開放，必看玫瑰花窗與飛扶壁",
+            "當天清晨抵達 CDG，搭 RER B 進市區、放完行李再過來"
+          ],
           notice: {
             ticket: "入場免費，建議 App 預約時段（塔樓另收費）",
             hours: "約 08:00–19:00，以官網為準",
@@ -716,7 +740,11 @@ const TRIP_DATA = {
           mapQuery: "Sainte-Chapelle Paris",
           stay: "13:15–14:15",
           images: [ "https://upload.wikimedia.org/wikipedia/commons/thumb/3/36/Sainte_Chapelle_Interior_Stained_Glass.jpg/960px-Sainte_Chapelle_Interior_Stained_Glass.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Santa_Capilla%2C_Par%C3%ADs%2C_Francia%2C_2022-11-01%2C_DD_80-82_HDR.jpg/960px-Santa_Capilla%2C_Par%C3%ADs%2C_Francia%2C_2022-11-01%2C_DD_80-82_HDR.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/7/79/Sainte-Chapelle%2C_Paris%2C_upper_chapel_rose.jpg/960px-Sainte-Chapelle%2C_Paris%2C_upper_chapel_rose.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/1/12/Sainte-Chapelle_%28Upper_chapel%29.jpg/960px-Sainte-Chapelle_%28Upper_chapel%29.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/1/18/Stained_Glass_%40_Chapelle_Haute_%40_Sainte-Chapelle_%40_Paris_%2829435839634%29.jpg/960px-Stained_Glass_%40_Chapelle_Haute_%40_Sainte-Chapelle_%40_Paris_%2829435839634%29.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d5/Paris%2C_Sainte-Chapelle%2C_Obere_Kapelle%2C_Innenansicht_%2817%29.jpg/960px-Paris%2C_Sainte-Chapelle%2C_Obere_Kapelle%2C_Innenansicht_%2817%29.jpg" ],
-          intro: "13 世紀的皇家禮拜堂，上層 15 面巨型彩繪玻璃牆是巴黎最震撼的室內景之一，晴天下午光線最美。",
+          intro: [
+            "13 世紀的皇家禮拜堂",
+            "上層 15 面巨型彩繪玻璃牆，巴黎最震撼的室內景之一",
+            "晴天下午光線最美"
+          ],
           notice: {
             ticket: "需門票約 €13，建議預約時段票，以官網為準",
             hours: "約 09:00–17:00（冬季），以官網為準",
@@ -729,7 +757,11 @@ const TRIP_DATA = {
           mapQuery: "Île Saint-Louis Paris",
           stay: "14:15–17:00",
           images: [ "https://upload.wikimedia.org/wikipedia/commons/thumb/6/68/Bouquinistes_in_Paris_%2822890464511%29.jpg/960px-Bouquinistes_in_Paris_%2822890464511%29.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c2/Paris_75005_Quai_de_Montebello_Bouquinistes_20071014.jpg/960px-Paris_75005_Quai_de_Montebello_Bouquinistes_20071014.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/Ile_Saint-Louis_from_Pont_Sully%40_Paris_%2829769949642%29.jpg/960px-Ile_Saint-Louis_from_Pont_Sully%40_Paris_%2829769949642%29.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2d/Paris_ile_Cite_ile_Saint_Louis_pont_Tournelle.jpg/960px-Paris_ile_Cite_ile_Saint_Louis_pont_Tournelle.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/8/87/Pont_de_la_Tournelle%2C_Paris_3_April_2016.jpg/960px-Pont_de_la_Tournelle%2C_Paris_3_April_2016.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/9/99/Pont_de_la_Tournelle_%2850299826243%29.jpg/960px-Pont_de_la_Tournelle_%2850299826243%29.jpg" ],
-          intro: "沿塞納河邊逛 Bouquinistes 綠色舊書攤，過橋到聖路易島吃 Berthillon 冰淇淋、鑽小巷，步調放慢的下午。",
+          intro: [
+            "沿塞納河邊逛 Bouquinistes 綠色舊書攤",
+            "過橋到聖路易島吃 Berthillon 冰淇淋、鑽小巷",
+            "步調放慢的下午"
+          ],
           notice: {
             ticket: "免門票",
             hours: "舊書攤約中午後陸續開張、日落前收",
@@ -748,7 +780,11 @@ const TRIP_DATA = {
           mapQuery: "Marché des Enfants Rouges Paris",
           stay: "10:00–12:00",
           images: [ "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b5/March%C3%A9_des_Enfants-Rouges%2C_Paris_July_2014.jpg/960px-March%C3%A9_des_Enfants-Rouges%2C_Paris_July_2014.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2e/March%C3%A9_des_Enfants-Rouges%2C_Paris_May_2016.jpg/960px-March%C3%A9_des_Enfants-Rouges%2C_Paris_May_2016.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a9/Vegetables_at_the_March%C3%A9_des_Enfants_Rouges.jpg/960px-Vegetables_at_the_March%C3%A9_des_Enfants_Rouges.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4b/Paris_III-March%C3%A9_des_Enfants_rouges-Entr%C3%A9e_Nord_Est.jpg/960px-Paris_III-March%C3%A9_des_Enfants_rouges-Entr%C3%A9e_Nord_Est.jpg" ],
-          intro: "巴黎現存最老的室內市集（1615 年），摩洛哥塔吉鍋、日式便當、法式熟食攤一字排開，當地人買菜吃午餐的地方。",
+          intro: [
+            "巴黎現存最老的室內市集（1615 年）",
+            "摩洛哥塔吉鍋、日式便當、法式熟食攤一字排開",
+            "當地人買菜吃午餐的地方"
+          ],
           notice: {
             ticket: "免門票",
             hours: "約 08:30–20:30，週一公休（2/4 為週四正常營業），以現場為準",
@@ -761,7 +797,10 @@ const TRIP_DATA = {
           mapQuery: "Marché des Enfants Rouges Paris",
           stay: "12:00–13:30",
           images: [ "https://upload.wikimedia.org/wikipedia/commons/thumb/5/50/Dijon_Covered_Market_%288%29.jpg/960px-Dijon_Covered_Market_%288%29.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a6/Fromagerie_Murand_-_March%C3%A9_Saint-Pierre_%28Caen%29_2025-03-30.jpg/960px-Fromagerie_Murand_-_March%C3%A9_Saint-Pierre_%28Caen%29_2025-03-30.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b2/Green_and_white_asparagus_on_a_market_stall_in_France_%2854479163981%29.jpg/960px-Green_and_white_asparagus_on_a_market_stall_in_France_%2854479163981%29.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/0/03/Fresh_fish_displayed_on_a_market_stall_at_the_port_in_Antibes%2C_France_%2854479363589%29.jpg/960px-Fresh_fish_displayed_on_a_market_stall_at_the_port_in_Antibes%2C_France_%2854479363589%29.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/8/81/Paris_street_market_stall_-_charcuterie_counter_2.jpg/960px-Paris_street_market_stall_-_charcuterie_counter_2.jpg" ],
-          intro: "直接在紅孩兒市集裡挑一攤吃午餐，熱門攤位 12 點後開始排隊，早點卡位。",
+          intro: [
+            "直接在紅孩兒市集裡挑一攤吃午餐",
+            "熱門攤位 12 點後開始排隊，早點卡位"
+          ],
           notice: {
             ticket: "免門票（餐費另計）",
             hours: "午餐時段 12:00–14:00 最熱鬧",
@@ -774,7 +813,11 @@ const TRIP_DATA = {
           mapQuery: "Place des Vosges Paris",
           stay: "13:30–17:30",
           images: [ "https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/Plaza_de_los_Vosgos%2C_Par%C3%ADs%2C_Francia%2C_2022-10-30%2C_DD_58.jpg/960px-Plaza_de_los_Vosgos%2C_Par%C3%ADs%2C_Francia%2C_2022-10-30%2C_DD_58.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7e/Paris_3e_Place_des_Vosges_Arcades_896.jpg/960px-Paris_3e_Place_des_Vosges_Arcades_896.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fa/P1140395_Paris_IV_place_des_Vosges_arcades_Est_rwk.JPG/960px-P1140395_Paris_IV_place_des_Vosges_arcades_Est_rwk.JPG", "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7e/H%C3%B4tel_H%C3%A9rouet%2C_Le_Marais%2C_Paris_May_2017.jpg/960px-H%C3%B4tel_H%C3%A9rouet%2C_Le_Marais%2C_Paris_May_2017.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/b/bb/H%C3%B4tel_de_Sully_07-2.jpg/960px-H%C3%B4tel_de_Sully_07-2.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/1/12/Sully_Garten.JPG/960px-Sully_Garten.JPG" ],
-          intro: "巴黎最有味道的老街區：設計小店、古著、甜點與畫廊。不指定路線，看到店就逛，最後走到巴黎最古老的皇家廣場——孚日廣場。",
+          intro: [
+            "巴黎最有味道的老街區",
+            "設計小店、古著、甜點與畫廊，看到店就逛",
+            "最後走到巴黎最古老的皇家廣場——孚日廣場"
+          ],
           notice: {
             ticket: "免門票",
             hours: "店家大多 11:00–19:00；瑪黑是巴黎少數週日也熱鬧的區",
@@ -793,7 +836,11 @@ const TRIP_DATA = {
           mapQuery: "Musée d'Orsay Paris",
           stay: "09:30–12:30",
           images: [ "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6f/Horloge_mus%C3%A9e_d%27Orsay.jpg/960px-Horloge_mus%C3%A9e_d%27Orsay.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Musee_d_Orsay_main_hall_Paris_2023_dllu.jpg/960px-Musee_d_Orsay_main_hall_Paris_2023_dllu.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/1/11/Mus%C3%A9e_d%27Orsay_clock%2C_Paris_May_2015.jpg/960px-Mus%C3%A9e_d%27Orsay_clock%2C_Paris_May_2015.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/Paris_75007_Mus%C3%A9e_d%27Orsay_Grande_nef_centrale_20180704.jpg/960px-Paris_75007_Mus%C3%A9e_d%27Orsay_Grande_nef_centrale_20180704.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1c/North_side_of_Orsay_Museum_building%2C_4_August_2007.jpg/960px-North_side_of_Orsay_Museum_building%2C_4_August_2007.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0c/Musee_d%27Orsay_and_Pont_Royal%2C_North-West_view_140402_1.jpg/960px-Musee_d%27Orsay_and_Pont_Royal%2C_North-West_view_140402_1.jpg" ],
-          intro: "由火車站改建的美術館，印象派最強館藏：莫內、雷諾瓦、梵谷、米勒都在這裡。頂層大鐘窗是經典拍照點。",
+          intro: [
+            "由火車站改建的美術館",
+            "印象派最強館藏：莫內、雷諾瓦、梵谷、米勒都在這裡",
+            "頂層大鐘窗是經典拍照點"
+          ],
           notice: {
             ticket: "需門票約 €16，官網預售免排隊，以官網為準",
             hours: "09:30–18:00，週一休館（2/5 為週五正常開放；週四夜間延長），以官網為準",
@@ -806,7 +853,10 @@ const TRIP_DATA = {
           mapQuery: "Saint-Germain-des-Prés Paris",
           stay: "12:30–14:00",
           images: [ "https://upload.wikimedia.org/wikipedia/commons/thumb/6/69/Caf%C3%A9_de_Flore%2C_172_boulevard_Saint-Germain%2C_Paris_6e.jpg/960px-Caf%C3%A9_de_Flore%2C_172_boulevard_Saint-Germain%2C_Paris_6e.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/2/26/Caf%C3%A9_de_Flore%2C_Paris_25_September_2019_02.jpg/960px-Caf%C3%A9_de_Flore%2C_Paris_25_September_2019_02.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/Caf%C3%A9_de_Flore%2C_Paris_25_September_2019_01.jpg/960px-Caf%C3%A9_de_Flore%2C_Paris_25_September_2019_01.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c8/Les_Deux_Magots%2C_25_September_2019.jpg/960px-Les_Deux_Magots%2C_25_September_2019.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/8/82/Les_Deux_Magots%2C_Paris_March_2009.jpg/960px-Les_Deux_Magots%2C_Paris_March_2009.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7d/Cafe_de_Flore%2C_Paris_4_June_2015.jpg/960px-Cafe_de_Flore%2C_Paris_4_June_2015.jpg" ],
-          intro: "奧賽附近或過河到聖日耳曼區用餐，老牌咖啡館 Café de Flore、Les Deux Magots 都在步行範圍。",
+          intro: [
+            "奧賽附近或過河到聖日耳曼區用餐",
+            "老牌咖啡館 Café de Flore、Les Deux Magots 都在步行範圍"
+          ],
           notice: {
             ticket: "餐費另計",
             hours: "多數餐廳 12:00–14:30 供應午餐",
@@ -819,7 +869,11 @@ const TRIP_DATA = {
           mapQuery: "Saint-Germain-des-Prés Paris",
           stay: "14:00–17:30",
           images: [ "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2f/Abad%C3%ADa_de_Saint-Germain-des-Pr%C3%A9s%2C_Par%C3%ADs%2C_Francia%2C_2022-11-01%2C_DD_20-22_HDR.jpg/960px-Abad%C3%ADa_de_Saint-Germain-des-Pr%C3%A9s%2C_Par%C3%ADs%2C_Francia%2C_2022-11-01%2C_DD_20-22_HDR.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/4/47/Nave_of_Abbaye_de_Saint-Germain-des-Pr%C3%A9s%2C_Paris%2C_France_-_Diliff.jpg/960px-Nave_of_Abbaye_de_Saint-Germain-des-Pr%C3%A9s%2C_Paris%2C_France_-_Diliff.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/9/96/Th%C3%A9%C3%A2tre_de_l%27Od%C3%A9on%2C_place_Paul-Claudel%2C_Paris_6e_2.jpg/960px-Th%C3%A9%C3%A2tre_de_l%27Od%C3%A9on%2C_place_Paul-Claudel%2C_Paris_6e_2.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fa/Rue_de_Buci%2C_Paris_6_October_2017_01.jpg/960px-Rue_de_Buci%2C_Paris_6_October_2017_01.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/6/67/Terrace_cafe%2C_Rue_de_Buci%2C_Paris_July_2010.jpg/960px-Terrace_cafe%2C_Rue_de_Buci%2C_Paris_July_2010.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/6/60/Boulevard_Saint-Germain%2C_Paris_5e_1.jpg/960px-Boulevard_Saint-Germain%2C_Paris_5e_1.jpg" ],
-          intro: "左岸文人區：百年咖啡館、獨立書店、精品小店慢慢逛，感受巴黎的知性面。",
+          intro: [
+            "左岸文人區",
+            "百年咖啡館、獨立書店、精品小店慢慢逛",
+            "感受巴黎的知性面"
+          ],
           notice: {
             ticket: "免門票",
             hours: "店家大多 10:00–19:00",
@@ -838,7 +892,12 @@ const TRIP_DATA = {
           mapQuery: "Marché d'Aligre Paris",
           stay: "08:30–11:00",
           images: [ "https://upload.wikimedia.org/wikipedia/commons/thumb/4/49/March%C3%A9_dAligre_3.jpg/960px-March%C3%A9_dAligre_3.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b1/March%C3%A9_dAligre_4.jpg/960px-March%C3%A9_dAligre_4.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2f/March%C3%A9_Couvert_Beauvau_-_Paris_XII_%28FR75%29_-_2021-05-23_-_1.jpg/960px-March%C3%A9_Couvert_Beauvau_-_Paris_XII_%28FR75%29_-_2021-05-23_-_1.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/8/89/March%C3%A9_Beauvau_int%C3%A9rieur.jpg/960px-March%C3%A9_Beauvau_int%C3%A9rieur.jpg" ],
-          intro: "巴黎在地人氣早市，露天蔬果攤＋室內 Beauvau 市場，價格親民、氣氛熱鬧，是感受巴黎日常的最佳地點。",
+          intro: [
+            "巴黎在地人氣早市",
+            "露天蔬果攤＋室內 Beauvau 市場",
+            "價格親民、氣氛熱鬧",
+            "感受巴黎日常的最佳地點"
+          ],
           notice: {
             ticket: "免門票",
             hours: "約 08:00–13:00，週一公休（2/6 為週六最熱鬧），以現場為準",
@@ -851,7 +910,10 @@ const TRIP_DATA = {
           mapQuery: "Marché d'Aligre Paris",
           stay: "11:00–12:00",
           images: [ "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8f/Paris-Rue_Mouffetard-106-Fromagerie-2017-gje.jpg/960px-Paris-Rue_Mouffetard-106-Fromagerie-2017-gje.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/5/58/Pezenas_Market_-_Cheese_stall_-_Flickr_-_MajiksBox_-_resting.jpg/960px-Pezenas_Market_-_Cheese_stall_-_Flickr_-_MajiksBox_-_resting.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b2/Paris_-_Fromagerie_Laurent_Dubois.jpg/960px-Paris_-_Fromagerie_Laurent_Dubois.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/2/26/Vitrine_dans_une_fromagerie_%2834051774134%29.jpg/960px-Vitrine_dans_une_fromagerie_%2834051774134%29.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c7/Paris_10e_Rue_Beaurepaire_Boulangerie_653.jpg/960px-Paris_10e_Rue_Beaurepaire_Boulangerie_653.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/4/46/Boulangerie_de_Saint-Maurice-de-Beynost_%28Ain%2C_France%29_-_des_baguettes_de_pain.JPG/960px-Boulangerie_de_Saint-Maurice-de-Beynost_%28Ain%2C_France%29_-_des_baguettes_de_pain.JPG" ],
-          intro: "在市場採買起司、長棍麵包、火腿與水果，湊一頓道地的法式野餐午餐。",
+          intro: [
+            "在市場採買起司、長棍麵包、火腿與水果",
+            "湊一頓道地的法式野餐午餐"
+          ],
           notice: {
             ticket: "食材費另計",
             hours: "市場內／步行採買",
@@ -864,7 +926,11 @@ const TRIP_DATA = {
           mapQuery: "Place de la Bastille Paris",
           stay: "12:00–17:00",
           images: [ "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7e/Place_de_la_Bastille%2C_avril_2021.jpg/960px-Place_de_la_Bastille%2C_avril_2021.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5f/Place_de_la_Bastille_depuis_l%27Op%C3%A9ra.jpg/960px-Place_de_la_Bastille_depuis_l%27Op%C3%A9ra.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c6/Side_View_of_the_Op%C3%A9ra_Bastille.jpg/960px-Side_View_of_the_Op%C3%A9ra_Bastille.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/5/55/Column_of_Place_de_la_Bastille%2C_Port_de_l%27Arsenal%2C_Paris_January_2017.jpg/960px-Column_of_Place_de_la_Bastille%2C_Port_de_l%27Arsenal%2C_Paris_January_2017.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/0/07/Paris_port_Arsenal.jpg/960px-Paris_port_Arsenal.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a3/Paris_port_jardin_Arsenal.jpg/960px-Paris_port_jardin_Arsenal.jpg" ],
-          intro: "用剛買的食材簡單午餐後，往巴士底方向慢逛：11 區的咖啡店、小酒館與設計店，是巴黎年輕人的地盤。",
+          intro: [
+            "用剛買的食材簡單午餐",
+            "往巴士底方向慢逛",
+            "11 區的咖啡店、小酒館與設計店，是巴黎年輕人的地盤"
+          ],
           notice: {
             ticket: "免門票",
             hours: "午餐 12:00–13:30，慢逛 13:30–17:00",
@@ -883,7 +949,11 @@ const TRIP_DATA = {
           mapQuery: "Château de Versailles",
           stay: "09:30–12:30",
           images: [ "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f1/Chateau_Versailles_Galerie_des_Glaces.jpg/960px-Chateau_Versailles_Galerie_des_Glaces.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/2/23/Garden_facade_of_the_Palace_of_Versailles_2.jpg/960px-Garden_facade_of_the_Palace_of_Versailles_2.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8a/Parterre_du_Midi_Garden_pond_and_Palace_of_Versailles_at_golden_hour_with_blue_sky_in_France.jpg/960px-Parterre_du_Midi_Garden_pond_and_Palace_of_Versailles_at_golden_hour_with_blue_sky_in_France.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/2/23/Palace_of_Versailles_Royal_Chapel_%2828281918971%29.jpg/960px-Palace_of_Versailles_Royal_Chapel_%2828281918971%29.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/3/37/Versailles_Chapel_-_July_2006_edit.jpg/960px-Versailles_Chapel_-_July_2006_edit.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/8/82/Salon_de_Mars_-_Grand_appartement_du_roi_%2824276158816%29.jpg/960px-Salon_de_Mars_-_Grand_appartement_du_roi_%2824276158816%29.jpg" ],
-          intro: "路易十四的太陽王宮殿，鏡廳、國王寢宮與皇家禮拜堂金碧輝煌，是巴黎近郊最重量級的一日行程。",
+          intro: [
+            "路易十四的太陽王宮殿",
+            "鏡廳、國王寢宮與皇家禮拜堂金碧輝煌",
+            "巴黎近郊最重量級的一日行程"
+          ],
           notice: {
             ticket: "需門票：Passport 票約 €24 起，務必官網預約時段，以官網為準",
             hours: "09:00–17:30（冬季），週一休館（2/7 為週日正常開放但人多，開門就進場），以官網為準",
@@ -896,7 +966,10 @@ const TRIP_DATA = {
           mapQuery: "Versailles France",
           stay: "12:30–13:30",
           images: [ "https://upload.wikimedia.org/wikipedia/commons/thumb/0/04/Ch%C3%A2teau_de_Versailles_au_lever_du_soleil_en_2013_13.jpg/960px-Ch%C3%A2teau_de_Versailles_au_lever_du_soleil_en_2013_13.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/2/29/Golden_Gate_%2846596387111%29.jpg/960px-Golden_Gate_%2846596387111%29.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f2/Statue_of_Louis_XIV_in_place_d%27armes_of_Versailles%2C_April_2011.jpg/960px-Statue_of_Louis_XIV_in_place_d%27armes_of_Versailles%2C_April_2011.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/9/90/Palace_of_Versailles_Gate.jpg/960px-Palace_of_Versailles_Gate.jpg" ],
-          intro: "宮殿周邊與凡爾賽鎮上有不少小館與麵包店，簡單解決午餐後回花園。",
+          intro: [
+            "宮殿周邊與凡爾賽鎮上有不少小館與麵包店",
+            "簡單解決午餐後回花園"
+          ],
           notice: {
             ticket: "餐費另計",
             hours: "12:00–14:00",
@@ -909,7 +982,11 @@ const TRIP_DATA = {
           mapQuery: "Grand Trianon Versailles",
           stay: "13:30–17:00",
           images: [ "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4b/Parc_de_Versailles%2C_parterre_de_Latone%2C_bassin_de_Latone_05.jpg/960px-Parc_de_Versailles%2C_parterre_de_Latone%2C_bassin_de_Latone_05.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/7/74/Ch%C3%A2teau_de_Versailles_%28Orangerie%29.jpg/960px-Ch%C3%A2teau_de_Versailles_%28Orangerie%29.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/5/51/Water_reflection_of_the_Orangerie_garden_and_Palace_of_Versailles_with_blue_sky_in_France.jpg/960px-Water_reflection_of_the_Orangerie_garden_and_Palace_of_Versailles_with_blue_sky_in_France.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7f/West_facade_of_Petit_Trianon_002.JPG/960px-West_facade_of_Petit_Trianon_002.JPG", "https://upload.wikimedia.org/wikipedia/commons/thumb/3/37/Salon_of_mirrors_with_royal_chandelier_in_the_Grand_Trianon_Domain_of_Versailles_France.jpg/960px-Salon_of_mirrors_with_royal_chandelier_in_the_Grand_Trianon_Domain_of_Versailles_France.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/0/05/Hameau_de_la_Reine_in_July_2022.jpg/960px-Hameau_de_la_Reine_in_July_2022.jpg" ],
-          intro: "下午逛幾何式大花園、大特里亞農與瑪麗安東尼的小特里亞農農莊，走累了可搭園內小火車。",
+          intro: [
+            "下午逛幾何式大花園",
+            "大特里亞農＋瑪麗安東尼的小特里亞農農莊",
+            "走累了可搭園內小火車"
+          ],
           notice: {
             ticket: "含在 Passport 票內；冬季花園多為免費開放（噴泉秀停演），以官網為準",
             hours: "花園 08:00–18:00；特里亞農 12:00 才開，以官網為準",
@@ -928,7 +1005,11 @@ const TRIP_DATA = {
           mapQuery: "Tour Eiffel Paris",
           stay: "09:30–12:00",
           images: [ "https://upload.wikimedia.org/wikipedia/commons/thumb/5/53/Eiffel_tower_from_trocadero.jpg/960px-Eiffel_tower_from_trocadero.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/a/af/Tour_eiffel_at_sunrise_from_the_trocadero.jpg/960px-Tour_eiffel_at_sunrise_from_the_trocadero.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/d/de/Eiffel_Tower_and_Pont_Alexandre_III_at_night.jpg/960px-Eiffel_Tower_and_Pont_Alexandre_III_at_night.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b7/Paris_-_The_Eiffel_Tower_in_spring_-_2307.jpg/960px-Paris_-_The_Eiffel_Tower_in_spring_-_2307.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/b/bd/Sous_la_Tour_Eiffel_1.jpg/960px-Sous_la_Tour_Eiffel_1.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/6/68/Details_of_Eiffel_Tower_structure%2C_south_pillar.jpg/960px-Details_of_Eiffel_Tower_structure%2C_south_pillar.jpg" ],
-          intro: "巴黎的代名詞。搭電梯上二層或頂層俯瞰全城，冬天早晨遊客較少、空氣通透，是登塔的好時段。",
+          intro: [
+            "巴黎的代名詞",
+            "搭電梯上二層或頂層俯瞰全城",
+            "冬天早晨遊客較少、空氣通透，是登塔的好時段"
+          ],
           notice: {
             ticket: "需門票：電梯至頂層約 €30、二層約 €19，官網約提前 2 個月開賣，以官網為準",
             hours: "約 09:30–23:00，以官網為準",
@@ -941,7 +1022,10 @@ const TRIP_DATA = {
           mapQuery: "Rue Cler Paris",
           stay: "12:00–13:30",
           images: [ "https://upload.wikimedia.org/wikipedia/commons/thumb/0/00/Fruit_shop%2C_Rue_Cler%2C_Paris_18_August_2016.jpg/960px-Fruit_shop%2C_Rue_Cler%2C_Paris_18_August_2016.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4b/March%C3%A9%2C_Rue_Cler%2C_75007_Paris%2C_France_2014.jpg/960px-March%C3%A9%2C_Rue_Cler%2C_75007_Paris%2C_France_2014.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/6/67/Terrace_cafe%2C_Rue_de_Buci%2C_Paris_July_2010.jpg/960px-Terrace_cafe%2C_Rue_de_Buci%2C_Paris_July_2010.jpg" ],
-          intro: "鐵塔周邊 7 區用餐，Rue Cler 市場街有輕食與熟食店可選。",
+          intro: [
+            "鐵塔周邊 7 區用餐",
+            "Rue Cler 市場街有輕食與熟食店可選"
+          ],
           notice: {
             ticket: "餐費另計",
             hours: "12:00–14:30",
@@ -954,7 +1038,11 @@ const TRIP_DATA = {
           mapQuery: "Champ de Mars Paris",
           stay: "13:30–17:00",
           images: [ "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8b/Eiffel_Tower_from_Champ-de-Mars%2C_7_August_2017.jpg/960px-Eiffel_Tower_from_Champ-de-Mars%2C_7_August_2017.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d2/Pont-Alexandre-III-et-Invalides.jpg/960px-Pont-Alexandre-III-et-Invalides.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/b/bd/Pont_Alexandre_III_-_01.jpg/960px-Pont_Alexandre_III_-_01.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5c/Pont_Alexandre_III_seen_from_the_Pont_des_Invalides_001.jpg/960px-Pont_Alexandre_III_seen_from_the_Pont_des_Invalides_001.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/7/75/Paris%2C_Pont_des_Arts_--_2014_--_1404.jpg/960px-Paris%2C_Pont_des_Arts_--_2014_--_1404.jpg" ],
-          intro: "從戰神廣場草坪回望鐵塔，沿塞納河散步到亞歷山大三世橋一帶，保留時間亂晃，走到哪算到哪。",
+          intro: [
+            "從戰神廣場草坪回望鐵塔",
+            "沿塞納河散步到亞歷山大三世橋一帶",
+            "保留時間亂晃，走到哪算到哪"
+          ],
           notice: {
             ticket: "免門票",
             hours: "全天開放",
@@ -973,7 +1061,11 @@ const TRIP_DATA = {
           mapQuery: "Palais Garnier Paris",
           stay: "10:00–11:30",
           images: [ "https://upload.wikimedia.org/wikipedia/commons/thumb/2/28/Monumental_stairway_of_the_palais_Garnier_opera_in_Paris.jpg/960px-Monumental_stairway_of_the_palais_Garnier_opera_in_Paris.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fb/Ceilings_of_the_palais_Garnier_opera_in_Paris%2C_05.jpg/960px-Ceilings_of_the_palais_Garnier_opera_in_Paris%2C_05.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/7/78/Palais_Garnier%27s_grand_salon%2C_12_February_2008.jpg/960px-Palais_Garnier%27s_grand_salon%2C_12_February_2008.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ef/Paris_Op%C3%A9ra_Garnier_Innen_Grand_Foyer_06.jpg/960px-Paris_Op%C3%A9ra_Garnier_Innen_Grand_Foyer_06.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/0/06/Palais_Garnier_auditorium_and_stage.jpg/960px-Palais_Garnier_auditorium_and_stage.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/1/12/West_facade_of_Palais_Garnier%2C_Paris_2017.jpg/960px-West_facade_of_Palais_Garnier%2C_Paris_2017.jpg" ],
-          intro: "《歌劇魅影》的舞台原型，金箔大階梯與夏卡爾天頂畫華麗到不真實，白天開放自由參觀。",
+          intro: [
+            "《歌劇魅影》的舞台原型",
+            "金箔大階梯與夏卡爾天頂畫華麗到不真實",
+            "白天開放自由參觀"
+          ],
           notice: {
             ticket: "參觀需門票約 €15，以官網為準",
             hours: "約 10:00–17:00，有排練或演出時部分區域關閉，以官網為準",
@@ -986,7 +1078,12 @@ const TRIP_DATA = {
           mapQuery: "Galeries Lafayette Haussmann Paris",
           stay: "11:45–14:00",
           images: [ "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c3/Galer%C3%ADas_Lafayette_Haussmann%2C_Par%C3%ADs%2C_Francia%2C_2022-10-31%2C_DD_11-13_HDR.jpg/960px-Galer%C3%ADas_Lafayette_Haussmann%2C_Par%C3%ADs%2C_Francia%2C_2022-10-31%2C_DD_11-13_HDR.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/9/95/Galeries_Lafayette_Paris_Dome_Detail.jpg/960px-Galeries_Lafayette_Paris_Dome_Detail.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d6/Galeries_Lafayette_Paris_Dome.jpg/960px-Galeries_Lafayette_Paris_Dome.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c7/Galeries_Lafayette_dome%2C_Paris.jpg/960px-Galeries_Lafayette_dome%2C_Paris.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6b/Galerie_Lafayette_Haussmann_Dome.jpg/960px-Galerie_Lafayette_Haussmann_Dome.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/5/59/Galeries_Lafayette_Haussmann_Inside.jpg/960px-Galeries_Lafayette_Haussmann_Inside.jpg" ],
-          intro: "巴黎最著名的百貨公司，新藝術風格彩繪玻璃穹頂必看；頂樓露台免費，可眺望歌劇院與鐵塔。午餐可在美食樓層解決。",
+          intro: [
+            "巴黎最著名的百貨公司",
+            "新藝術風格彩繪玻璃穹頂必看",
+            "頂樓露台免費，可眺望歌劇院與鐵塔",
+            "午餐可在美食樓層解決"
+          ],
           notice: {
             ticket: "免門票；頂樓觀景台免費",
             hours: "約 10:00–20:30，週日照常營業，以官網為準",
@@ -999,7 +1096,11 @@ const TRIP_DATA = {
           mapQuery: "Printemps Haussmann Paris",
           stay: "14:00–17:30",
           images: [ "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0d/Paris_9_-_Printemps_cupola_%281%29.jpg/960px-Paris_9_-_Printemps_cupola_%281%29.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/6/66/Paris_9_-_Printemps_cupola_%283%29.jpg/960px-Paris_9_-_Printemps_cupola_%283%29.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/1/18/Printemps-Paris.JPG/960px-Printemps-Paris.JPG", "https://upload.wikimedia.org/wikipedia/commons/thumb/4/45/Paris_Printemps_Haussmann_%2830890126292%29.jpg/960px-Paris_Printemps_Haussmann_%2830890126292%29.jpg" ],
-          intro: "沿奧斯曼大道逛春天百貨（Printemps）與周邊，這一帶是巴黎購物主戰場，藥妝與甜點伴手禮可在此補齊。",
+          intro: [
+            "沿奧斯曼大道逛春天百貨（Printemps）與周邊",
+            "這一帶是巴黎購物主戰場",
+            "藥妝與甜點伴手禮可在此補齊"
+          ],
           notice: {
             ticket: "免門票",
             hours: "百貨大多 10:00–20:00",
@@ -1018,7 +1119,11 @@ const TRIP_DATA = {
           mapQuery: "Musée du Louvre Paris",
           stay: "09:30–14:00",
           images: [ "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a2/Louvre_Courtyard%2C_Looking_West.jpg/960px-Louvre_Courtyard%2C_Looking_West.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/6/66/Louvre_Museum_Wikimedia_Commons.jpg/960px-Louvre_Museum_Wikimedia_Commons.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/2/28/Cour_Napol%C3%A9on_at_night_-_Louvre.jpg/960px-Cour_Napol%C3%A9on_at_night_-_Louvre.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/Grande_Galerie%2C_Louvre_Museum%2C_25_September_2019_01.jpg/960px-Grande_Galerie%2C_Louvre_Museum%2C_25_September_2019_01.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/b/bf/Victoire_de_Samothrace_-_Musee_du_Louvre_-_20190812.jpg/960px-Victoire_de_Samothrace_-_Musee_du_Louvre_-_20190812.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6a/Mona_Lisa.jpg/960px-Mona_Lisa.jpg" ],
-          intro: "世界最大博物館，蒙娜麗莎、勝利女神、米洛的維納斯三大鎮館必看。安排 4.5 小時挑重點走，德農館是精華動線。",
+          intro: [
+            "世界最大博物館",
+            "蒙娜麗莎、勝利女神、米洛的維納斯三大鎮館必看",
+            "安排 4.5 小時挑重點走，德農館是精華動線"
+          ],
           notice: {
             ticket: "需門票約 €22，務必官網預約時段；週二休館（2/10 為週三正常開放），以官網為準",
             hours: "09:00–18:00（部分晚間延長），以官網為準",
@@ -1031,7 +1136,10 @@ const TRIP_DATA = {
           mapQuery: "Palais-Royal Paris",
           stay: "14:00–15:00",
           images: [ "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a9/Librairie_Galignani%2C_au_224_rue_de_Rivoli%2C_Paris._.jpg/960px-Librairie_Galignani%2C_au_224_rue_de_Rivoli%2C_Paris._.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5d/Galignani_001.jpg/960px-Galignani_001.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/Rue_de_Rivoli_as_seen_from_the_Tour_Saint-Jacques%2C_11_August_2013.jpg/960px-Rue_de_Rivoli_as_seen_from_the_Tour_Saint-Jacques%2C_11_August_2013.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e4/Arcades%2C_Rue_de_Rivoli%2C_Paris_26_December_2016_001.jpg/960px-Arcades%2C_Rue_de_Rivoli%2C_Paris_26_December_2016_001.jpg" ],
-          intro: "羅浮宮周邊或 Rue de Rivoli 沿線用餐，宮內 Carrousel 美食街也可快速解決。",
+          intro: [
+            "羅浮宮周邊或 Rue de Rivoli 沿線用餐",
+            "宮內 Carrousel 美食街也可快速解決"
+          ],
           notice: {
             ticket: "餐費另計",
             hours: "12:00–15:00",
@@ -1044,7 +1152,11 @@ const TRIP_DATA = {
           mapQuery: "Jardin des Tuileries Paris",
           stay: "15:00–17:30",
           images: [ "https://upload.wikimedia.org/wikipedia/commons/thumb/0/00/Grand_bassin_octogonal_Jardin_des_Tuileries_003.jpg/960px-Grand_bassin_octogonal_Jardin_des_Tuileries_003.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7b/Paris_Chaises_jardin_des_Tuileries_2014.jpg/960px-Paris_Chaises_jardin_des_Tuileries_2014.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/d/da/Pavillon_de_Flore_from_the_Tuileries_Garden%2C_Paris_5_November_2019.jpg/960px-Pavillon_de_Flore_from_the_Tuileries_Garden%2C_Paris_5_November_2019.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c5/Paris_Jardin_des_Tuileries_printemps_2014.jpg/960px-Paris_Jardin_des_Tuileries_printemps_2014.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6d/Paris_-_Place_de_la_Concorde_-_3119.jpg/960px-Paris_-_Place_de_la_Concorde_-_3119.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/5/52/Luxor_Obelisk%2C_Place_de_la_Concorde%2C_Paris_2014.jpg/960px-Luxor_Obelisk%2C_Place_de_la_Concorde%2C_Paris_2014.jpg" ],
-          intro: "從羅浮宮沿杜樂麗花園的林蔭大道一路散步到協和廣場，冬日午後光線斜斜的，是巴黎最經典的散步軸線。",
+          intro: [
+            "從羅浮宮沿杜樂麗花園的林蔭大道散步到協和廣場",
+            "冬日午後光線斜斜的",
+            "巴黎最經典的散步軸線"
+          ],
           notice: {
             ticket: "免門票",
             hours: "花園冬季約 07:30–19:30",
@@ -1063,7 +1175,11 @@ const TRIP_DATA = {
           mapQuery: "Montmartre Paris",
           stay: "10:00–12:30",
           images: [ "https://upload.wikimedia.org/wikipedia/commons/thumb/2/22/Rue_de_l%27Abreuvoir%2C_Montmartre%2C_Paris_9_July_2015.jpg/960px-Rue_de_l%27Abreuvoir%2C_Montmartre%2C_Paris_9_July_2015.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/2/24/2022-04-11-La_Maison_Rose-8379.jpg/960px-2022-04-11-La_Maison_Rose-8379.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/2/23/La_Maison_Rose_in_Montmartre%2C_2_May_2018.jpg/960px-La_Maison_Rose_in_Montmartre%2C_2_May_2018.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/2022-04-12-Le_mur_des_je_t%27aime-8493.jpg/960px-2022-04-12-Le_mur_des_je_t%27aime-8493.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/2/22/Windmill%2C_Montmartre%2C_Paris_23_April_2017.jpg/960px-Windmill%2C_Montmartre%2C_Paris_23_April_2017.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/5/59/Montmartre_stairs%2C_Paris_26_May_2014.jpg/960px-Montmartre_stairs%2C_Paris_26_May_2014.jpg" ],
-          intro: "巴黎最有波希米亞氣息的山丘街區：愛牆、煎餅磨坊、《艾蜜莉的異想世界》咖啡館都在這裡，石板坡道隨便拍都好看。",
+          intro: [
+            "巴黎最有波希米亞氣息的山丘街區",
+            "愛牆、煎餅磨坊、《艾蜜莉的異想世界》咖啡館都在這裡",
+            "石板坡道隨便拍都好看"
+          ],
           notice: {
             ticket: "免門票",
             hours: "全天開放",
@@ -1076,7 +1192,11 @@ const TRIP_DATA = {
           mapQuery: "Basilique du Sacré-Cœur Montmartre Paris",
           stay: "12:30–14:00",
           images: [ "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Basilique_du_Sacr%C3%A9-C%C5%93ur_de_Montmartre_-_Paris_-_GT-01_-_2024.jpg/960px-Basilique_du_Sacr%C3%A9-C%C5%93ur_de_Montmartre_-_Paris_-_GT-01_-_2024.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d0/Paris_-_Basilique_du_Sacr%C3%A9-C%C5%93ur_de_Montmartre_-_2025-09-30_23-31-57_001.jpg/960px-Paris_-_Basilique_du_Sacr%C3%A9-C%C5%93ur_de_Montmartre_-_2025-09-30_23-31-57_001.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a9/Sacre_Coeur_cor_Jesu-DSC_1455w.jpg/960px-Sacre_Coeur_cor_Jesu-DSC_1455w.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Basilique_du_Sacr%C3%A9-C%C5%93ur_mosaic_of_the_Jesuit_Chapel_2026-01-03-2.jpg/960px-Basilique_du_Sacr%C3%A9-C%C5%93ur_mosaic_of_the_Jesuit_Chapel_2026-01-03-2.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9b/Paris_View_from_Sacr%C3%A9-C%C5%93ur_-20140603-RM-162815.jpg/960px-Paris_View_from_Sacr%C3%A9-C%C5%93ur_-20140603-RM-162815.jpg" ],
-          intro: "白色圓頂的羅馬拜占庭式教堂，站在巴黎最高的山丘上，教堂前階梯就是眺望全城的免費觀景台。",
+          intro: [
+            "白色圓頂的羅馬拜占庭式教堂",
+            "站在巴黎最高的山丘上",
+            "教堂前階梯就是眺望全城的免費觀景台"
+          ],
           notice: {
             ticket: "教堂免費；登圓頂另收費約 €8，以官網為準",
             hours: "約 06:30–22:30，以官網為準",
@@ -1089,7 +1209,11 @@ const TRIP_DATA = {
           mapQuery: "Place du Tertre Paris",
           stay: "14:00–17:30",
           images: [ "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fd/Artist_at_Place_du_Tertre_in_November_2019.jpg/960px-Artist_at_Place_du_Tertre_in_November_2019.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/5/52/Paris_75018_Place_du_Tertre_20160907_Caf%C3%A9_Restaurant.jpg/960px-Paris_75018_Place_du_Tertre_20160907_Caf%C3%A9_Restaurant.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/0/07/Restaurants%2C_Place_du_Tertre%2C_Paris_30_September_2019.jpg/960px-Restaurants%2C_Place_du_Tertre%2C_Paris_30_September_2019.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/2/29/La_Cr%C3%A9maill%C3%A8re_1900%2C_Place_du_Tertre%2C_Paris_12_May_2014.jpg/960px-La_Cr%C3%A9maill%C3%A8re_1900%2C_Place_du_Tertre%2C_Paris_12_May_2014.jpg" ],
-          intro: "Place du Tertre 聚集現場作畫的街頭畫家，周邊小巷不排死路線，鑽進咖啡館、手作店，走到日落。",
+          intro: [
+            "Place du Tertre 聚集現場作畫的街頭畫家",
+            "周邊小巷不排死路線",
+            "鑽進咖啡館、手作店，走到日落"
+          ],
           notice: {
             ticket: "免門票",
             hours: "畫家攤位約 10:00–日落",
@@ -1108,7 +1232,11 @@ const TRIP_DATA = {
           mapQuery: "Arc de Triomphe Paris",
           stay: "10:30–12:30",
           images: [ "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e7/Arc_de_Triomphe_de_l%27%C3%89toile_in_July_2011.jpg/960px-Arc_de_Triomphe_de_l%27%C3%89toile_in_July_2011.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d2/1002_Arc_de_Triomphe_in_Paris_at_night_Photo_by_Giles_Laurent.jpg/960px-1002_Arc_de_Triomphe_in_Paris_at_night_Photo_by_Giles_Laurent.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/1/15/Arc_de_Triomphe_at_sunset.jpg/960px-Arc_de_Triomphe_at_sunset.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/5/53/Avenue_des_Champs-%C3%89lys%C3%A9es_from_the_Arc_de_Triomphe%2C_Paris_8_December_2014.jpg/960px-Avenue_des_Champs-%C3%89lys%C3%A9es_from_the_Arc_de_Triomphe%2C_Paris_8_December_2014.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a5/Paris_-_Arc_de_Triomphe_at_dusk1.jpg/960px-Paris_-_Arc_de_Triomphe_at_dusk1.jpg" ],
-          intro: "拿破崙的勝利之門，登頂可以看到 12 條大道放射狀展開的星形廣場，視野比鐵塔更「巴黎」。",
+          intro: [
+            "拿破崙的勝利之門",
+            "登頂看 12 條大道放射狀展開的星形廣場",
+            "視野比鐵塔更「巴黎」"
+          ],
           notice: {
             ticket: "登頂需門票約 €16，以官網為準",
             hours: "約 10:00–22:30，以官網為準",
@@ -1121,7 +1249,10 @@ const TRIP_DATA = {
           mapQuery: "Avenue des Champs-Élysées Paris",
           stay: "12:30–14:00",
           images: [ "https://upload.wikimedia.org/wikipedia/commons/thumb/3/35/Ladur%C3%A9e_aux_Champs-%C3%89lys%C3%A9es.jpg/960px-Ladur%C3%A9e_aux_Champs-%C3%89lys%C3%A9es.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c5/Macarons_from_Ladur%C3%A9e_on_display.jpg/960px-Macarons_from_Ladur%C3%A9e_on_display.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/9/95/Colorful_Macarons_%28Unsplash%29.jpg/960px-Colorful_Macarons_%28Unsplash%29.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f9/A_rainbow_of_macarons_%28part_deux%29.jpg/960px-A_rainbow_of_macarons_%28part_deux%29.jpg" ],
-          intro: "香榭麗舍周邊用餐；名店 Ladurée 香榭麗舍店可順路吃馬卡龍。",
+          intro: [
+            "香榭麗舍周邊用餐",
+            "名店 Ladurée 香榭麗舍店可順路吃馬卡龍"
+          ],
           notice: {
             ticket: "餐費另計",
             hours: "12:00–14:30",
@@ -1134,7 +1265,12 @@ const TRIP_DATA = {
           mapQuery: "Avenue des Champs-Élysées Paris",
           stay: "14:00–17:30",
           images: [ "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6e/Arc_de_Triomphe%2C_Avenue_des_Champs-%C3%89lys%C3%A9es%2C_Paris%2C_France_%28_Ank_Kumar_%2C_Infosys_Limited_%29_01.jpg/960px-Arc_de_Triomphe%2C_Avenue_des_Champs-%C3%89lys%C3%A9es%2C_Paris%2C_France_%28_Ank_Kumar_%2C_Infosys_Limited_%29_01.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/5/55/The_Avenue_des_Champs-%C3%89lys%C3%A9es_and_the_Arc_de_Triomphe%2C_Paris_27_December_2021.jpg/960px-The_Avenue_des_Champs-%C3%89lys%C3%A9es_and_the_Arc_de_Triomphe%2C_Paris_27_December_2021.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a9/Christmas_Illumination_Champs-Elys%C3%A9es%2C_Paris_%282011%29.jpg/960px-Christmas_Illumination_Champs-Elys%C3%A9es%2C_Paris_%282011%29.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/2/22/Avenue_des_Champs-Elys%C3%A9es%2C_Paris_12_December_2020.jpg/960px-Avenue_des_Champs-Elys%C3%A9es%2C_Paris_12_December_2020.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/5/51/Illuminations_de_No%C3%ABl_2024_des_Champs-%C3%89lys%C3%A9es.jpg/960px-Illuminations_de_No%C3%ABl_2024_des_Champs-%C3%89lys%C3%A9es.jpg" ],
-          intro: "從凱旋門一路逛到圓點廣場：旗艦店、車廠展示間與百年拱廊街。行程最後一個完整下午，視天氣傍晚回凱旋門看夕陽或夜景。",
+          intro: [
+            "從凱旋門一路逛到圓點廣場",
+            "旗艦店、車廠展示間與百年拱廊街",
+            "行程最後一個完整下午",
+            "視天氣傍晚回凱旋門看夕陽或夜景"
+          ],
           notice: {
             ticket: "免門票",
             hours: "店家大多 10:00–20:00",
@@ -1153,7 +1289,11 @@ const TRIP_DATA = {
           mapQuery: "Paris Charles de Gaulle Airport Terminal 1",
           stay: "約 06:30 出發",
           images: [ "https://upload.wikimedia.org/wikipedia/commons/thumb/d/de/Paris_Charles_de_Gaulle_Airport_Terminal_1.jpg/960px-Paris_Charles_de_Gaulle_Airport_Terminal_1.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/8/83/Paris-Charles_de_Gaulle_Airport_Terminal_1%2C_16_June_2013.jpg/960px-Paris-Charles_de_Gaulle_Airport_Terminal_1%2C_16_June_2013.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/9/92/Charles_de_Gaulle_Airport_Terminal_Interior.jpg/960px-Charles_de_Gaulle_Airport_Terminal_Interior.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d8/Paris_CDG_International_Airport_January_8%2C_2011.jpg/960px-Paris_CDG_International_Airport_January_8%2C_2011.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9d/Charles_de_Gaulle_Airport_terminal_2E.jpg/960px-Charles_de_Gaulle_Airport_terminal_2E.jpg" ],
-          intro: "一早退房，搭 RER B 或計程車前往戴高樂機場第一航廈，抓 09:45 起飛前 3 小時左右抵達辦理退稅與報到。",
+          intro: [
+            "一早退房，搭 RER B 或計程車前往戴高樂機場第一航廈",
+            "09:45 起飛，抓前 3 小時左右抵達",
+            "預留辦理退稅與報到時間"
+          ],
           notice: {
             ticket: "RER B 單程約 €12；計程車右岸定額約 €56，以官方公告為準",
             hours: "退稅（PABLO 機台）在托運前辦理，留足時間",
@@ -1166,7 +1306,11 @@ const TRIP_DATA = {
           mapQuery: "Paris Charles de Gaulle Airport Terminal 1",
           stay: "09:45–19:35",
           images: [ "https://upload.wikimedia.org/wikipedia/commons/thumb/7/77/Etihad_Boeing_787-9_A6-BNE_IAD_VA2.jpg/960px-Etihad_Boeing_787-9_A6-BNE_IAD_VA2.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/A6-BMG_Boeing_787-10_Etihad_Airways_SVO_2025-01-19_4252.jpg/960px-A6-BMG_Boeing_787-10_Etihad_Airways_SVO_2025-01-19_4252.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c0/Etihad_Airways_Airbus_A350_A6-XWB_at_Tokyo_Narita_Int%27l_Airport.jpg/960px-Etihad_Airways_Airbus_A350_A6-XWB_at_Tokyo_Narita_Int%27l_Airport.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Etihad_Airways%2C_A6-XWA%2C_Airbus_A350-1041.jpg/960px-Etihad_Airways%2C_A6-XWA%2C_Airbus_A350-1041.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/c/cf/Etihad_Airways_A380-861_A6-API_%40YYZ.jpg/960px-Etihad_Airways_A380-861_A6-API_%40YYZ.jpg" ],
-          intro: "阿提哈德航空 EY032，09:45 從 CDG T1 起飛，19:35 抵達阿布達比，飛行 6 小時 50 分。",
+          intro: [
+            "阿提哈德航空 EY032",
+            "09:45 從 CDG T1 起飛，19:35 抵達阿布達比",
+            "飛行 6 小時 50 分"
+          ],
           notice: {
             ticket: "已開票（訂位代號屬敏感資料，解鎖後於基本資料頁查看）",
             hours: "起飛 09:45（建議 07:00 前抵達機場）",
@@ -1179,7 +1323,11 @@ const TRIP_DATA = {
           mapQuery: "Zayed International Airport Abu Dhabi",
           stay: "21:25 起飛，2/14 09:00 抵台",
           images: [ "https://upload.wikimedia.org/wikipedia/commons/thumb/4/48/Abu_Dhabi_%28UAE%29%2C_Zayed_International_Airport%2C_Terminal_A_%2801%29.jpg/960px-Abu_Dhabi_%28UAE%29%2C_Zayed_International_Airport%2C_Terminal_A_%2801%29.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/2/22/Abu_Dhabi_%28UAE%29%2C_Zayed_International_Airport%2C_Terminal_A_%2802%29.jpg/960px-Abu_Dhabi_%28UAE%29%2C_Zayed_International_Airport%2C_Terminal_A_%2802%29.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e4/Abu_Dhabi_%28UAE%29%2C_Zayed_International_Airport%2C_Terminal_A_%2808%29.jpg/960px-Abu_Dhabi_%28UAE%29%2C_Zayed_International_Airport%2C_Terminal_A_%2808%29.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/6/68/Abu_Dhabi_%28UAE%29%2C_Zayed_International_Airport%2C_Terminal_A_%2805%29.jpg/960px-Abu_Dhabi_%28UAE%29%2C_Zayed_International_Airport%2C_Terminal_A_%2805%29.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/d/da/A6-DDC_Etihad_Airways_Boeing_777-FFX%2C_takeoff_from_Schiphol_%28EHAM-AMS%29_runway_36L_pic1.JPG/960px-A6-DDC_Etihad_Airways_Boeing_777-FFX%2C_takeoff_from_Schiphol_%28EHAM-AMS%29_runway_36L_pic1.JPG" ],
-          intro: "轉機後搭 EY898 於 21:25 起飛，飛行 7 小時 35 分，2 月 14 日上午 09:00 抵達桃園機場 T2，旅程結束。",
+          intro: [
+            "轉機後搭 EY898，21:25 起飛",
+            "飛行 7 小時 35 分",
+            "2 月 14 日上午 09:00 抵達桃園機場 T2，旅程結束"
+          ],
           notice: {
             ticket: "已開票（訂位代號屬敏感資料，解鎖後於基本資料頁查看）",
             hours: "AUH 21:25 → TPE 2/14 09:00（+1）",
@@ -1200,16 +1348,26 @@ const TRIP_DATA = {
     modes: [
       {
         name: "Metro 地鐵", icon: "train",
-        when: "每天市區移動（第一天～第十天，行程各點幾乎都在地鐵沿線）",
-        ticket: "單程 t+ 票約 €2.5；建議 Navigo Easy 卡（空卡 €2）儲值 10 次回數票約 €22。密集移動可評估 Navigo Découverte 週卡約 €31（週一～週日效期、需一張大頭照）；本行程 2/3–2/13 橫跨兩個計價週，買前先試算，以現場為準",
+        when: [ "每天市區移動（第一天～第十天）", "行程各點幾乎都在地鐵沿線" ],
+        ticket: [
+          "單程 t+ 票約 €2.5",
+          "建議 Navigo Easy 卡（空卡 €2）：儲值 10 次回數票約 €22",
+          "密集移動可評估 Navigo Découverte 週卡約 €31（週一～週日效期，需一張大頭照）",
+          "本行程 2/3–2/13 橫跨兩個計價週，買前先試算",
+          "以現場公告為準"
+        ],
         hours: "約 05:30–00:45（週五、六與節日前夕約到 01:45）",
         tips: [ "車廂內與手扶梯注意扒手，背包背前面", "晚歸日（蒙馬特、澀谷式夜景行程）先查該線末班車", "進站刷卡後中途出站票即失效" ],
         images: [ "https://upload.wikimedia.org/wikipedia/commons/thumb/e/eb/Abbesses_Metro_March_3%2C_2010.jpg/960px-Abbesses_Metro_March_3%2C_2010.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/8/82/Metro_station_entrance_%28%C3%A9dicule_Guimard%29_Porte_Dauphine_Paris_16e_002.jpg/960px-Metro_station_entrance_%28%C3%A9dicule_Guimard%29_Porte_Dauphine_Paris_16e_002.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/b/bf/Carte_Navigo_D%C3%A9couverte.jpg/960px-Carte_Navigo_D%C3%A9couverte.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/5/51/Navigo_Easy_card.jpg/960px-Navigo_Easy_card.jpg" ]
       },
       {
         name: "RER B（機場往返）", icon: "train",
-        when: "第一天 CDG→市區、第十一天 市區→CDG（車程約 35–50 分）",
-        ticket: "CDG 機場段單程約 €11.8（機場段不含在一般 t+ 票；Navigo 週卡全區版可直接搭），以現場為準",
+        when: [ "第一天 CDG→市區", "第十一天 市區→CDG（車程約 35–50 分）" ],
+        ticket: [
+          "CDG 機場段單程約 €11.8（一般 t+ 票不含機場段）",
+          "Navigo 週卡全區版可直接搭",
+          "以現場公告為準"
+        ],
         hours: "約 04:50–23:50，清晨班距 10–20 分鐘",
         tips: [ "購票認明「Paris–CDG」機場專用票", "月台與車廂顧好行李", "第十一天清晨出發，前一晚先查首班車時刻" ],
         images: [ "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5a/D%C3%A9part_d%27une_MI_79_du_RER_B_de_la_voie_43_de_la_gare_souterraine_de_Paris-Nord.jpg/960px-D%C3%A9part_d%27une_MI_79_du_RER_B_de_la_voie_43_de_la_gare_souterraine_de_Paris-Nord.jpg" ]
@@ -1217,7 +1375,7 @@ const TRIP_DATA = {
       {
         name: "RER C（凡爾賽）", icon: "train",
         when: "第五天 凡爾賽宮一日往返",
-        ticket: "巴黎市區–凡爾賽單程約 €4（Navigo 週卡涵蓋），以現場為準",
+        ticket: [ "巴黎市區–凡爾賽單程約 €4（Navigo 週卡涵蓋）", "以現場公告為準" ],
         hours: "約 05:30–00:30，往凡爾賽方向約 15 分鐘一班",
         tips: [ "搭往 Versailles Château Rive Gauche 方向，下車步行約 10 分鐘到宮殿", "RER C 分支多，上車前確認列車終點站顯示" ],
         images: []
@@ -1233,7 +1391,11 @@ const TRIP_DATA = {
       {
         name: "Roissybus／計程車（機場備案）", icon: "taxi",
         when: "第一天／第十一天 機場往返的替代方案",
-        ticket: "Roissybus 機場–Opéra 約 €16.6（車程 60–75 分）；計程車機場–右岸定額約 €56，兩人以上分攤可考慮，以現場為準",
+        ticket: [
+          "Roissybus 機場–Opéra 約 €16.6（車程 60–75 分）",
+          "計程車機場–右岸定額約 €56，兩人以上分攤可考慮",
+          "以現場公告為準"
+        ],
         hours: "Roissybus 約 05:15–00:30；計程車 24 小時（清晨建議前一晚預約）",
         tips: [ "第十一天 06:30 出發若擔心 RER B 清晨班距，預約計程車最穩", "只搭排班計程車，不理會航廈內攬客司機" ],
         images: []
@@ -1241,7 +1403,7 @@ const TRIP_DATA = {
       {
         name: "市區公車（補充）", icon: "bus",
         when: "想邊移動邊看街景時替代 Metro",
-        ticket: "與 Metro 同票制（t+ 票、Navigo 皆可），上車由前門刷卡",
+        ticket: [ "與 Metro 同票制（t+ 票、Navigo 皆可）", "上車由前門刷卡" ],
         hours: "大多 07:00–22:30，深夜另有 Noctilien 夜間巴士",
         tips: [ "72 路沿塞納河右岸行駛，沿途風景好", "尖峰時段會塞車，趕時間仍以 Metro 為主" ],
         images: [ "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b0/Irisbus_Cit%C3%A9lis_12_8804_RATP%2C_ligne_92%2C_Paris.jpg/960px-Irisbus_Cit%C3%A9lis_12_8804_RATP%2C_ligne_92%2C_Paris.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Bus_RATP_Ligne_39_sur_Boulevard_des_Italiens_%C3%A0_Paris_%28juillet_2025%29.JPG/960px-Bus_RATP_Ligne_39_sur_Boulevard_des_Italiens_%C3%A0_Paris_%28juillet_2025%29.JPG" ]
@@ -1275,6 +1437,8 @@ const TRIP_DATA = {
   const $$ = (sel, el) => Array.from((el || document).querySelectorAll(sel));
   const esc = s => String(s == null ? "" : s)
     .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+  /* 文案欄位同時支援字串與字串陣列：陣列＝一行一個重點 */
+  const lines = v => Array.isArray(v) ? v : (v == null || v === "" ? [] : [String(v)]);
 
   const CN_NUM = ["零","一","二","三","四","五","六","七","八","九","十"];
   const cnDay = n => {
@@ -1490,8 +1654,8 @@ const TRIP_DATA = {
     html += '</div></aside></div>';
 
     /* --- 天氣：橫向一排 11 天小卡 --- */
-    html += '<div class="card"><h3>' + secTitle("05", "天氣與濕度", "Weather", wxIcon(D.weather.overall)) + '</h3>'
-      + '<p style="font-size:.9rem;margin-bottom:14px;">' + esc(D.weather.overall) + '</p><div class="wx-grid">';
+    html += '<div class="card"><h3>' + secTitle("05", "天氣與濕度", "Weather", wxIcon(lines(D.weather.overall).join("、"))) + '</h3>'
+      + '<div class="wx-overall">' + lines(D.weather.overall).map(t => '<p>' + esc(t) + '</p>').join('') + '</div><div class="wx-grid">';
     D.weather.daily.forEach(w => {
       const wi = wxIcon(w.desc);
       html += '<div class="wx-day"><div class="d">' + fmtDate(w.date) + '</div>'
@@ -1509,7 +1673,8 @@ const TRIP_DATA = {
       + '<div>' + ic("sun", "sm ic-terra") + ' 日落<b>' + esc(D.sun.sunset) + '</b></div>'
       + '<div class="muted">當地時間</div>'
       + '</div>'
-      + '<div class="ss-dress">' + ic("shirt", "sm ic-blue") + ' ' + esc(D.clothing) + '</div>'
+      + '<div class="ss-dress">' + lines(D.clothing).map((t, i) =>
+          '<div class="dl">' + (i === 0 ? ic("shirt", "sm ic-blue") + ' ' : '') + esc(t) + '</div>').join('') + '</div>'
       + '</div></div>';
 
     p.innerHTML = html;
@@ -1610,8 +1775,9 @@ const TRIP_DATA = {
     (T.modes || []).forEach((m, i) => {
       const imgs = Array.isArray(m.images) ? m.images : [];
       html += '<div class="card"><h3>' + secTitle(pad2(i + 2), m.name, "", m.icon || "train") + '</h3>'
-        + '<div class="tr-when">' + esc(m.when) + '</div>'
-        + '<div class="kv"><span class="k">' + ic("ticket", "sm") + '票怎麼買</span><span class="v">' + esc(m.ticket) + '</span></div>'
+        + '<div class="tr-when">' + lines(m.when).map(t => '<div>' + esc(t) + '</div>').join('') + '</div>'
+        + '<div class="kv"><span class="k">' + ic("ticket", "sm") + '票怎麼買</span><span class="v">'
+        + lines(m.ticket).map(t => '<div class="vl">' + esc(t) + '</div>').join('') + '</span></div>'
         + '<div class="kv"><span class="k">' + ic("clock", "sm") + '營運時間</span><span class="v">' + esc(m.hours) + '</span></div>'
         + (m.tips || []).map(t => '<div class="kv"><span class="k">' + ic("alert", "sm") + '注意</span><span class="v">' + esc(t) + '</span></div>').join('')
         + (imgs.length ? '<div class="tr-imgs">' + imgs.map(u => lbImg(u, m.name)).join('') + '</div>' : '')
@@ -1941,7 +2107,7 @@ const TRIP_DATA = {
         + '<div class="spot-head"><span class="order-badge">No.' + (si + 1) + '　第 ' + (si + 1) + ' 站</span>'
         + '<h3>' + title + '</h3><div class="stay">' + ic("clock", "sm") + esc(s.stay) + '</div></div>'
         + carouselHTML(s.images || [], s.name)
-        + '<div class="body"><p class="intro">' + esc(s.intro) + '</p>'
+        + '<div class="body"><div class="intro">' + lines(s.intro).map(t => '<p>' + esc(t) + '</p>').join('') + '</div>'
         + '<div class="notice"><div class="nt-title">' + ic("alert", "sm ic-terra") + ' Notes ・ 注意提醒</div><ul>'
         + '<li>' + ic("ticket", "sm ic-blue") + '<span>票券：' + esc(s.notice.ticket) + '</span></li>'
         + '<li>' + ic("clock", "sm ic-gold") + '<span>開放時間：' + esc(s.notice.hours) + '</span></li>'
