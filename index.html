@@ -7,6 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600&family=Noto+Sans+TC:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://accounts.google.com/gsi/client" async></script>
 <style>
   :root{
     --bg:#F2F1EF;
@@ -423,6 +424,24 @@
   table.expense td.acts{white-space:nowrap;}
   .exp-pending{color:var(--gold);font-size:.72rem;letter-spacing:.04em;font-weight:600;}
 
+  /* ===== Google 登入與記錄者頭像 ===== */
+  .auth-av{width:22px;height:22px;border-radius:50%;vertical-align:-6px;margin-right:7px;}
+  img.auth-av{object-fit:cover;}
+  span.auth-av{
+    display:inline-flex;align-items:center;justify-content:center;
+    background:var(--blue);color:#fff;font-size:.72rem;font-weight:600;line-height:1;
+  }
+  .lock-btn.auth-off{color:#b5b2ad;border-color:var(--line-soft);cursor:default;}
+  .lock-btn.auth-off:hover{color:#b5b2ad;border-color:var(--line-soft);}
+  .rec-av{width:20px;height:20px;border-radius:50%;vertical-align:-5px;margin-right:6px;}
+  img.rec-av{object-fit:cover;}
+  span.rec-av{
+    display:inline-flex;align-items:center;justify-content:center;
+    background:var(--blue);color:#fff;font-size:.68rem;font-weight:600;line-height:1;
+  }
+  .gsi-host{display:flex;justify-content:center;margin:14px 0 4px;min-height:44px;}
+  .lock-btn{margin-left:4px;margin-right:4px;}
+
   /* ===== 敏感資料鎖定 ===== */
   .lock-btn{
     appearance:none;cursor:pointer;margin-top:12px;
@@ -520,6 +539,10 @@ const TRIP_DATA = {
 
   /* 旅伴護照資料屬敏感資訊，已移入 secure 加密區（見下方 secure 欄位說明） */
   travelers: [],
+
+  /* Google 登入用 OAuth Client ID（Google Cloud Console 建立「網頁應用程式」憑證後填入字串）。
+     null 時登入按鈕顯示灰態「Google 登入尚未設定」，全站其他功能照常。 */
+  googleClientId: null,
 
   /* 多段轉機：flights 為陣列，每段一筆 */
   flights: [
@@ -1174,6 +1197,7 @@ const TRIP_DATA = {
   <h1 id="trip-title"></h1>
   <div class="sub" id="trip-sub"></div>
   <button id="lock-btn" class="lock-btn" type="button"></button>
+  <button id="auth-btn" class="lock-btn" type="button"></button>
 </header>
 
 <nav class="tabbar" id="tabbar"></nav>
@@ -1383,10 +1407,13 @@ const TRIP_DATA = {
       + flGroup("去程") + flGroup("回程") + '</div>'
       + '</div><aside class="ig-side">';
 
-    html += '<div class="card"><h3>' + secTitle("02", "護照資訊", "Passport", "idcard") + '</h3>'
+    html += '<div class="card"><h3>' + secTitle("02", "旅伴", "Members", "user") + '</h3>'
+      + '<p class="muted">成員資料待補</p></div>';
+
+    html += '<div class="card"><h3>' + secTitle("03", "護照資訊", "Passport", "idcard") + '</h3>'
       + '<div id="travelers-box"></div></div>';
 
-    html += '<div class="card"><h3>' + secTitle("03", "飯店資訊", "Hotel", "home") + '</h3>';
+    html += '<div class="card"><h3>' + secTitle("04", "飯店資訊", "Hotel", "home") + '</h3>';
     D.hotels.forEach((h, hi) => {
       const nm = h.url
         ? '<a href="' + esc(h.url) + '" target="_blank" rel="noopener">' + esc(h.name) + '</a>'
@@ -1400,7 +1427,7 @@ const TRIP_DATA = {
     html += '</div></aside></div>';
 
     /* --- 天氣：橫向一排 11 天小卡 --- */
-    html += '<div class="card"><h3>' + secTitle("04", "天氣與濕度", "Weather", wxIcon(D.weather.overall)) + '</h3>'
+    html += '<div class="card"><h3>' + secTitle("05", "天氣與濕度", "Weather", wxIcon(D.weather.overall)) + '</h3>'
       + '<p style="font-size:.9rem;margin-bottom:14px;">' + esc(D.weather.overall) + '</p><div class="wx-grid">';
     D.weather.daily.forEach(w => {
       const wi = wxIcon(w.desc);
@@ -1412,7 +1439,7 @@ const TRIP_DATA = {
     html += '</div></div>';
 
     /* --- 日出日落＋建議穿著：一條橫向資訊帶 --- */
-    html += '<div class="card"><h3>' + secTitle("05", "日出日落・建議穿著", "Sun & Dress", "sunrise") + '</h3>'
+    html += '<div class="card"><h3>' + secTitle("06", "日出日落・建議穿著", "Sun & Dress", "sunrise") + '</h3>'
       + '<div class="sun-strip">'
       + '<div class="ss-sun">'
       + '<div>' + ic("sunrise", "sm ic-gold") + ' 日出<b>' + esc(D.sun.sunrise) + '</b></div>'
@@ -1605,6 +1632,100 @@ const TRIP_DATA = {
   });
   refreshSecure();
 
+  /* ---------- Google 帳號登入（Google Identity Services；僅身分識別用途，非安全驗證） ---------- */
+  const AUTH_K = "trip::" + TRIP_DATA.id + "::gprofile";
+  const authProfile = () => {
+    try { return JSON.parse(localStorage.getItem(AUTH_K)) || null; } catch (e) { return null; }
+  };
+  /* 頭像 HTML：img 載入失敗時退回字母圓點 */
+  const authAv = (p, cls) => {
+    const letter = '<span class="' + cls + '">' + esc(String(p.name || "?").slice(0, 1).toUpperCase()) + '</span>';
+    if (!p.picture) return letter;
+    return '<img class="' + cls + '" src="' + esc(p.picture) + '" alt="" referrerpolicy="no-referrer"'
+      + ' onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'inline-flex\';">'
+      + '<span class="' + cls + '" style="display:none;">' + esc(String(p.name || "?").slice(0, 1).toUpperCase()) + '</span>';
+  };
+  const parseJwt = t => {
+    try {
+      const b = t.split(".")[1].replace(/-/g, "+").replace(/_/g, "/");
+      return JSON.parse(decodeURIComponent(Array.from(atob(b), c =>
+        "%" + ("0" + c.charCodeAt(0).toString(16)).slice(-2)).join("")));
+    } catch (e) { return null; }
+  };
+  let gsiReady = false;
+  let authPendingCb = null;
+  function onGoogleCred(resp) {
+    const p = resp && resp.credential ? parseJwt(resp.credential) : null;
+    if (!p || !p.email) return;
+    try {
+      localStorage.setItem(AUTH_K, JSON.stringify({
+        name: p.name || p.email, email: p.email, picture: p.picture || ""
+      }));
+    } catch (e) {}
+    const box = $(".auth-modal");
+    if (box) box.remove();
+    refreshAuth();
+    if (authPendingCb) { const cb = authPendingCb; authPendingCb = null; cb(); }
+  }
+  function gsiInit() {
+    if (gsiReady || !TRIP_DATA.googleClientId) return gsiReady;
+    if (!(window.google && google.accounts && google.accounts.id)) return false;
+    google.accounts.id.initialize({ client_id: TRIP_DATA.googleClientId, callback: onGoogleCred });
+    gsiReady = true;
+    return true;
+  }
+  function openAuthModal(cb) {
+    if ($(".auth-modal")) return;
+    authPendingCb = cb || null;
+    const box = document.createElement("div");
+    box.className = "sec-modal auth-modal";
+    const body = TRIP_DATA.googleClientId
+      ? (gsiInit()
+        ? '<p class="muted">使用 Google 帳號登入：僅作為記帳署名與頭像顯示，不會存取你的其他資料。</p><div class="gsi-host" id="gsi-host"></div>'
+        : '<p class="muted">Google 登入元件載入中或被瀏覽器阻擋，請稍後再試。</p>')
+      : '<p class="muted">Google 登入尚未設定：請先在 TRIP_DATA.googleClientId 填入 OAuth Client ID。</p>';
+    box.innerHTML = '<div class="sec-card"><h4>' + ic("user", "sm") + ' 使用 Google 登入</h4>'
+      + body + '<div class="sec-actions"><button type="button" class="sec-cancel">取消</button></div></div>';
+    document.body.appendChild(box);
+    if (TRIP_DATA.googleClientId && gsiReady) {
+      google.accounts.id.renderButton($("#gsi-host", box), { theme: "outline", size: "large", text: "signin_with", shape: "pill" });
+    }
+    box.addEventListener("click", e => {
+      if (e.target === box || e.target.closest(".sec-cancel")) { authPendingCb = null; box.remove(); }
+    });
+  }
+  function authLogout() {
+    try { localStorage.removeItem(AUTH_K); } catch (e) {}
+    if (gsiReady) { try { google.accounts.id.disableAutoSelect(); } catch (e) {} }
+    refreshAuth();
+  }
+  function refreshAuth() {
+    const btn = $("#auth-btn");
+    if (!btn) return;
+    const p = authProfile();
+    if (p) {
+      btn.classList.remove("auth-off");
+      btn.innerHTML = authAv(p, "auth-av") + esc(p.name) + '・登出';
+      btn.title = esc(p.email);
+    } else if (!TRIP_DATA.googleClientId) {
+      btn.classList.add("auth-off");
+      btn.innerHTML = ic("user", "sm") + ' Google 登入尚未設定';
+      btn.title = "";
+    } else {
+      btn.classList.remove("auth-off");
+      btn.innerHTML = ic("user", "sm") + ' 使用 Google 登入';
+      btn.title = "";
+    }
+    const f = $("#exp-form");
+    if (f && p && !f.elements.payer.value) f.elements.payer.value = p.name;
+  }
+  const authBtn = $("#auth-btn");
+  if (authBtn) authBtn.addEventListener("click", () => {
+    if (authProfile()) { authLogout(); return; }
+    openAuthModal();
+  });
+  refreshAuth();
+
   /* ---------- Lightbox：點 .lb 圖片全螢幕放大，再點關閉 ---------- */
   document.addEventListener("click", e => {
     const t = e.target;
@@ -1765,6 +1886,61 @@ const TRIP_DATA = {
   };
   const lsGet = (k, d) => { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch (e) { return d; } };
   const lsSet = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} };
+
+  /* ---------- 匯率 EUR↔TWD：open.er-api.com 主源＋jsDelivr(fawazahmed0) 備援 ---------- */
+  const FX = { rate: null, date: "", offline: false, K: "trip::" + TRIP_DATA.id + "::fxcache" };
+  const fxShortDate = d => { const m = String(d).match(/(\d{4})-(\d{2})-(\d{2})/); return m ? (+m[2]) + "/" + (+m[3]) : String(d); };
+  function fxNote() {
+    const el = $("#fx-note");
+    if (!el) return;
+    if (!FX.rate) el.textContent = "目前取不到匯率——兩邊金額請手動輸入";
+    else el.textContent = (FX.offline ? "離線匯率（" + fxShortDate(FX.date) + "）" : "匯率（" + fxShortDate(FX.date) + "）")
+      + "：1 EUR ≈ " + FX.rate.toFixed(2) + " TWD。輸入任一欄自動換算，另一欄可手動微調。";
+  }
+  async function fxLoad() {
+    const cached = lsGet(FX.K, null);
+    if (cached && cached.rate) { FX.rate = cached.rate; FX.date = cached.date; FX.offline = true; }
+    const sources = [
+      { url: "https://open.er-api.com/v6/latest/EUR",
+        pick: j => ({ rate: j && j.rates && j.rates.TWD,
+                      date: j && j.time_last_update_unix ? new Date(j.time_last_update_unix * 1000).toISOString().slice(0, 10) : "" }) },
+      { url: "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies/eur.json",
+        pick: j => ({ rate: j && j.eur && j.eur.twd, date: (j && j.date) || "" }) }
+    ];
+    for (const s of sources) {
+      try {
+        const r = await fetch(s.url, { cache: "no-store" });
+        if (!r.ok) continue;
+        const v = s.pick(await r.json());
+        if (v.rate && isFinite(v.rate)) {
+          FX.rate = +v.rate;
+          FX.date = v.date || new Date().toISOString().slice(0, 10);
+          FX.offline = false;
+          lsSet(FX.K, { rate: FX.rate, date: FX.date, ts: Date.now() });
+          break;
+        }
+      } catch (e) { /* 換下一個來源 */ }
+    }
+    fxNote();
+    refreshExpenses();
+  }
+
+  /* 舊格式（單幣 {amount,currency}）自動遷移為雙幣顯示 */
+  function expNorm(e) {
+    if (e.amountEUR != null || e.amountTWD != null) return e;
+    const n = Object.assign({}, e);
+    if ((e.currency || "EUR") === "TWD") {
+      n.amountTWD = e.amount;
+      n.amountEUR = FX.rate ? +(e.amount / FX.rate).toFixed(2) : null;
+    } else {
+      n.amountEUR = e.amount;
+      n.amountTWD = FX.rate ? Math.round(e.amount * FX.rate) : null;
+    }
+    n.inputCurrency = e.currency || "EUR";
+    n.rate = FX.rate || null;
+    n.rateDate = FX.rate ? FX.date + "（自動補算）" : null;
+    return n;
+  }
   const getToken = () => { try { return localStorage.getItem(EXP.K.token) || ""; } catch (e) { return ""; } };
   const newId = () => Date.now().toString(36) + "-" + Math.random().toString(36).slice(2, 8);
   const utf8b64 = s => btoa(unescape(encodeURIComponent(s)));
@@ -1855,23 +2031,24 @@ const TRIP_DATA = {
   function refreshExpenses() {
     const stats = $("#exp-stats"), table = $("#exp-table");
     if (!stats || !table) return;
-    const list = expList();
+    const list = expList().map(expNorm);
     const queuedIds = new Set(EXP.queue.map(o => o.type === "delete" ? o.id : o.item.id));
 
-    const addTo = (map, key, e) => {
+    const addTo = (map, key, cur, amt) => {
+      if (amt == null || isNaN(amt)) return;
       if (!map[key]) map[key] = {};
-      map[key][e.currency] = (map[key][e.currency] || 0) + e.amount;
+      map[key][cur] = (map[key][cur] || 0) + amt;
     };
-    const moneyStr = obj => Object.entries(obj).map(([c, a]) => c + " " + fmtMoney(a)).join("　+　") || "—";
+    const moneyStr = obj => Object.entries(obj).map(([c, a]) => c + " " + fmtMoney(c === "TWD" ? Math.round(a) : +a.toFixed(2))).join("　·　") || "—";
     const totals = {}, byPayer = {}, byCat = {};
     list.forEach(e => {
       if (e.status === "已退款") return;
-      totals[e.currency] = (totals[e.currency] || 0) + e.amount;
-      addTo(byPayer, e.payer || "未填", e);
-      addTo(byCat, e.category || "其他", e);
+      addTo(totals, "t", "EUR", e.amountEUR); addTo(totals, "t", "TWD", e.amountTWD);
+      addTo(byPayer, e.payer || "未填", "EUR", e.amountEUR); addTo(byPayer, e.payer || "未填", "TWD", e.amountTWD);
+      addTo(byCat, e.category || "其他", "EUR", e.amountEUR); addTo(byCat, e.category || "其他", "TWD", e.amountTWD);
     });
     stats.innerHTML =
-      '<div class="stat-card"><div class="t">' + ic("wallet", "sm ic-blue") + '總花費（不含已退款）</div><div class="big">' + moneyStr(totals) + '</div></div>'
+      '<div class="stat-card"><div class="t">' + ic("wallet", "sm ic-blue") + '總花費（不含已退款）</div><div class="big">' + moneyStr(totals.t || {}) + '</div></div>'
       + '<div class="stat-card"><div class="t">' + ic("user", "sm ic-terra") + '依「誰付的」小計</div>'
       + (Object.keys(byPayer).length
         ? Object.entries(byPayer).map(([k, v]) => '<div class="row"><span>' + esc(k) + '</span><b>' + moneyStr(v) + '</b></div>').join('')
@@ -1886,9 +2063,16 @@ const TRIP_DATA = {
     const badgeCls = s => s === "已付款" ? "paid" : s === "待付款" ? "pending" : s === "已退款" ? "refund" : "other";
     let rows = "";
     list.forEach(e => {
-      rows += '<tr><td>' + esc(e.name)
+      /* 記錄者頭像：新格式 recordedBy={name,email,picture}；舊字串格式僅取名字 */
+      const rb = e.recordedBy;
+      const rec = rb ? (typeof rb === "object" ? rb : { name: String(rb) }) : null;
+      const recAv = rec && rec.name
+        ? '<span title="記錄：' + esc(rec.name) + (rec.email ? "（" + esc(rec.email) + "）" : "") + '">' + authAv(rec, "rec-av") + '</span>'
+        : '';
+      rows += '<tr><td>' + recAv + esc(e.name)
         + (queuedIds.has(e.id) ? ' <span class="exp-pending">●未同步</span>' : '') + '</td>'
-        + '<td class="amt">' + esc(e.currency) + ' ' + fmtMoney(e.amount) + '</td>'
+        + '<td class="amt">' + (e.amountEUR != null ? "EUR " + fmtMoney(e.amountEUR) : '<span class="muted">—</span>')
+        + '<br><span class="muted">' + (e.amountTWD != null ? "TWD " + fmtMoney(e.amountTWD) : "—") + '</span></td>'
         + '<td><span class="badge ' + badgeCls(e.status) + '">' + esc(e.status) + '</span></td>'
         + '<td><span class="chip">' + esc(e.category) + '</span></td>'
         + '<td>' + ic("user", "sm ic-terra") + ' ' + esc(e.payer) + '</td>'
@@ -1924,13 +2108,14 @@ const TRIP_DATA = {
       + '<span class="en" id="exp-sync-badge" style="cursor:pointer;"></span></h3>'
       + '<form id="exp-form"><div class="ef-grid">'
       + '<div class="ef-f ef-name"><label>項目名稱</label><input name="name" required autocomplete="off"></div>'
-      + '<div class="ef-f"><label>金額</label><input name="amount" type="number" step="0.01" min="0" required></div>'
-      + '<div class="ef-f"><label>幣別</label><select name="currency"><option>EUR</option><option>TWD</option></select></div>'
+      + '<div class="ef-f"><label>金額 EUR €</label><input name="amountEUR" type="number" step="0.01" min="0" inputmode="decimal"></div>'
+      + '<div class="ef-f"><label>金額 TWD NT$</label><input name="amountTWD" type="number" step="1" min="0" inputmode="decimal"></div>'
       + '<div class="ef-f"><label>狀態</label><select name="status"><option>已付款</option><option>待付款</option><option>已退款</option></select></div>'
       + '<div class="ef-f"><label>分類</label><select name="category">' + cats.map(c => '<option>' + c + '</option>').join('') + '</select></div>'
       + '<div class="ef-f"><label>誰付的</label><input name="payer" autocomplete="off"></div>'
       + '<div class="ef-f ef-note"><label>備註</label><input name="note" autocomplete="off"></div>'
-      + '</div><div class="ef-actions">'
+      + '</div><div class="muted" id="fx-note" style="margin-top:8px;"></div>'
+      + '<div class="ef-actions">'
       + '<button type="button" class="ef-cancel" id="exp-cancel" style="display:none;">取消編輯</button>'
       + '<button type="submit" class="ef-submit" id="exp-submit">新增</button>'
       + '</div></form></div>'
@@ -1953,40 +2138,78 @@ const TRIP_DATA = {
     const form = $("#exp-form", p);
     const fe = n => form.elements[n];
     let editingId = null;
+    /* 雙幣即時換算：輸入任一欄補另一欄；被手動改過的欄不再覆蓋 */
+    const touched = { EUR: false, TWD: false };
+    let lastInput = "EUR";
+    fe("amountEUR").addEventListener("input", () => {
+      touched.EUR = true; lastInput = "EUR";
+      if (FX.rate && fe("amountEUR").value !== "" && !touched.TWD)
+        fe("amountTWD").value = Math.round(parseFloat(fe("amountEUR").value || 0) * FX.rate);
+    });
+    fe("amountTWD").addEventListener("input", () => {
+      touched.TWD = true; lastInput = "TWD";
+      if (FX.rate && fe("amountTWD").value !== "" && !touched.EUR)
+        fe("amountEUR").value = (parseFloat(fe("amountTWD").value || 0) / FX.rate).toFixed(2);
+    });
     const resetForm = () => {
       editingId = null; form.reset();
+      touched.EUR = touched.TWD = false; lastInput = "EUR";
       $("#exp-submit", p).textContent = "新增";
       $("#exp-cancel", p).style.display = "none";
+      const u = authProfile();
+      if (u) fe("payer").value = u.name;
     };
-    form.addEventListener("submit", e => {
-      e.preventDefault();
-      const prev = editingId ? expList().find(x => x.id === editingId) : null;
+    const doSubmit = () => {
+      const prev = editingId ? expNorm(expList().find(x => x.id === editingId) || {}) : null;
+      const eur = parseFloat(fe("amountEUR").value);
+      const twd = parseFloat(fe("amountTWD").value);
+      const name = fe("name").value.trim();
+      if (!name || (isNaN(eur) && isNaN(twd))) return;
+      const u = authProfile();
       const item = {
         id: editingId || newId(),
-        name: fe("name").value.trim(),
-        amount: parseFloat(fe("amount").value) || 0,
-        currency: fe("currency").value,
+        name: name,
+        amountEUR: isNaN(eur) ? null : eur,
+        amountTWD: isNaN(twd) ? null : Math.round(twd),
+        inputCurrency: lastInput,
+        rate: FX.rate || null,
+        rateDate: FX.rate ? FX.date : null,
+        /* 舊欄位相容 */
+        amount: lastInput === "TWD" ? (isNaN(twd) ? null : Math.round(twd)) : (isNaN(eur) ? null : eur),
+        currency: lastInput,
         status: fe("status").value,
         category: fe("category").value,
         payer: fe("payer").value.trim(),
         note: fe("note").value.trim(),
+        recordedBy: u ? { name: u.name, email: u.email, picture: u.picture || "" } : null,
         createdAt: (prev && prev.createdAt) || new Date().toISOString()
       };
-      if (!item.name) return;
-      const msg = "expense: " + (prev ? "更新 " : "") + item.name + " " + item.currency + " " + item.amount;
+      const amtStr = lastInput === "TWD" ? "TWD " + (item.amountTWD || 0) : "EUR " + (item.amountEUR || 0);
+      const msg = "expense: " + (prev ? "更新 " : "") + item.name + " " + amtStr + (u ? " by " + u.name : "");
       resetForm();
       expEnqueue({ type: "upsert", item: item }, msg);
+    };
+    form.addEventListener("submit", e => {
+      e.preventDefault();
+      /* 已設定 Google 登入但尚未登入：提示先登入，登入成功後自動送出 */
+      if (!authProfile() && TRIP_DATA.googleClientId) { openAuthModal(doSubmit); return; }
+      doSubmit();
     });
     $("#exp-cancel", p).addEventListener("click", resetForm);
 
     $("#exp-table", p).addEventListener("click", e => {
       const eb = e.target.closest("[data-edit]"), db = e.target.closest("[data-del]");
       if (eb) {
-        const item = expList().find(x => x.id === eb.dataset.edit);
-        if (!item) return;
+        const raw = expList().find(x => x.id === eb.dataset.edit);
+        if (!raw) return;
+        const item = expNorm(raw);
         editingId = item.id;
-        fe("name").value = item.name; fe("amount").value = item.amount;
-        fe("currency").value = item.currency; fe("status").value = item.status;
+        touched.EUR = touched.TWD = false;
+        lastInput = item.inputCurrency || "EUR";
+        fe("name").value = item.name;
+        fe("amountEUR").value = item.amountEUR != null ? item.amountEUR : "";
+        fe("amountTWD").value = item.amountTWD != null ? item.amountTWD : "";
+        fe("status").value = item.status;
         fe("category").value = item.category; fe("payer").value = item.payer; fe("note").value = item.note;
         $("#exp-submit", p).textContent = "更新";
         $("#exp-cancel", p).style.display = "";
@@ -2026,6 +2249,8 @@ const TRIP_DATA = {
 
     $("#exp-sync-badge", p).addEventListener("click", () => expSync());
     window.addEventListener("online", () => expSync());
+    resetForm();
+    fxLoad();
     expLoad();
   })();
 
