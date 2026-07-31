@@ -1,0 +1,1777 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>我的旅遊手冊</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600&family=Noto+Sans+TC:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#F2F1EF;
+    --ink:#1a1a1a;
+    --soft:#767676;
+    --line:#c9c6c1;
+    --line-soft:#dedbd6;
+    --serif:'Playfair Display','Songti TC',Georgia,serif;   /* 只用於大型展示標題與英文裝飾小標 */
+    --sans:-apple-system,BlinkMacSystemFont,'Inter','Noto Sans TC','PingFang TC','Segoe UI','Microsoft JhengHei',sans-serif;
+    /* 法式低飽和色盤：功能性上色用，文字主體維持碳灰 */
+    --blue:#3D5A80;  --blue-soft:#E4EAF1;
+    --terra:#C1666B; --terra-soft:#F5E6E6;
+    --sage:#84A98C;  --sage-soft:#E8F0EA;
+    --gold:#C9A227;  --gold-soft:#F5EED6;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html{-webkit-text-size-adjust:100%;}
+  body{
+    font-family:var(--sans);
+    background:var(--bg);color:var(--ink);
+    font-size:16px;line-height:1.7;letter-spacing:.01em;font-weight:400;
+  }
+  a{color:inherit;text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:3px;}
+
+  /* ===== Header ===== */
+  header.hero{
+    background:var(--bg);color:var(--ink);
+    padding:38px 20px 22px;text-align:center;
+  }
+  header.hero .eyebrow{
+    font-family:var(--serif);
+    font-size:.68rem;letter-spacing:.45em;color:var(--soft);
+    text-transform:uppercase;margin-bottom:12px;
+  }
+  header.hero h1{
+    font-family:'Playfair Display',var(--serif);
+    font-size:1.6rem;font-weight:500;letter-spacing:.12em;
+  }
+  header.hero .sub{font-size:.8rem;color:var(--soft);margin-top:8px;letter-spacing:.12em;}
+
+  /* ===== Tab bar ===== */
+  nav.tabbar{
+    position:sticky;top:0;z-index:50;
+    background:var(--bg);
+    border-top:1px solid var(--line);border-bottom:1px solid var(--line);
+    display:flex;overflow-x:auto;-webkit-overflow-scrolling:touch;
+    scrollbar-width:none;
+  }
+  nav.tabbar::-webkit-scrollbar{display:none;}
+  nav.tabbar button{
+    flex:0 0 auto;appearance:none;border:none;background:none;cursor:pointer;
+    font-family:var(--sans);
+    padding:13px 15px 12px;font-size:.85rem;color:var(--soft);
+    letter-spacing:.08em;font-weight:500;white-space:nowrap;
+    border-bottom:1px solid transparent;
+  }
+  nav.tabbar button.active{color:var(--ink);border-bottom-color:var(--ink);font-weight:600;}
+
+  main{max-width:860px;margin:0 auto;padding:8px 20px 90px;}
+  section.panel{display:none;}
+  section.panel.active{display:block;animation:fadein .3s ease;}
+  @keyframes fadein{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:none;}}
+
+  /* ===== Sections（去卡片化：細分隔線分區）===== */
+  .card{
+    background:transparent;border:none;border-radius:0;box-shadow:none;
+    border-top:1px solid var(--line);
+    padding:26px 0 30px;margin:0;
+  }
+  section.panel > .card:first-child{border-top:none;}
+  .card h3{
+    font-size:.85rem;letter-spacing:.14em;text-transform:uppercase;
+    font-weight:700;color:var(--ink);margin-bottom:16px;
+    display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+  }
+  .card h3 .no{color:var(--soft);letter-spacing:.08em;font-weight:500;}
+  .card h3 .en{font-family:var(--serif);color:var(--soft);letter-spacing:.26em;font-weight:500;font-size:.7rem;}
+  .card h3 .ic{width:17px;height:17px;flex:0 0 auto;}
+  .kv{display:flex;flex-wrap:wrap;gap:4px 0;font-size:.95rem;padding:6px 0;border-bottom:1px solid var(--line-soft);}
+  .kv:last-child{border-bottom:none;}
+  .kv .k{flex:0 0 7.5em;color:var(--soft);letter-spacing:.08em;font-weight:500;}
+  .kv .v{flex:1;min-width:12em;font-weight:500;}
+  .muted{color:var(--soft);font-size:.87rem;}
+  /* 單色線條 icon 基本樣式 */
+  .ic{
+    width:16px;height:16px;stroke:currentColor;stroke-width:1.7;fill:none;
+    stroke-linecap:round;stroke-linejoin:round;
+    vertical-align:-3px;display:inline-block;
+  }
+  .ic.sm{width:14px;height:14px;vertical-align:-2px;}
+  .kv .k .ic{margin-right:6px;}
+  nav.tabbar button .ic{width:14px;height:14px;vertical-align:-2px;margin-right:6px;}
+
+  /* ===== Clocks ===== */
+  .clocks{display:flex;}
+  .clock{
+    flex:1;text-align:left;padding:6px 0 6px 20px;
+    border-left:1px solid var(--line);
+  }
+  .clock:first-child{border-left:none;padding-left:0;}
+  .clock .zone{font-size:.72rem;color:var(--soft);letter-spacing:.16em;text-transform:uppercase;font-weight:500;}
+  .clock .time{font-size:2rem;font-weight:700;font-variant-numeric:tabular-nums;letter-spacing:.02em;}
+  .clock .date{font-size:.8rem;color:var(--soft);letter-spacing:.08em;font-weight:500;}
+
+  /* ===== Weather ===== */
+  .wx-grid{display:flex;gap:0;overflow-x:auto;padding-bottom:4px;}
+  .wx-day{
+    flex:0 0 auto;min-width:132px;background:transparent;
+    border-left:1px solid var(--line-soft);border-radius:0;
+    padding:6px 14px;font-size:.84rem;text-align:left;
+  }
+  .wx-day:first-child{border-left:none;padding-left:0;}
+  .wx-day .d{font-weight:600;color:var(--ink);letter-spacing:.06em;}
+  .wx-day .t{font-size:1.15rem;font-weight:600;}
+
+  /* ===== Prep checklist ===== */
+  .progress-wrap{margin-bottom:18px;}
+  .progress-bar{height:2px;background:var(--line-soft);border-radius:0;overflow:hidden;}
+  .progress-bar > div{height:100%;background:var(--ink);border-radius:0;transition:width .3s;}
+  .prep-cat{margin-bottom:14px;}
+  .prep-cat h4{
+    font-size:.86rem;color:var(--ink);background:transparent;
+    border-bottom:1px solid var(--line);
+    padding:8px 0;border-radius:0;margin-bottom:2px;
+    letter-spacing:.08em;font-weight:700;
+  }
+  .prep-cat h4 .no{color:var(--soft);margin-right:10px;letter-spacing:.04em;font-weight:500;}
+  .prep-cat h4 .ic{margin-right:8px;}
+  label.prep-item{
+    display:flex;align-items:flex-start;gap:12px;padding:11px 0;
+    border-bottom:1px solid var(--line-soft);cursor:pointer;font-size:.95rem;
+  }
+  label.prep-item:last-child{border-bottom:none;}
+  label.prep-item input{
+    appearance:none;-webkit-appearance:none;
+    width:15px;height:15px;margin-top:7px;flex:0 0 auto;
+    border:1px solid var(--ink);border-radius:0;background:transparent;
+    position:relative;cursor:pointer;
+  }
+  label.prep-item input:checked{background:var(--ink);}
+  label.prep-item input:checked::after{
+    content:"";position:absolute;left:4px;top:0px;width:4px;height:9px;
+    border:solid var(--bg);border-width:0 1px 1px 0;transform:rotate(45deg);
+  }
+  label.prep-item .txt .name{font-weight:600;}
+  label.prep-item.done .txt .name{text-decoration:line-through;color:var(--soft);}
+  .deadline{
+    display:inline-block;font-size:.74rem;background:transparent;
+    border:1px solid var(--line);color:var(--soft);
+    border-radius:999px;padding:0 10px;margin-left:8px;letter-spacing:.08em;
+  }
+
+  /* ===== Day flow (node graph) ===== */
+  .flow-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;padding:10px 2px 14px;}
+  .flow{display:flex;align-items:flex-start;min-width:min-content;}
+  .flow-node{flex:0 0 auto;text-align:center;width:112px;}
+  .flow-node .dot{
+    width:36px;height:36px;line-height:34px;border-radius:50%;margin:0 auto 8px;
+    background:transparent;border:1px solid var(--ink);
+    color:var(--ink);font-weight:400;font-size:.9rem;
+  }
+  .flow-node .nm{font-size:.86rem;font-weight:600;line-height:1.4;letter-spacing:.02em;}
+  .flow-node .st{font-size:.76rem;color:var(--soft);letter-spacing:.04em;font-weight:500;}
+  .flow-link{
+    flex:0 0 auto;width:44px;height:1px;margin-top:18px;
+    background:var(--line);position:relative;
+  }
+  .flow-link::after{
+    content:"";position:absolute;right:0;top:-2.5px;width:5px;height:5px;
+    border-top:1px solid var(--ink);border-right:1px solid var(--ink);
+    transform:rotate(45deg);
+  }
+
+  /* ===== Spot ===== */
+  .spot{padding-top:26px;}
+  .spot .spot-head{padding:0 0 12px;}
+  .spot h3{
+    font-size:1.22rem;font-weight:700;color:var(--ink);margin-bottom:2px;
+    letter-spacing:.01em;text-transform:none;display:block;
+  }
+  .spot h3 a{text-decoration:none;border-bottom:1px solid var(--ink);}
+  .spot h3 .ic{width:15px;height:15px;margin-left:6px;vertical-align:-1px;}
+  .spot .order-badge{
+    display:inline-block;background:transparent;color:var(--soft);border-radius:0;
+    font-size:.72rem;padding:0;margin-bottom:8px;font-weight:600;letter-spacing:.18em;
+    text-transform:uppercase;
+  }
+  .spot .stay{font-size:.84rem;color:var(--soft);margin-bottom:12px;letter-spacing:.04em;font-weight:500;font-variant-numeric:tabular-nums;}
+  .spot .stay .ic{margin-right:5px;}
+  .spot .body{padding:14px 0 0;}
+  .spot .intro{font-size:.95rem;}
+
+  /* ===== Carousel ===== */
+  .carousel{position:relative;}
+  .car-track{
+    display:flex;overflow-x:auto;scroll-snap-type:x mandatory;
+    -webkit-overflow-scrolling:touch;scrollbar-width:none;
+  }
+  .car-track::-webkit-scrollbar{display:none;}
+  .car-track img{
+    flex:0 0 100%;width:100%;aspect-ratio:16/9;object-fit:cover;
+    scroll-snap-align:center;display:block;border-radius:0;
+    background:#e5e2dd;
+  }
+  .car-btn{
+    position:absolute;top:50%;transform:translateY(-50%);
+    width:30px;height:30px;border-radius:999px;cursor:pointer;
+    background:rgba(242,241,239,.85);color:var(--ink);
+    border:1px solid var(--ink);
+    font-size:.95rem;line-height:1;font-family:var(--sans);
+    display:flex;align-items:center;justify-content:center;
+  }
+  .car-btn.prev{left:10px;}
+  .car-btn.next{right:10px;}
+  .car-dots{
+    position:absolute;bottom:10px;left:0;right:0;display:flex;justify-content:center;gap:7px;
+  }
+  .car-dots span{
+    width:16px;height:2px;border-radius:0;background:rgba(255,255,255,.72);
+    box-shadow:0 0 2px rgba(0,0,0,.45);
+  }
+  .car-dots span.on{background:var(--ink);box-shadow:0 0 0 1px rgba(255,255,255,.75);}
+
+  /* ===== Notice block ===== */
+  .notice{
+    background:transparent;
+    border:1px solid var(--line);border-left:2px solid var(--ink);
+    border-radius:0;padding:12px 16px;margin-top:14px;font-size:.9rem;
+  }
+  .notice .nt-title{
+    font-weight:700;color:var(--ink);margin-bottom:6px;
+    font-size:.74rem;letter-spacing:.14em;text-transform:uppercase;
+  }
+  .notice ul{list-style:none;}
+  .notice li{padding:3px 0;display:flex;gap:9px;}
+  .notice li .ic{flex:0 0 auto;margin-top:7px;color:var(--soft);}
+
+  /* ===== Tomorrow preview ===== */
+  .tomorrow{
+    background:transparent;
+    border:1px solid var(--line);border-top:1px solid var(--line);
+    padding:22px 20px 24px;margin-top:30px;
+  }
+
+  /* ===== Expense ===== */
+  .stats{display:grid;grid-template-columns:1fr;gap:0;margin-bottom:26px;border-top:1px solid var(--line);}
+  @media(min-width:640px){.stats{grid-template-columns:1fr 1fr 1fr;}}
+  .stat-card{
+    background:transparent;border:none;border-bottom:1px solid var(--line-soft);
+    border-radius:0;padding:16px 4px;box-shadow:none;
+  }
+  @media(min-width:640px){
+    .stat-card{border-bottom:none;border-left:1px solid var(--line-soft);padding:18px 18px;}
+    .stat-card:first-child{border-left:none;padding-left:4px;}
+  }
+  .stat-card .t{font-size:.74rem;color:var(--soft);margin-bottom:6px;letter-spacing:.12em;text-transform:uppercase;font-weight:500;}
+  .stat-card .t .ic{margin-right:6px;}
+  .stat-card .big{font-size:1.5rem;font-weight:700;color:var(--ink);letter-spacing:.01em;font-variant-numeric:tabular-nums;}
+  .stat-card .row{display:flex;justify-content:space-between;font-size:.88rem;padding:3px 0;}
+  .stat-card .row b{font-variant-numeric:tabular-nums;font-weight:600;}
+
+  .table-wrap{
+    overflow-x:auto;-webkit-overflow-scrolling:touch;
+    background:transparent;border:none;border-radius:0;box-shadow:none;
+  }
+  table.expense{border-collapse:collapse;width:100%;min-width:640px;font-size:.92rem;}
+  table.expense th{
+    background:transparent;color:var(--soft);text-align:left;padding:10px 14px 8px;
+    white-space:nowrap;font-weight:600;font-size:.75rem;
+    letter-spacing:.1em;text-transform:uppercase;
+    border-bottom:1px solid var(--ink);
+  }
+  table.expense th:first-child{padding-left:0;}
+  table.expense td{padding:11px 14px;border-bottom:1px solid var(--line-soft);white-space:nowrap;}
+  table.expense td:first-child{padding-left:0;}
+  table.expense td.amt{text-align:right;font-variant-numeric:tabular-nums;font-weight:500;}
+  .badge{
+    display:inline-block;border-radius:999px;padding:1px 12px;
+    font-size:.75rem;font-weight:500;letter-spacing:.12em;
+    background:transparent;border:1px solid var(--soft);color:var(--soft);
+  }
+  .badge.paid{border-color:var(--ink);color:var(--ink);}
+  .badge.pending{border-color:var(--soft);color:var(--soft);}
+  .badge.refund{border-style:dashed;border-color:var(--soft);color:var(--soft);}
+
+  /* ===== 配色套用（功能性、有節制） ===== */
+  .ic-blue{color:var(--blue);}
+  .ic-gold{color:var(--gold);}
+  .ic-terra{color:var(--terra);}
+  .ic-sage{color:var(--sage);}
+  .card h3 .ic{color:var(--blue);}
+  .card h3 .no{color:var(--blue);}
+  .card h3 .en{color:var(--terra);}
+  nav.tabbar button.active{color:var(--blue);border-bottom-color:var(--blue);}
+  a:hover{color:var(--blue);}
+  .car-btn:hover{background:var(--blue);border-color:var(--blue);color:#fff;}
+  .flow-node .dot{border-color:var(--blue);color:var(--blue);}
+  .flow-node .st{color:var(--terra);font-weight:600;}
+  .flow-link::after{border-top-color:var(--blue);border-right-color:var(--blue);}
+  .wx-day .t{color:var(--blue);}
+  label.prep-item input:checked{background:var(--blue);border-color:var(--blue);}
+  .progress-bar > div{background:var(--blue);}
+  .prep-cat h4{border-left:3px solid var(--line);padding-left:10px;}
+  .prep-cat.c0 h4{border-left-color:var(--blue);}  .prep-cat.c0 h4 .ic{color:var(--blue);}
+  .prep-cat.c1 h4{border-left-color:var(--terra);} .prep-cat.c1 h4 .ic{color:var(--terra);}
+  .prep-cat.c2 h4{border-left-color:var(--sage);}  .prep-cat.c2 h4 .ic{color:var(--sage);}
+  .prep-cat.c3 h4{border-left-color:var(--gold);}  .prep-cat.c3 h4 .ic{color:var(--gold);}
+  .notice{border-left-color:var(--blue);}
+  .notice li .ic.ic-blue{color:var(--blue);}
+  .notice li .ic.ic-gold{color:var(--gold);}
+  .notice li .ic.ic-terra{color:var(--terra);}
+  .notice li .ic.ic-sage{color:var(--sage);}
+  .badge.paid{border-color:var(--sage);color:var(--sage);}
+  .badge.pending{border-color:var(--gold);color:var(--gold);}
+  .chip{
+    display:inline-block;background:var(--blue-soft);color:var(--blue);
+    border-radius:999px;padding:1px 10px;font-size:.75rem;font-weight:500;
+  }
+  .ov-row .ov-day{border-color:var(--blue);color:var(--blue);}
+  .tr-when{color:var(--terra);}
+
+  /* ===== 基本資料：雜誌式版面 ===== */
+  .info-hero{
+    display:flex;flex-wrap:wrap;gap:18px 44px;
+    justify-content:space-between;align-items:flex-end;padding-top:30px;
+  }
+  .ih-count{display:flex;align-items:baseline;gap:10px;}
+  .ih-num{font-size:3.4rem;font-weight:700;color:var(--blue);line-height:1;font-variant-numeric:tabular-nums;}
+  .ih-unit{font-size:1rem;font-weight:600;letter-spacing:.05em;}
+  .ih-dates{margin-top:8px;font-weight:500;}
+  .ih-clocks{flex:0 1 360px;min-width:270px;}
+  .info-grid{display:grid;grid-template-columns:1fr;column-gap:48px;}
+  @media(min-width:820px){
+    .info-grid{grid-template-columns:3fr 2fr;}
+  }
+  .fl-dir{
+    font-size:.78rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;
+    color:var(--blue);margin:16px 0 10px;
+  }
+  .fl-dir .ic{margin-right:6px;}
+  .fl-tl{border-left:1px solid var(--line);margin-left:7px;padding-left:22px;}
+  .fl-node{position:relative;padding:2px 0;}
+  .fl-node::before{
+    content:"";position:absolute;left:-27.5px;top:11px;width:9px;height:9px;
+    border-radius:50%;background:var(--bg);border:2px solid var(--blue);
+  }
+  .fl-node > .ic{color:var(--blue);margin-left:2px;}
+  .fl-time{font-size:1.5rem;font-weight:700;font-variant-numeric:tabular-nums;margin-right:8px;}
+  .fl-date{color:var(--soft);font-size:.85rem;margin-right:8px;font-variant-numeric:tabular-nums;font-weight:500;}
+  .fl-ap{font-size:.9rem;font-weight:500;}
+  .fl-meta{font-size:.8rem;color:var(--soft);padding:8px 0 14px;line-height:1.6;}
+  .sun-strip{display:flex;flex-wrap:wrap;gap:16px 44px;align-items:flex-start;}
+  .ss-sun{flex:0 0 auto;font-size:.95rem;}
+  .ss-sun b{font-weight:700;margin-left:4px;}
+  .ss-dress{flex:1;min-width:250px;font-size:.92rem;}
+
+  /* ===== 旅程總覽 ===== */
+  .ov-summary{font-size:1.05rem;font-weight:600;letter-spacing:.06em;margin-bottom:4px;}
+  .ov-flight{font-size:.92rem;padding:5px 0;border-bottom:1px solid var(--line-soft);}
+  .ov-flight:last-child{border-bottom:none;}
+  .ov-flight .ic{margin-right:8px;}
+  .ov-row{
+    display:block;width:100%;text-align:left;cursor:pointer;
+    appearance:none;background:none;border:none;font-family:var(--sans);color:var(--ink);
+    padding:13px 0;border-bottom:1px solid var(--line-soft);
+    font-size:.95rem;line-height:1.7;letter-spacing:.01em;
+  }
+  .ov-row:hover .ov-day{border-color:var(--ink);}
+  .ov-row .ov-top{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;}
+  .ov-row .ov-day{
+    font-weight:600;letter-spacing:.06em;font-size:.78rem;text-transform:uppercase;
+    border:1px solid var(--line);border-radius:999px;padding:0 10px;
+  }
+  .ov-row .ov-date{color:var(--soft);font-size:.85rem;font-weight:500;}
+  .ov-row .ov-theme{font-weight:600;}
+  .ov-row .ov-spots{color:var(--soft);font-size:.88rem;display:block;margin-top:2px;}
+  .ov-row .ov-spots .ic{margin-right:6px;}
+  .ov-stats{display:flex;gap:26px;flex-wrap:wrap;margin-top:4px;}
+  .ov-stats .st{font-size:.9rem;}
+  .ov-stats .st b{font-size:1.4rem;font-weight:600;margin-right:6px;}
+
+  /* ===== 交通資訊 ===== */
+  .tr-when{font-size:.85rem;color:var(--soft);letter-spacing:.06em;margin:-8px 0 10px;font-weight:500;}
+  .tr-imgs{display:flex;gap:10px;overflow-x:auto;padding:12px 0 4px;}
+  .tr-imgs img{
+    height:120px;width:auto;flex:0 0 auto;display:block;border-radius:0;
+    cursor:zoom-in;background:#e5e2dd;
+  }
+  .tr-map-hint{font-size:.78rem;color:var(--soft);letter-spacing:.08em;margin-top:4px;}
+
+  /* ===== 敏感資料鎖定 ===== */
+  .lock-btn{
+    appearance:none;cursor:pointer;margin-top:12px;
+    background:transparent;border:1px solid var(--line);border-radius:999px;
+    font-family:var(--sans);font-size:.78rem;letter-spacing:.08em;color:var(--soft);
+    padding:4px 16px;
+  }
+  .lock-btn:hover{border-color:var(--blue);color:var(--blue);}
+  .sec-locked{color:var(--soft);cursor:pointer;}
+  .sec-locked.unset{cursor:default;font-size:.9em;}
+  .sec-locked .dots{filter:blur(2.5px);letter-spacing:2px;margin-left:4px;}
+  .sec-block{font-size:.9rem;color:var(--soft);padding:8px 0;}
+  .sec-block .dots{filter:blur(3px);letter-spacing:2px;display:block;margin-top:4px;}
+  .sec-modal{
+    position:fixed;inset:0;z-index:300;background:rgba(24,23,22,.45);
+    display:flex;align-items:center;justify-content:center;padding:20px;
+  }
+  .sec-card{
+    background:var(--bg);border:1px solid var(--line);max-width:380px;width:100%;
+    padding:26px 28px;
+  }
+  .sec-card h4{
+    font-size:.9rem;letter-spacing:.14em;text-transform:uppercase;
+    font-weight:700;margin-bottom:8px;
+  }
+  .sec-card h4 .ic{color:var(--blue);margin-right:4px;}
+  .sec-card p{font-size:.85rem;margin-bottom:14px;}
+  .sec-card input{
+    width:100%;padding:9px 12px;font-family:var(--sans);font-size:1rem;
+    background:transparent;border:1px solid var(--line);border-radius:0;color:var(--ink);
+  }
+  .sec-card input:focus{outline:none;border-color:var(--blue);}
+  .sec-err{color:var(--terra);font-size:.82rem;min-height:1.4em;margin-top:6px;}
+  .sec-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:8px;}
+  .sec-actions button{
+    appearance:none;cursor:pointer;font-family:var(--sans);font-size:.85rem;letter-spacing:.06em;
+    padding:6px 18px;border-radius:999px;border:1px solid var(--line);background:transparent;color:var(--soft);
+  }
+  .sec-actions .sec-ok{border-color:var(--blue);color:var(--blue);}
+  .sec-actions .sec-ok:hover{background:var(--blue);color:#fff;}
+
+  /* ===== Lightbox ===== */
+  .lightbox{
+    position:fixed;inset:0;z-index:200;background:rgba(24,23,22,.93);
+    display:flex;align-items:center;justify-content:center;cursor:zoom-out;
+    padding:18px;
+  }
+  .lightbox img{max-width:100%;max-height:100%;object-fit:contain;background:#fff;}
+  .lightbox .lb-close{
+    position:absolute;top:14px;right:18px;color:#fff;font-size:1.6rem;line-height:1;
+    font-family:var(--sans);
+  }
+
+  @media(min-width:640px){
+    header.hero{padding:56px 20px 30px;}
+    header.hero h1{font-size:2.1rem;}
+    main{padding:12px 24px 110px;}
+    .car-track img{aspect-ratio:2/1;}
+    .tr-imgs img{height:150px;}
+  }
+</style>
+</head>
+<body>
+
+<script>
+/* ==========================================================================
+   TRIP_DATA — 整個網頁的唯一資料來源。
+   換一趟旅程時，只需要替換這個物件，頁面（含頁籤數量）會自動重新產生。
+   本次資料來源：使用者 Notion「2027法國」頁面；
+   標注（預估）（待補）（以官網為準）者為系統補充，非 Notion 原始資料。
+   圖片：Wikimedia Commons 直連縮圖（已逐一驗證可用）；斷網或圖片失效時
+   會自動 fallback 成灰色佔位圖（見 phFallback）。
+   ========================================================================== */
+
+/* 產生 inline SVG 佔位圖（data URI）的小工具 */
+const ph = (text, c1, c2) => {
+  const svg = '<svg xmlns="http://www.w3.org/2000/svg" width="800" height="450">'
+    + '<defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1">'
+    + '<stop offset="0" stop-color="' + c1 + '"/><stop offset="1" stop-color="' + c2 + '"/>'
+    + '</linearGradient></defs>'
+    + '<rect width="800" height="450" fill="url(#g)"/>'
+    + '<text x="400" y="235" font-size="38" fill="rgba(60,58,54,.7)" text-anchor="middle" font-family="serif">' + text + '</text></svg>';
+  return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
+};
+/* 圖片載入失敗時的統一 fallback（供 img onerror 使用） */
+const phFallback = t => ph(t || 'PHOTO', '#e3e0db', '#cfccc6');
+
+const TRIP_DATA = {
+  id: "paris-2027",                 // 唯一代號，行前準備勾選狀態以此為 localStorage key
+  title: "2027 法國巴黎 11 天",
+  subtitle: "冬季巴黎慢遊",
+  timezone: "Europe/Paris",         // 旅遊地時區（IANA 名稱）
+  timezoneLabel: "巴黎",
+  dates: { start: "2027-02-02", end: "2027-02-14" },  // 含飛行日：2/2 台北出發、2/14 返抵台北
+
+  /* 旅伴護照資料屬敏感資訊，已移入 secure 加密區（見下方 secure 欄位說明） */
+  travelers: [],
+
+  /* 多段轉機：flights 為陣列，每段一筆 */
+  flights: [
+    {
+      label: "去程（第一段）", airline: "阿提哈德航空", flightNo: "EY899",
+      depart: { airport: "臺灣桃園國際機場 TPE T2", time: "2027-02-02 18:40" },
+      arrive: { airport: "阿布達比國際機場 AUH A", time: "2027-02-03 00:30（+1）" },
+      baggage: "手提 7kg／托運 25kg", note: "飛行 9 小時 50 分，2/3 抵達"
+    },
+    {
+      label: "去程（第二段）", airline: "阿提哈德航空", flightNo: "EY031",
+      depart: { airport: "阿布達比國際機場 AUH A", time: "2027-02-03 02:30" },
+      arrive: { airport: "巴黎戴高樂機場 CDG T1", time: "2027-02-03 07:10" },
+      baggage: "手提 7kg／托運 25kg", note: "轉機約 2 小時，飛行 7 小時 40 分"
+    },
+    {
+      label: "回程（第一段）", airline: "阿提哈德航空", flightNo: "EY032",
+      depart: { airport: "巴黎戴高樂機場 CDG T1", time: "2027-02-13 09:45" },
+      arrive: { airport: "阿布達比國際機場 AUH A", time: "2027-02-13 19:35" },
+      baggage: "手提 7kg／托運 25kg", note: "飛行 6 小時 50 分"
+    },
+    {
+      label: "回程（第二段）", airline: "阿提哈德航空", flightNo: "EY898",
+      depart: { airport: "阿布達比國際機場 AUH A", time: "2027-02-13 21:25" },
+      arrive: { airport: "臺灣桃園國際機場 TPE T2", time: "2027-02-14 09:00（+1）" },
+      baggage: "手提 7kg／托運 25kg", note: "飛行 7 小時 35 分，2/14 上午抵達"
+    }
+  ],
+
+  hotels: [
+    {
+      name: "待補：巴黎住宿尚未提供",
+      url: "",
+      address: "待補（行程以 Metro 移動，建議選 1–7 區地鐵沿線）",
+      checkIn: "2027-02-03", checkOut: "2027-02-13"
+      /* 訂房編號屬敏感資訊，已移入 secure 加密區（hotelBookingRefs） */
+    }
+  ],
+
+  /* ============================================================
+     secure：敏感資料加密區（護照、訂位代號、訂房編號）
+     - null＝尚未設定。用本機的 encrypt.html 輸入資料與密碼產生密文後，
+       將整段 blob 物件貼到這裡取代 null。
+     - blob 格式：{ v:1, alg, salt, iv, ciphertext }（皆 base64）
+     - 演算法：WebCrypto PBKDF2（SHA-256、310000 次迭代）導出金鑰
+       ＋ AES-GCM 256 加密；解密後為 JSON：
+       { travelers:[{name,passportName,passportNo,expiry},...],
+         bookingRef:"...", hotelBookingRefs:{ "0":"..." } }
+     - 密碼與明碼都不會出現在本檔原始碼中，可安心公開部署。
+     ============================================================ */
+  secure: {
+    "v": 1,
+    "alg": "PBKDF2-SHA256/310000+AES-GCM",
+    "salt": "C5UQF/mCsTJJEu7V0Ojtiw==",
+    "iv": "XPL9s+ve8pRScK2z",
+    "ciphertext": "5Yvxy1yZixQXfQR6AmbBH18J2YOKWASKIIf6IESb054c7wYPNixVv0qHK9xV/bNY8f1mtSxZaSs8mWnYFZVAnJJQtBMkJPNd6eXY+Z/F7pQjz7uskEweHNnTSrxn0abjH95UBXFS/n6UQFuh2/lKd4z0ZO0w5I7Yl0iP9qLImyyDIzEgRDIvRX2NO6zVdK8="
+  },
+
+  /* 每日天氣概況（2 月平均預估：依巴黎歷年氣候，出發前請再查即時預報） */
+  weather: {
+    overall: "（2 月平均預估）巴黎 2 月為冬季：均溫約 2–8°C、相對濕度約 81%、每月約 13 天有雨、偶有降雪，白天約 10 小時。以下為氣候平均值，非即時預報。",
+    daily: [
+      { date: "2027-02-03", desc: "多雲偶雨（預估）", tempMin: 2, tempMax: 8, humidity: "82%", rain: "45%" },
+      { date: "2027-02-04", desc: "多雲偶雨（預估）", tempMin: 2, tempMax: 8, humidity: "82%", rain: "45%" },
+      { date: "2027-02-05", desc: "多雲偶雨（預估）", tempMin: 2, tempMax: 8, humidity: "81%", rain: "45%" },
+      { date: "2027-02-06", desc: "多雲偶雨（預估）", tempMin: 1, tempMax: 7, humidity: "81%", rain: "45%" },
+      { date: "2027-02-07", desc: "多雲偶雨（預估）", tempMin: 1, tempMax: 7, humidity: "81%", rain: "45%" },
+      { date: "2027-02-08", desc: "多雲偶雨（預估）", tempMin: 2, tempMax: 8, humidity: "81%", rain: "45%" },
+      { date: "2027-02-09", desc: "多雲偶雨（預估）", tempMin: 2, tempMax: 8, humidity: "81%", rain: "45%" },
+      { date: "2027-02-10", desc: "多雲偶雨（預估）", tempMin: 2, tempMax: 8, humidity: "81%", rain: "45%" },
+      { date: "2027-02-11", desc: "多雲偶雨（預估）", tempMin: 2, tempMax: 8, humidity: "80%", rain: "45%" },
+      { date: "2027-02-12", desc: "多雲偶雨（預估）", tempMin: 2, tempMax: 8, humidity: "80%", rain: "45%" },
+      { date: "2027-02-13", desc: "多雲偶雨（預估）", tempMin: 2, tempMax: 8, humidity: "80%", rain: "45%" }
+    ]
+  },
+
+  sun: { sunrise: "約 08:05（2 月上旬平均預估）", sunset: "約 18:05（2 月上旬平均預估）" },
+
+  clothing: "（依 2 月平均氣候預估）巴黎冬天濕冷、日夜都在 10 度以下：洋蔥式穿法，發熱衣＋毛衣＋防風保暖大衣，圍巾、手套、毛帽必備；常下小雨，帶摺疊傘並穿防水好走的鞋。博物館與商場室內暖氣強，外套選好穿脫的。",
+
+  /* 行前準備清單：Notion 未提供行前清單，以下為依巴黎行程產生的建議項目，可自行增刪 */
+  prep: [
+    {
+      category: "簽證",
+      items: [
+        { name: "免簽：確認護照效期", note: "台灣護照赴法觀光 90 天免簽，確認護照效期 6 個月以上", deadline: "" },
+        { name: "確認 ETIAS 電子旅行許可是否已上路", note: "歐盟 ETIAS 若已實施需線上申請，出發前務必查最新規定", deadline: "2027-01-15" }
+      ]
+    },
+    {
+      category: "要提前買的票",
+      items: [
+        { name: "羅浮宮門票（2/10 上午場）", note: "官網預約指定時段；週二休館（2/10 為週三可入場）", deadline: "2027-01-20" },
+        { name: "凡爾賽宮 Passport 票（2/7）", note: "含宮殿＋花園＋特里亞農；週一休館（2/7 為週日可入場，人多請早）", deadline: "2027-01-20" },
+        { name: "奧賽博物館門票（2/5）", note: "官網預售免排隊；週一休館（2/5 為週五可入場）", deadline: "2027-01-25" },
+        { name: "艾菲爾鐵塔登塔票（2/8）", note: "官網約提前 2 個月開賣，熱門時段秒殺", deadline: "2026-12-10" },
+        { name: "聖禮拜堂門票（2/3 下午）", note: "時段票，與巴黎古監獄有聯票可比價", deadline: "2027-01-25" }
+      ]
+    },
+    {
+      category: "要提前預約的",
+      items: [
+        { name: "巴黎聖母院入場預約（2/3 中午）", note: "免費但建議 App 預約時段免排隊", deadline: "2027-02-01" },
+        { name: "地鐵票規劃：Navigo Easy 或週票", note: "行程幾乎每天搭 Metro／RER（含凡爾賽 RER C、機場 RER B），週票以週一起算可試算", deadline: "2027-01-30" }
+      ]
+    },
+    {
+      category: "其他準備",
+      items: [
+        { name: "歐洲轉接頭（Type C/E）＋延長線", note: "法國 230V 雙圓孔插座", deadline: "2027-01-30" },
+        { name: "投保旅遊平安險＋不便險", note: "轉機航程建議含班機延誤與行李遺失", deadline: "2027-02-01" },
+        { name: "買 eSIM 或開通漫遊", note: "13 天流量方案（2/2–2/14）", deadline: "2027-02-01" },
+        { name: "換歐元現金", note: "市集（Enfants Rouges、Aligre）小攤多半收現金", deadline: "2027-01-30" }
+      ]
+    }
+  ],
+
+  /* 每天一個物件，頁籤數量由此陣列長度自動產生（D1–D11 來自 Notion 行程表） */
+  days: [
+    {
+      date: "2027-02-03",
+      theme: "4區｜西堤島＋聖路易島（建議 10:30 出發）",
+      spots: [
+        {
+          name: "巴黎聖母院",
+          url: "https://www.notredamedeparis.fr/",
+          stay: "11:30–13:00",
+          images: [ "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b4/Cath%C3%A9drale_Notre-Dame_de_Paris%2C_20_March_2014.jpg/960px-Cath%C3%A9drale_Notre-Dame_de_Paris%2C_20_March_2014.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7a/Paris%2C_Notre_Dame_--_2014_--_1477.jpg/960px-Paris%2C_Notre_Dame_--_2014_--_1477.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d8/North_rose_window_of_Notre-Dame_de_Paris%2C_Aug_2010.jpg/960px-North_rose_window_of_Notre-Dame_de_Paris%2C_Aug_2010.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d0/Notre-Dame_de_Paris_and_%C3%8Ele_de_la_Cit%C3%A9_at_dusk_140516_1.jpg/960px-Notre-Dame_de_Paris_and_%C3%8Ele_de_la_Cit%C3%A9_at_dusk_140516_1.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/1/18/Cathedrale_Notre-Dame_de_Paris_nef_nouvelles_cloches.jpg/960px-Cathedrale_Notre-Dame_de_Paris_nef_nouvelles_cloches.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c2/Cath%C3%A9drale_Notre-Dame_de_Paris_-_15.jpg/960px-Cath%C3%A9drale_Notre-Dame_de_Paris_-_15.jpg" ],
+          intro: "西堤島上的哥德式大教堂，巴黎的心臟。修復後重新開放，玫瑰花窗與飛扶壁是必看重點。當天清晨抵達 CDG，搭 RER B 進市區、飯店放行李後前往。",
+          notice: {
+            ticket: "入場免費，建議 App 預約時段（塔樓另收費）",
+            hours: "約 08:00–19:00，以官網為準",
+            tips: [ "交通：CDG → RER B → 市區 → 飯店放行李 → Metro／步行", "紅眼航班後的第一站，行程排鬆一點" ]
+          }
+        },
+        {
+          name: "聖禮拜堂 Sainte-Chapelle",
+          url: "https://www.sainte-chapelle.fr/",
+          stay: "13:15–14:15",
+          images: [ "https://upload.wikimedia.org/wikipedia/commons/thumb/3/36/Sainte_Chapelle_Interior_Stained_Glass.jpg/960px-Sainte_Chapelle_Interior_Stained_Glass.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Santa_Capilla%2C_Par%C3%ADs%2C_Francia%2C_2022-11-01%2C_DD_80-82_HDR.jpg/960px-Santa_Capilla%2C_Par%C3%ADs%2C_Francia%2C_2022-11-01%2C_DD_80-82_HDR.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/7/79/Sainte-Chapelle%2C_Paris%2C_upper_chapel_rose.jpg/960px-Sainte-Chapelle%2C_Paris%2C_upper_chapel_rose.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/1/12/Sainte-Chapelle_%28Upper_chapel%29.jpg/960px-Sainte-Chapelle_%28Upper_chapel%29.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/1/18/Stained_Glass_%40_Chapelle_Haute_%40_Sainte-Chapelle_%40_Paris_%2829435839634%29.jpg/960px-Stained_Glass_%40_Chapelle_Haute_%40_Sainte-Chapelle_%40_Paris_%2829435839634%29.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d5/Paris%2C_Sainte-Chapelle%2C_Obere_Kapelle%2C_Innenansicht_%2817%29.jpg/960px-Paris%2C_Sainte-Chapelle%2C_Obere_Kapelle%2C_Innenansicht_%2817%29.jpg" ],
+          intro: "13 世紀的皇家禮拜堂，上層 15 面巨型彩繪玻璃牆是巴黎最震撼的室內景之一，晴天下午光線最美。",
+          notice: {
+            ticket: "需門票約 €13，建議預約時段票，以官網為準",
+            hours: "約 09:00–17:00（冬季），以官網為準",
+            tips: [ "從聖母院步行約 5 分鐘", "位於司法宮內，入場需安檢" ]
+          }
+        },
+        {
+          name: "舊書攤＋塞納河＋聖路易島",
+          url: "",
+          stay: "14:15–17:00",
+          images: [ "https://upload.wikimedia.org/wikipedia/commons/thumb/6/68/Bouquinistes_in_Paris_%2822890464511%29.jpg/960px-Bouquinistes_in_Paris_%2822890464511%29.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c2/Paris_75005_Quai_de_Montebello_Bouquinistes_20071014.jpg/960px-Paris_75005_Quai_de_Montebello_Bouquinistes_20071014.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/Ile_Saint-Louis_from_Pont_Sully%40_Paris_%2829769949642%29.jpg/960px-Ile_Saint-Louis_from_Pont_Sully%40_Paris_%2829769949642%29.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2d/Paris_ile_Cite_ile_Saint_Louis_pont_Tournelle.jpg/960px-Paris_ile_Cite_ile_Saint_Louis_pont_Tournelle.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/8/87/Pont_de_la_Tournelle%2C_Paris_3_April_2016.jpg/960px-Pont_de_la_Tournelle%2C_Paris_3_April_2016.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/9/99/Pont_de_la_Tournelle_%2850299826243%29.jpg/960px-Pont_de_la_Tournelle_%2850299826243%29.jpg" ],
+          intro: "沿塞納河邊逛 Bouquinistes 綠色舊書攤，過橋到聖路易島吃 Berthillon 冰淇淋、鑽小巷，步調放慢的下午。",
+          notice: {
+            ticket: "免門票",
+            hours: "舊書攤約中午後陸續開張、日落前收",
+            tips: [ "回程：Metro／步行", "冬天河邊風大，圍巾帽子帶著" ]
+          }
+        }
+      ]
+    },
+    {
+      date: "2027-02-04",
+      theme: "3–4區｜瑪黑 Le Marais（建議 09:30 出發）",
+      spots: [
+        {
+          name: "紅孩兒市集 Marché des Enfants Rouges",
+          url: "",
+          stay: "10:00–12:00",
+          images: [ "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b5/March%C3%A9_des_Enfants-Rouges%2C_Paris_July_2014.jpg/960px-March%C3%A9_des_Enfants-Rouges%2C_Paris_July_2014.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2e/March%C3%A9_des_Enfants-Rouges%2C_Paris_May_2016.jpg/960px-March%C3%A9_des_Enfants-Rouges%2C_Paris_May_2016.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a9/Vegetables_at_the_March%C3%A9_des_Enfants_Rouges.jpg/960px-Vegetables_at_the_March%C3%A9_des_Enfants_Rouges.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4b/Paris_III-March%C3%A9_des_Enfants_rouges-Entr%C3%A9e_Nord_Est.jpg/960px-Paris_III-March%C3%A9_des_Enfants_rouges-Entr%C3%A9e_Nord_Est.jpg" ],
+          intro: "巴黎現存最老的室內市集（1615 年），摩洛哥塔吉鍋、日式便當、法式熟食攤一字排開，當地人買菜吃午餐的地方。",
+          notice: {
+            ticket: "免門票",
+            hours: "約 08:30–20:30，週一公休（2/4 為週四正常營業），以現場為準",
+            tips: [ "交通：飯店 → Metro → Temple／Filles du Calvaire → 步行", "小攤多收現金" ]
+          }
+        },
+        {
+          name: "市場午餐",
+          url: "",
+          stay: "12:00–13:30",
+          images: [ "https://upload.wikimedia.org/wikipedia/commons/thumb/5/50/Dijon_Covered_Market_%288%29.jpg/960px-Dijon_Covered_Market_%288%29.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a6/Fromagerie_Murand_-_March%C3%A9_Saint-Pierre_%28Caen%29_2025-03-30.jpg/960px-Fromagerie_Murand_-_March%C3%A9_Saint-Pierre_%28Caen%29_2025-03-30.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b2/Green_and_white_asparagus_on_a_market_stall_in_France_%2854479163981%29.jpg/960px-Green_and_white_asparagus_on_a_market_stall_in_France_%2854479163981%29.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/0/03/Fresh_fish_displayed_on_a_market_stall_at_the_port_in_Antibes%2C_France_%2854479363589%29.jpg/960px-Fresh_fish_displayed_on_a_market_stall_at_the_port_in_Antibes%2C_France_%2854479363589%29.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/8/81/Paris_street_market_stall_-_charcuterie_counter_2.jpg/960px-Paris_street_market_stall_-_charcuterie_counter_2.jpg" ],
+          intro: "直接在紅孩兒市集裡挑一攤吃午餐，熱門攤位 12 點後開始排隊，早點卡位。",
+          notice: {
+            ticket: "免門票（餐費另計）",
+            hours: "午餐時段 12:00–14:00 最熱鬧",
+            tips: [ "座位不多，兩人可分頭排不同攤" ]
+          }
+        },
+        {
+          name: "瑪黑區＋孚日廣場",
+          url: "",
+          stay: "13:30–17:30",
+          images: [ "https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/Plaza_de_los_Vosgos%2C_Par%C3%ADs%2C_Francia%2C_2022-10-30%2C_DD_58.jpg/960px-Plaza_de_los_Vosgos%2C_Par%C3%ADs%2C_Francia%2C_2022-10-30%2C_DD_58.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7e/Paris_3e_Place_des_Vosges_Arcades_896.jpg/960px-Paris_3e_Place_des_Vosges_Arcades_896.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fa/P1140395_Paris_IV_place_des_Vosges_arcades_Est_rwk.JPG/960px-P1140395_Paris_IV_place_des_Vosges_arcades_Est_rwk.JPG", "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7e/H%C3%B4tel_H%C3%A9rouet%2C_Le_Marais%2C_Paris_May_2017.jpg/960px-H%C3%B4tel_H%C3%A9rouet%2C_Le_Marais%2C_Paris_May_2017.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/b/bb/H%C3%B4tel_de_Sully_07-2.jpg/960px-H%C3%B4tel_de_Sully_07-2.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/1/12/Sully_Garten.JPG/960px-Sully_Garten.JPG" ],
+          intro: "巴黎最有味道的老街區：設計小店、古著、甜點與畫廊。不指定路線，看到店就逛，最後走到巴黎最古老的皇家廣場——孚日廣場。",
+          notice: {
+            ticket: "免門票",
+            hours: "店家大多 11:00–19:00；瑪黑是巴黎少數週日也熱鬧的區",
+            tips: [ "回程：Metro／步行", "雨果故居（孚日廣場旁）常設展免費" ]
+          }
+        }
+      ]
+    },
+    {
+      date: "2027-02-05",
+      theme: "7→6區｜奧賽＋聖日耳曼（建議 09:00 出發）",
+      spots: [
+        {
+          name: "奧賽博物館",
+          url: "https://www.musee-orsay.fr/",
+          stay: "09:30–12:30",
+          images: [ "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6f/Horloge_mus%C3%A9e_d%27Orsay.jpg/960px-Horloge_mus%C3%A9e_d%27Orsay.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Musee_d_Orsay_main_hall_Paris_2023_dllu.jpg/960px-Musee_d_Orsay_main_hall_Paris_2023_dllu.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/1/11/Mus%C3%A9e_d%27Orsay_clock%2C_Paris_May_2015.jpg/960px-Mus%C3%A9e_d%27Orsay_clock%2C_Paris_May_2015.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/Paris_75007_Mus%C3%A9e_d%27Orsay_Grande_nef_centrale_20180704.jpg/960px-Paris_75007_Mus%C3%A9e_d%27Orsay_Grande_nef_centrale_20180704.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1c/North_side_of_Orsay_Museum_building%2C_4_August_2007.jpg/960px-North_side_of_Orsay_Museum_building%2C_4_August_2007.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0c/Musee_d%27Orsay_and_Pont_Royal%2C_North-West_view_140402_1.jpg/960px-Musee_d%27Orsay_and_Pont_Royal%2C_North-West_view_140402_1.jpg" ],
+          intro: "由火車站改建的美術館，印象派最強館藏：莫內、雷諾瓦、梵谷、米勒都在這裡。頂層大鐘窗是經典拍照點。",
+          notice: {
+            ticket: "需門票約 €16，官網預售免排隊，以官網為準",
+            hours: "09:30–18:00，週一休館（2/5 為週五正常開放；週四夜間延長），以官網為準",
+            tips: [ "交通：飯店 → Metro／RER → Musée d'Orsay", "一開館人最少，直衝 5 樓印象派" ]
+          }
+        },
+        {
+          name: "午餐（餐廳待補）",
+          url: "",
+          stay: "12:30–14:00",
+          images: [ "https://upload.wikimedia.org/wikipedia/commons/thumb/6/69/Caf%C3%A9_de_Flore%2C_172_boulevard_Saint-Germain%2C_Paris_6e.jpg/960px-Caf%C3%A9_de_Flore%2C_172_boulevard_Saint-Germain%2C_Paris_6e.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/2/26/Caf%C3%A9_de_Flore%2C_Paris_25_September_2019_02.jpg/960px-Caf%C3%A9_de_Flore%2C_Paris_25_September_2019_02.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/Caf%C3%A9_de_Flore%2C_Paris_25_September_2019_01.jpg/960px-Caf%C3%A9_de_Flore%2C_Paris_25_September_2019_01.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c8/Les_Deux_Magots%2C_25_September_2019.jpg/960px-Les_Deux_Magots%2C_25_September_2019.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/8/82/Les_Deux_Magots%2C_Paris_March_2009.jpg/960px-Les_Deux_Magots%2C_Paris_March_2009.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7d/Cafe_de_Flore%2C_Paris_4_June_2015.jpg/960px-Cafe_de_Flore%2C_Paris_4_June_2015.jpg" ],
+          intro: "奧賽附近或過河到聖日耳曼區用餐，老牌咖啡館 Café de Flore、Les Deux Magots 都在步行範圍。",
+          notice: {
+            ticket: "餐費另計",
+            hours: "多數餐廳 12:00–14:30 供應午餐",
+            tips: [ "移動方式：步行過塞納河" ]
+          }
+        },
+        {
+          name: "聖日耳曼德佩區",
+          url: "",
+          stay: "14:00–17:30",
+          images: [ "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2f/Abad%C3%ADa_de_Saint-Germain-des-Pr%C3%A9s%2C_Par%C3%ADs%2C_Francia%2C_2022-11-01%2C_DD_20-22_HDR.jpg/960px-Abad%C3%ADa_de_Saint-Germain-des-Pr%C3%A9s%2C_Par%C3%ADs%2C_Francia%2C_2022-11-01%2C_DD_20-22_HDR.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/4/47/Nave_of_Abbaye_de_Saint-Germain-des-Pr%C3%A9s%2C_Paris%2C_France_-_Diliff.jpg/960px-Nave_of_Abbaye_de_Saint-Germain-des-Pr%C3%A9s%2C_Paris%2C_France_-_Diliff.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/9/96/Th%C3%A9%C3%A2tre_de_l%27Od%C3%A9on%2C_place_Paul-Claudel%2C_Paris_6e_2.jpg/960px-Th%C3%A9%C3%A2tre_de_l%27Od%C3%A9on%2C_place_Paul-Claudel%2C_Paris_6e_2.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fa/Rue_de_Buci%2C_Paris_6_October_2017_01.jpg/960px-Rue_de_Buci%2C_Paris_6_October_2017_01.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/6/67/Terrace_cafe%2C_Rue_de_Buci%2C_Paris_July_2010.jpg/960px-Terrace_cafe%2C_Rue_de_Buci%2C_Paris_July_2010.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/6/60/Boulevard_Saint-Germain%2C_Paris_5e_1.jpg/960px-Boulevard_Saint-Germain%2C_Paris_5e_1.jpg" ],
+          intro: "左岸文人區：百年咖啡館、獨立書店、精品小店慢慢逛，感受巴黎的知性面。",
+          notice: {
+            ticket: "免門票",
+            hours: "店家大多 10:00–19:00",
+            tips: [ "回程：Metro／步行" ]
+          }
+        }
+      ]
+    },
+    {
+      date: "2027-02-06",
+      theme: "12→11區｜Aligre＋Bastille（建議 08:00 出發）",
+      spots: [
+        {
+          name: "阿里格市集 Marché d'Aligre",
+          url: "",
+          stay: "08:30–11:00",
+          images: [ "https://upload.wikimedia.org/wikipedia/commons/thumb/4/49/March%C3%A9_dAligre_3.jpg/960px-March%C3%A9_dAligre_3.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b1/March%C3%A9_dAligre_4.jpg/960px-March%C3%A9_dAligre_4.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2f/March%C3%A9_Couvert_Beauvau_-_Paris_XII_%28FR75%29_-_2021-05-23_-_1.jpg/960px-March%C3%A9_Couvert_Beauvau_-_Paris_XII_%28FR75%29_-_2021-05-23_-_1.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/8/89/March%C3%A9_Beauvau_int%C3%A9rieur.jpg/960px-March%C3%A9_Beauvau_int%C3%A9rieur.jpg" ],
+          intro: "巴黎在地人氣早市，露天蔬果攤＋室內 Beauvau 市場，價格親民、氣氛熱鬧，是感受巴黎日常的最佳地點。",
+          notice: {
+            ticket: "免門票",
+            hours: "約 08:00–13:00，週一公休（2/6 為週六最熱鬧），以現場為準",
+            tips: [ "交通：飯店 → Metro → Ledru-Rollin → 步行", "帶現金與購物袋" ]
+          }
+        },
+        {
+          name: "採買起司＋麵包＋水果",
+          url: "",
+          stay: "11:00–12:00",
+          images: [ "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8f/Paris-Rue_Mouffetard-106-Fromagerie-2017-gje.jpg/960px-Paris-Rue_Mouffetard-106-Fromagerie-2017-gje.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/5/58/Pezenas_Market_-_Cheese_stall_-_Flickr_-_MajiksBox_-_resting.jpg/960px-Pezenas_Market_-_Cheese_stall_-_Flickr_-_MajiksBox_-_resting.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b2/Paris_-_Fromagerie_Laurent_Dubois.jpg/960px-Paris_-_Fromagerie_Laurent_Dubois.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/2/26/Vitrine_dans_une_fromagerie_%2834051774134%29.jpg/960px-Vitrine_dans_une_fromagerie_%2834051774134%29.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c7/Paris_10e_Rue_Beaurepaire_Boulangerie_653.jpg/960px-Paris_10e_Rue_Beaurepaire_Boulangerie_653.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/4/46/Boulangerie_de_Saint-Maurice-de-Beynost_%28Ain%2C_France%29_-_des_baguettes_de_pain.JPG/960px-Boulangerie_de_Saint-Maurice-de-Beynost_%28Ain%2C_France%29_-_des_baguettes_de_pain.JPG" ],
+          intro: "在市場採買起司、長棍麵包、火腿與水果，湊一頓道地的法式野餐午餐。",
+          notice: {
+            ticket: "食材費另計",
+            hours: "市場內／步行採買",
+            tips: [ "想帶起司回台灣的話，請店家真空包裝並先查檢疫規定" ]
+          }
+        },
+        {
+          name: "市場食材午餐 → Bastille／11區",
+          url: "",
+          stay: "12:00–17:00",
+          images: [ "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7e/Place_de_la_Bastille%2C_avril_2021.jpg/960px-Place_de_la_Bastille%2C_avril_2021.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5f/Place_de_la_Bastille_depuis_l%27Op%C3%A9ra.jpg/960px-Place_de_la_Bastille_depuis_l%27Op%C3%A9ra.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c6/Side_View_of_the_Op%C3%A9ra_Bastille.jpg/960px-Side_View_of_the_Op%C3%A9ra_Bastille.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/5/55/Column_of_Place_de_la_Bastille%2C_Port_de_l%27Arsenal%2C_Paris_January_2017.jpg/960px-Column_of_Place_de_la_Bastille%2C_Port_de_l%27Arsenal%2C_Paris_January_2017.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/0/07/Paris_port_Arsenal.jpg/960px-Paris_port_Arsenal.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a3/Paris_port_jardin_Arsenal.jpg/960px-Paris_port_jardin_Arsenal.jpg" ],
+          intro: "用剛買的食材簡單午餐後，往巴士底方向慢逛：11 區的咖啡店、小酒館與設計店，是巴黎年輕人的地盤。",
+          notice: {
+            ticket: "免門票",
+            hours: "午餐 12:00–13:30，慢逛 13:30–17:00",
+            tips: [ "回程：Metro／步行", "冬天戶外野餐冷，可找有座位的公園或帶回飯店吃" ]
+          }
+        }
+      ]
+    },
+    {
+      date: "2027-02-07",
+      theme: "凡爾賽 Versailles 一日（建議 08:00 出發）",
+      spots: [
+        {
+          name: "凡爾賽宮",
+          url: "https://www.chateauversailles.fr/",
+          stay: "09:30–12:30",
+          images: [ "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f1/Chateau_Versailles_Galerie_des_Glaces.jpg/960px-Chateau_Versailles_Galerie_des_Glaces.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/2/23/Garden_facade_of_the_Palace_of_Versailles_2.jpg/960px-Garden_facade_of_the_Palace_of_Versailles_2.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8a/Parterre_du_Midi_Garden_pond_and_Palace_of_Versailles_at_golden_hour_with_blue_sky_in_France.jpg/960px-Parterre_du_Midi_Garden_pond_and_Palace_of_Versailles_at_golden_hour_with_blue_sky_in_France.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/2/23/Palace_of_Versailles_Royal_Chapel_%2828281918971%29.jpg/960px-Palace_of_Versailles_Royal_Chapel_%2828281918971%29.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/3/37/Versailles_Chapel_-_July_2006_edit.jpg/960px-Versailles_Chapel_-_July_2006_edit.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/8/82/Salon_de_Mars_-_Grand_appartement_du_roi_%2824276158816%29.jpg/960px-Salon_de_Mars_-_Grand_appartement_du_roi_%2824276158816%29.jpg" ],
+          intro: "路易十四的太陽王宮殿，鏡廳、國王寢宮與皇家禮拜堂金碧輝煌，是巴黎近郊最重量級的一日行程。",
+          notice: {
+            ticket: "需門票：Passport 票約 €24 起，務必官網預約時段，以官網為準",
+            hours: "09:00–17:30（冬季），週一休館（2/7 為週日正常開放但人多，開門就進場），以官網為準",
+            tips: [ "交通：飯店 → Metro → RER C → Versailles Château Rive Gauche → 步行", "安檢排隊長，提早 30 分鐘到" ]
+          }
+        },
+        {
+          name: "午餐（凡爾賽鎮上）",
+          url: "",
+          stay: "12:30–13:30",
+          images: [ "https://upload.wikimedia.org/wikipedia/commons/thumb/0/04/Ch%C3%A2teau_de_Versailles_au_lever_du_soleil_en_2013_13.jpg/960px-Ch%C3%A2teau_de_Versailles_au_lever_du_soleil_en_2013_13.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/2/29/Golden_Gate_%2846596387111%29.jpg/960px-Golden_Gate_%2846596387111%29.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f2/Statue_of_Louis_XIV_in_place_d%27armes_of_Versailles%2C_April_2011.jpg/960px-Statue_of_Louis_XIV_in_place_d%27armes_of_Versailles%2C_April_2011.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/9/90/Palace_of_Versailles_Gate.jpg/960px-Palace_of_Versailles_Gate.jpg" ],
+          intro: "宮殿周邊與凡爾賽鎮上有不少小館與麵包店，簡單解決午餐後回花園。",
+          notice: {
+            ticket: "餐費另計",
+            hours: "12:00–14:00",
+            tips: [ "步行即可" ]
+          }
+        },
+        {
+          name: "凡爾賽花園＋大小特里亞農",
+          url: "https://www.chateauversailles.fr/",
+          stay: "13:30–17:00",
+          images: [ "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4b/Parc_de_Versailles%2C_parterre_de_Latone%2C_bassin_de_Latone_05.jpg/960px-Parc_de_Versailles%2C_parterre_de_Latone%2C_bassin_de_Latone_05.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/7/74/Ch%C3%A2teau_de_Versailles_%28Orangerie%29.jpg/960px-Ch%C3%A2teau_de_Versailles_%28Orangerie%29.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/5/51/Water_reflection_of_the_Orangerie_garden_and_Palace_of_Versailles_with_blue_sky_in_France.jpg/960px-Water_reflection_of_the_Orangerie_garden_and_Palace_of_Versailles_with_blue_sky_in_France.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7f/West_facade_of_Petit_Trianon_002.JPG/960px-West_facade_of_Petit_Trianon_002.JPG", "https://upload.wikimedia.org/wikipedia/commons/thumb/3/37/Salon_of_mirrors_with_royal_chandelier_in_the_Grand_Trianon_Domain_of_Versailles_France.jpg/960px-Salon_of_mirrors_with_royal_chandelier_in_the_Grand_Trianon_Domain_of_Versailles_France.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/0/05/Hameau_de_la_Reine_in_July_2022.jpg/960px-Hameau_de_la_Reine_in_July_2022.jpg" ],
+          intro: "下午逛幾何式大花園、大特里亞農與瑪麗安東尼的小特里亞農農莊，走累了可搭園內小火車。",
+          notice: {
+            ticket: "含在 Passport 票內；冬季花園多為免費開放（噴泉秀停演），以官網為準",
+            hours: "花園 08:00–18:00；特里亞農 12:00 才開，以官網為準",
+            tips: [ "回程：RER C → 巴黎 → 飯店", "園區極大，穿好走的鞋" ]
+          }
+        }
+      ]
+    },
+    {
+      date: "2027-02-08",
+      theme: "7區｜艾菲爾鐵塔＋塞納河（建議 09:00 出發）",
+      spots: [
+        {
+          name: "艾菲爾鐵塔",
+          url: "https://www.toureiffel.paris/",
+          stay: "09:30–12:00",
+          images: [ "https://upload.wikimedia.org/wikipedia/commons/thumb/5/53/Eiffel_tower_from_trocadero.jpg/960px-Eiffel_tower_from_trocadero.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/a/af/Tour_eiffel_at_sunrise_from_the_trocadero.jpg/960px-Tour_eiffel_at_sunrise_from_the_trocadero.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/d/de/Eiffel_Tower_and_Pont_Alexandre_III_at_night.jpg/960px-Eiffel_Tower_and_Pont_Alexandre_III_at_night.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b7/Paris_-_The_Eiffel_Tower_in_spring_-_2307.jpg/960px-Paris_-_The_Eiffel_Tower_in_spring_-_2307.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/b/bd/Sous_la_Tour_Eiffel_1.jpg/960px-Sous_la_Tour_Eiffel_1.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/6/68/Details_of_Eiffel_Tower_structure%2C_south_pillar.jpg/960px-Details_of_Eiffel_Tower_structure%2C_south_pillar.jpg" ],
+          intro: "巴黎的代名詞。搭電梯上二層或頂層俯瞰全城，冬天早晨遊客較少、空氣通透，是登塔的好時段。",
+          notice: {
+            ticket: "需門票：電梯至頂層約 €30、二層約 €19，官網約提前 2 個月開賣，以官網為準",
+            hours: "約 09:30–23:00，以官網為準",
+            tips: [ "交通：飯店 → Metro → Trocadéro／Bir-Hakeim → 步行", "Trocadéro 對岸是最經典的鐵塔全景拍照位" ]
+          }
+        },
+        {
+          name: "午餐（餐廳待補）",
+          url: "",
+          stay: "12:00–13:30",
+          images: [ "https://upload.wikimedia.org/wikipedia/commons/thumb/0/00/Fruit_shop%2C_Rue_Cler%2C_Paris_18_August_2016.jpg/960px-Fruit_shop%2C_Rue_Cler%2C_Paris_18_August_2016.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4b/March%C3%A9%2C_Rue_Cler%2C_75007_Paris%2C_France_2014.jpg/960px-March%C3%A9%2C_Rue_Cler%2C_75007_Paris%2C_France_2014.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/6/67/Terrace_cafe%2C_Rue_de_Buci%2C_Paris_July_2010.jpg/960px-Terrace_cafe%2C_Rue_de_Buci%2C_Paris_July_2010.jpg" ],
+          intro: "鐵塔周邊 7 區用餐，Rue Cler 市場街有輕食與熟食店可選。",
+          notice: {
+            ticket: "餐費另計",
+            hours: "12:00–14:30",
+            tips: [ "步行即可" ]
+          }
+        },
+        {
+          name: "戰神廣場＋7區＋塞納河",
+          url: "",
+          stay: "13:30–17:00",
+          images: [ "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8b/Eiffel_Tower_from_Champ-de-Mars%2C_7_August_2017.jpg/960px-Eiffel_Tower_from_Champ-de-Mars%2C_7_August_2017.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d2/Pont-Alexandre-III-et-Invalides.jpg/960px-Pont-Alexandre-III-et-Invalides.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/b/bd/Pont_Alexandre_III_-_01.jpg/960px-Pont_Alexandre_III_-_01.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5c/Pont_Alexandre_III_seen_from_the_Pont_des_Invalides_001.jpg/960px-Pont_Alexandre_III_seen_from_the_Pont_des_Invalides_001.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/7/75/Paris%2C_Pont_des_Arts_--_2014_--_1404.jpg/960px-Paris%2C_Pont_des_Arts_--_2014_--_1404.jpg" ],
+          intro: "從戰神廣場草坪回望鐵塔，沿塞納河散步到亞歷山大三世橋一帶，保留時間亂晃，走到哪算到哪。",
+          notice: {
+            ticket: "免門票",
+            hours: "全天開放",
+            tips: [ "回程：Metro／步行", "入夜後每小時整點鐵塔燈光秀閃 5 分鐘，值得等" ]
+          }
+        }
+      ]
+    },
+    {
+      date: "2027-02-09",
+      theme: "9區｜Opéra＋Haussmann（建議 09:30 出發）",
+      spots: [
+        {
+          name: "巴黎歌劇院（加尼葉宮）",
+          url: "https://www.operadeparis.fr/",
+          stay: "10:00–11:30",
+          images: [ "https://upload.wikimedia.org/wikipedia/commons/thumb/2/28/Monumental_stairway_of_the_palais_Garnier_opera_in_Paris.jpg/960px-Monumental_stairway_of_the_palais_Garnier_opera_in_Paris.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fb/Ceilings_of_the_palais_Garnier_opera_in_Paris%2C_05.jpg/960px-Ceilings_of_the_palais_Garnier_opera_in_Paris%2C_05.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/7/78/Palais_Garnier%27s_grand_salon%2C_12_February_2008.jpg/960px-Palais_Garnier%27s_grand_salon%2C_12_February_2008.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ef/Paris_Op%C3%A9ra_Garnier_Innen_Grand_Foyer_06.jpg/960px-Paris_Op%C3%A9ra_Garnier_Innen_Grand_Foyer_06.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/0/06/Palais_Garnier_auditorium_and_stage.jpg/960px-Palais_Garnier_auditorium_and_stage.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/1/12/West_facade_of_Palais_Garnier%2C_Paris_2017.jpg/960px-West_facade_of_Palais_Garnier%2C_Paris_2017.jpg" ],
+          intro: "《歌劇魅影》的舞台原型，金箔大階梯與夏卡爾天頂畫華麗到不真實，白天開放自由參觀。",
+          notice: {
+            ticket: "參觀需門票約 €15，以官網為準",
+            hours: "約 10:00–17:00，有排練或演出時部分區域關閉，以官網為準",
+            tips: [ "交通：飯店 → Metro → Opéra" ]
+          }
+        },
+        {
+          name: "老佛爺百貨 Galeries Lafayette",
+          url: "https://haussmann.galerieslafayette.com/",
+          stay: "11:45–14:00",
+          images: [ "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c3/Galer%C3%ADas_Lafayette_Haussmann%2C_Par%C3%ADs%2C_Francia%2C_2022-10-31%2C_DD_11-13_HDR.jpg/960px-Galer%C3%ADas_Lafayette_Haussmann%2C_Par%C3%ADs%2C_Francia%2C_2022-10-31%2C_DD_11-13_HDR.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/9/95/Galeries_Lafayette_Paris_Dome_Detail.jpg/960px-Galeries_Lafayette_Paris_Dome_Detail.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d6/Galeries_Lafayette_Paris_Dome.jpg/960px-Galeries_Lafayette_Paris_Dome.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c7/Galeries_Lafayette_dome%2C_Paris.jpg/960px-Galeries_Lafayette_dome%2C_Paris.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6b/Galerie_Lafayette_Haussmann_Dome.jpg/960px-Galerie_Lafayette_Haussmann_Dome.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/5/59/Galeries_Lafayette_Haussmann_Inside.jpg/960px-Galeries_Lafayette_Haussmann_Inside.jpg" ],
+          intro: "巴黎最著名的百貨公司，新藝術風格彩繪玻璃穹頂必看；頂樓露台免費，可眺望歌劇院與鐵塔。午餐可在美食樓層解決。",
+          notice: {
+            ticket: "免門票；頂樓觀景台免費",
+            hours: "約 10:00–20:30，週日照常營業，以官網為準",
+            tips: [ "從歌劇院步行約 5 分鐘", "退稅櫃檯人多，購物集中一次辦" ]
+          }
+        },
+        {
+          name: "春天百貨＋Haussmann 大道",
+          url: "",
+          stay: "14:00–17:30",
+          images: [ "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0d/Paris_9_-_Printemps_cupola_%281%29.jpg/960px-Paris_9_-_Printemps_cupola_%281%29.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/6/66/Paris_9_-_Printemps_cupola_%283%29.jpg/960px-Paris_9_-_Printemps_cupola_%283%29.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/1/18/Printemps-Paris.JPG/960px-Printemps-Paris.JPG", "https://upload.wikimedia.org/wikipedia/commons/thumb/4/45/Paris_Printemps_Haussmann_%2830890126292%29.jpg/960px-Paris_Printemps_Haussmann_%2830890126292%29.jpg" ],
+          intro: "沿奧斯曼大道逛春天百貨（Printemps）與周邊，這一帶是巴黎購物主戰場，藥妝與甜點伴手禮可在此補齊。",
+          notice: {
+            ticket: "免門票",
+            hours: "百貨大多 10:00–20:00",
+            tips: [ "回程：Metro", "退稅記得帶護照" ]
+          }
+        }
+      ]
+    },
+    {
+      date: "2027-02-10",
+      theme: "1區｜Louvre＋Tuileries（建議 09:00 出發）",
+      spots: [
+        {
+          name: "羅浮宮",
+          url: "https://www.louvre.fr/",
+          stay: "09:30–14:00",
+          images: [ "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a2/Louvre_Courtyard%2C_Looking_West.jpg/960px-Louvre_Courtyard%2C_Looking_West.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/6/66/Louvre_Museum_Wikimedia_Commons.jpg/960px-Louvre_Museum_Wikimedia_Commons.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/2/28/Cour_Napol%C3%A9on_at_night_-_Louvre.jpg/960px-Cour_Napol%C3%A9on_at_night_-_Louvre.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/Grande_Galerie%2C_Louvre_Museum%2C_25_September_2019_01.jpg/960px-Grande_Galerie%2C_Louvre_Museum%2C_25_September_2019_01.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/b/bf/Victoire_de_Samothrace_-_Musee_du_Louvre_-_20190812.jpg/960px-Victoire_de_Samothrace_-_Musee_du_Louvre_-_20190812.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6a/Mona_Lisa.jpg/960px-Mona_Lisa.jpg" ],
+          intro: "世界最大博物館，蒙娜麗莎、勝利女神、米洛的維納斯三大鎮館必看。安排 4.5 小時挑重點走，德農館是精華動線。",
+          notice: {
+            ticket: "需門票約 €22，務必官網預約時段；週二休館（2/10 為週三正常開放），以官網為準",
+            hours: "09:00–18:00（部分晚間延長），以官網為準",
+            tips: [ "交通：飯店 → Metro → Palais Royal–Musée du Louvre", "從 Carrousel 商場入口進場排隊較短" ]
+          }
+        },
+        {
+          name: "午餐（餐廳待補）",
+          url: "",
+          stay: "14:00–15:00",
+          images: [ "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a9/Librairie_Galignani%2C_au_224_rue_de_Rivoli%2C_Paris._.jpg/960px-Librairie_Galignani%2C_au_224_rue_de_Rivoli%2C_Paris._.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5d/Galignani_001.jpg/960px-Galignani_001.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/Rue_de_Rivoli_as_seen_from_the_Tour_Saint-Jacques%2C_11_August_2013.jpg/960px-Rue_de_Rivoli_as_seen_from_the_Tour_Saint-Jacques%2C_11_August_2013.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e4/Arcades%2C_Rue_de_Rivoli%2C_Paris_26_December_2016_001.jpg/960px-Arcades%2C_Rue_de_Rivoli%2C_Paris_26_December_2016_001.jpg" ],
+          intro: "羅浮宮周邊或 Rue de Rivoli 沿線用餐，宮內 Carrousel 美食街也可快速解決。",
+          notice: {
+            ticket: "餐費另計",
+            hours: "12:00–15:00",
+            tips: [ "步行即可" ]
+          }
+        },
+        {
+          name: "杜樂麗花園 → 協和廣場",
+          url: "",
+          stay: "15:00–17:30",
+          images: [ "https://upload.wikimedia.org/wikipedia/commons/thumb/0/00/Grand_bassin_octogonal_Jardin_des_Tuileries_003.jpg/960px-Grand_bassin_octogonal_Jardin_des_Tuileries_003.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7b/Paris_Chaises_jardin_des_Tuileries_2014.jpg/960px-Paris_Chaises_jardin_des_Tuileries_2014.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/d/da/Pavillon_de_Flore_from_the_Tuileries_Garden%2C_Paris_5_November_2019.jpg/960px-Pavillon_de_Flore_from_the_Tuileries_Garden%2C_Paris_5_November_2019.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c5/Paris_Jardin_des_Tuileries_printemps_2014.jpg/960px-Paris_Jardin_des_Tuileries_printemps_2014.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6d/Paris_-_Place_de_la_Concorde_-_3119.jpg/960px-Paris_-_Place_de_la_Concorde_-_3119.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/5/52/Luxor_Obelisk%2C_Place_de_la_Concorde%2C_Paris_2014.jpg/960px-Luxor_Obelisk%2C_Place_de_la_Concorde%2C_Paris_2014.jpg" ],
+          intro: "從羅浮宮沿杜樂麗花園的林蔭大道一路散步到協和廣場，冬日午後光線斜斜的，是巴黎最經典的散步軸線。",
+          notice: {
+            ticket: "免門票",
+            hours: "花園冬季約 07:30–19:30",
+            tips: [ "回程：Metro／步行", "橘園美術館（莫內睡蓮）就在花園內，有興趣可加購" ]
+          }
+        }
+      ]
+    },
+    {
+      date: "2027-02-11",
+      theme: "18區｜Montmartre 蒙馬特（建議 09:30 出發）",
+      spots: [
+        {
+          name: "蒙馬特街區",
+          url: "",
+          stay: "10:00–12:30",
+          images: [ "https://upload.wikimedia.org/wikipedia/commons/thumb/2/22/Rue_de_l%27Abreuvoir%2C_Montmartre%2C_Paris_9_July_2015.jpg/960px-Rue_de_l%27Abreuvoir%2C_Montmartre%2C_Paris_9_July_2015.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/2/24/2022-04-11-La_Maison_Rose-8379.jpg/960px-2022-04-11-La_Maison_Rose-8379.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/2/23/La_Maison_Rose_in_Montmartre%2C_2_May_2018.jpg/960px-La_Maison_Rose_in_Montmartre%2C_2_May_2018.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/2022-04-12-Le_mur_des_je_t%27aime-8493.jpg/960px-2022-04-12-Le_mur_des_je_t%27aime-8493.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/2/22/Windmill%2C_Montmartre%2C_Paris_23_April_2017.jpg/960px-Windmill%2C_Montmartre%2C_Paris_23_April_2017.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/5/59/Montmartre_stairs%2C_Paris_26_May_2014.jpg/960px-Montmartre_stairs%2C_Paris_26_May_2014.jpg" ],
+          intro: "巴黎最有波希米亞氣息的山丘街區：愛牆、煎餅磨坊、《艾蜜莉的異想世界》咖啡館都在這裡，石板坡道隨便拍都好看。",
+          notice: {
+            ticket: "免門票",
+            hours: "全天開放",
+            tips: [ "交通：飯店 → Metro → Abbesses／Anvers → 步行", "坡多路滑，穿防滑的鞋" ]
+          }
+        },
+        {
+          name: "聖心堂",
+          url: "https://www.sacre-coeur-montmartre.com/",
+          stay: "12:30–14:00",
+          images: [ "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Basilique_du_Sacr%C3%A9-C%C5%93ur_de_Montmartre_-_Paris_-_GT-01_-_2024.jpg/960px-Basilique_du_Sacr%C3%A9-C%C5%93ur_de_Montmartre_-_Paris_-_GT-01_-_2024.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d0/Paris_-_Basilique_du_Sacr%C3%A9-C%C5%93ur_de_Montmartre_-_2025-09-30_23-31-57_001.jpg/960px-Paris_-_Basilique_du_Sacr%C3%A9-C%C5%93ur_de_Montmartre_-_2025-09-30_23-31-57_001.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a9/Sacre_Coeur_cor_Jesu-DSC_1455w.jpg/960px-Sacre_Coeur_cor_Jesu-DSC_1455w.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Basilique_du_Sacr%C3%A9-C%C5%93ur_mosaic_of_the_Jesuit_Chapel_2026-01-03-2.jpg/960px-Basilique_du_Sacr%C3%A9-C%C5%93ur_mosaic_of_the_Jesuit_Chapel_2026-01-03-2.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9b/Paris_View_from_Sacr%C3%A9-C%C5%93ur_-20140603-RM-162815.jpg/960px-Paris_View_from_Sacr%C3%A9-C%C5%93ur_-20140603-RM-162815.jpg" ],
+          intro: "白色圓頂的羅馬拜占庭式教堂，站在巴黎最高的山丘上，教堂前階梯就是眺望全城的免費觀景台。",
+          notice: {
+            ticket: "教堂免費；登圓頂另收費約 €8，以官網為準",
+            hours: "約 06:30–22:30，以官網為準",
+            tips: [ "步行／爬坡，也可搭纜車 Funiculaire（可用地鐵票）", "階梯周邊注意兜售與扒手" ]
+          }
+        },
+        {
+          name: "小丘廣場＋蒙馬特小巷",
+          url: "",
+          stay: "14:00–17:30",
+          images: [ "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fd/Artist_at_Place_du_Tertre_in_November_2019.jpg/960px-Artist_at_Place_du_Tertre_in_November_2019.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/5/52/Paris_75018_Place_du_Tertre_20160907_Caf%C3%A9_Restaurant.jpg/960px-Paris_75018_Place_du_Tertre_20160907_Caf%C3%A9_Restaurant.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/0/07/Restaurants%2C_Place_du_Tertre%2C_Paris_30_September_2019.jpg/960px-Restaurants%2C_Place_du_Tertre%2C_Paris_30_September_2019.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/2/29/La_Cr%C3%A9maill%C3%A8re_1900%2C_Place_du_Tertre%2C_Paris_12_May_2014.jpg/960px-La_Cr%C3%A9maill%C3%A8re_1900%2C_Place_du_Tertre%2C_Paris_12_May_2014.jpg" ],
+          intro: "Place du Tertre 聚集現場作畫的街頭畫家，周邊小巷不排死路線，鑽進咖啡館、手作店，走到日落。",
+          notice: {
+            ticket: "免門票",
+            hours: "畫家攤位約 10:00–日落",
+            tips: [ "回程：Metro", "請畫家作畫先談好價錢" ]
+          }
+        }
+      ]
+    },
+    {
+      date: "2027-02-12",
+      theme: "8區｜凱旋門＋香榭麗舍（建議 10:00 出發）",
+      spots: [
+        {
+          name: "凱旋門",
+          url: "https://www.paris-arc-de-triomphe.fr/",
+          stay: "10:30–12:30",
+          images: [ "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e7/Arc_de_Triomphe_de_l%27%C3%89toile_in_July_2011.jpg/960px-Arc_de_Triomphe_de_l%27%C3%89toile_in_July_2011.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d2/1002_Arc_de_Triomphe_in_Paris_at_night_Photo_by_Giles_Laurent.jpg/960px-1002_Arc_de_Triomphe_in_Paris_at_night_Photo_by_Giles_Laurent.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/1/15/Arc_de_Triomphe_at_sunset.jpg/960px-Arc_de_Triomphe_at_sunset.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/5/53/Avenue_des_Champs-%C3%89lys%C3%A9es_from_the_Arc_de_Triomphe%2C_Paris_8_December_2014.jpg/960px-Avenue_des_Champs-%C3%89lys%C3%A9es_from_the_Arc_de_Triomphe%2C_Paris_8_December_2014.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a5/Paris_-_Arc_de_Triomphe_at_dusk1.jpg/960px-Paris_-_Arc_de_Triomphe_at_dusk1.jpg" ],
+          intro: "拿破崙的勝利之門，登頂可以看到 12 條大道放射狀展開的星形廣場，視野比鐵塔更「巴黎」。",
+          notice: {
+            ticket: "登頂需門票約 €16，以官網為準",
+            hours: "約 10:00–22:30，以官網為準",
+            tips: [ "交通：飯店 → Metro → Charles de Gaulle–Étoile", "務必走地下道過去，不要橫越圓環車陣" ]
+          }
+        },
+        {
+          name: "午餐（餐廳待補）",
+          url: "",
+          stay: "12:30–14:00",
+          images: [ "https://upload.wikimedia.org/wikipedia/commons/thumb/3/35/Ladur%C3%A9e_aux_Champs-%C3%89lys%C3%A9es.jpg/960px-Ladur%C3%A9e_aux_Champs-%C3%89lys%C3%A9es.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c5/Macarons_from_Ladur%C3%A9e_on_display.jpg/960px-Macarons_from_Ladur%C3%A9e_on_display.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/9/95/Colorful_Macarons_%28Unsplash%29.jpg/960px-Colorful_Macarons_%28Unsplash%29.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f9/A_rainbow_of_macarons_%28part_deux%29.jpg/960px-A_rainbow_of_macarons_%28part_deux%29.jpg" ],
+          intro: "香榭麗舍周邊用餐；名店 Ladurée 香榭麗舍店可順路吃馬卡龍。",
+          notice: {
+            ticket: "餐費另計",
+            hours: "12:00–14:30",
+            tips: [ "步行即可" ]
+          }
+        },
+        {
+          name: "香榭麗舍大道＋周邊",
+          url: "",
+          stay: "14:00–17:30",
+          images: [ "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6e/Arc_de_Triomphe%2C_Avenue_des_Champs-%C3%89lys%C3%A9es%2C_Paris%2C_France_%28_Ank_Kumar_%2C_Infosys_Limited_%29_01.jpg/960px-Arc_de_Triomphe%2C_Avenue_des_Champs-%C3%89lys%C3%A9es%2C_Paris%2C_France_%28_Ank_Kumar_%2C_Infosys_Limited_%29_01.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/5/55/The_Avenue_des_Champs-%C3%89lys%C3%A9es_and_the_Arc_de_Triomphe%2C_Paris_27_December_2021.jpg/960px-The_Avenue_des_Champs-%C3%89lys%C3%A9es_and_the_Arc_de_Triomphe%2C_Paris_27_December_2021.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a9/Christmas_Illumination_Champs-Elys%C3%A9es%2C_Paris_%282011%29.jpg/960px-Christmas_Illumination_Champs-Elys%C3%A9es%2C_Paris_%282011%29.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/2/22/Avenue_des_Champs-Elys%C3%A9es%2C_Paris_12_December_2020.jpg/960px-Avenue_des_Champs-Elys%C3%A9es%2C_Paris_12_December_2020.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/5/51/Illuminations_de_No%C3%ABl_2024_des_Champs-%C3%89lys%C3%A9es.jpg/960px-Illuminations_de_No%C3%ABl_2024_des_Champs-%C3%89lys%C3%A9es.jpg" ],
+          intro: "從凱旋門一路逛到圓點廣場：旗艦店、車廠展示間與百年拱廊街。行程最後一個完整下午，視天氣傍晚回凱旋門看夕陽或夜景。",
+          notice: {
+            ticket: "免門票",
+            hours: "店家大多 10:00–20:00",
+            tips: [ "回程：Metro／步行", "今晚回飯店先打包行李，明早 06:30 出發" ]
+          }
+        }
+      ]
+    },
+    {
+      date: "2027-02-13",
+      theme: "返程（約 06:30 出發）",
+      spots: [
+        {
+          name: "飯店 → 戴高樂機場 CDG T1",
+          url: "",
+          stay: "約 06:30 出發",
+          images: [ "https://upload.wikimedia.org/wikipedia/commons/thumb/d/de/Paris_Charles_de_Gaulle_Airport_Terminal_1.jpg/960px-Paris_Charles_de_Gaulle_Airport_Terminal_1.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/8/83/Paris-Charles_de_Gaulle_Airport_Terminal_1%2C_16_June_2013.jpg/960px-Paris-Charles_de_Gaulle_Airport_Terminal_1%2C_16_June_2013.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/9/92/Charles_de_Gaulle_Airport_Terminal_Interior.jpg/960px-Charles_de_Gaulle_Airport_Terminal_Interior.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d8/Paris_CDG_International_Airport_January_8%2C_2011.jpg/960px-Paris_CDG_International_Airport_January_8%2C_2011.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9d/Charles_de_Gaulle_Airport_terminal_2E.jpg/960px-Charles_de_Gaulle_Airport_terminal_2E.jpg" ],
+          intro: "一早退房，搭 RER B 或計程車前往戴高樂機場第一航廈，抓 09:45 起飛前 3 小時左右抵達辦理退稅與報到。",
+          notice: {
+            ticket: "RER B 單程約 €12；計程車右岸定額約 €56，以官方公告為準",
+            hours: "退稅（PABLO 機台）在托運前辦理，留足時間",
+            tips: [ "清晨 RER B 班距較長，先查首班車", "行李托運 25kg，前晚先秤重" ]
+          }
+        },
+        {
+          name: "EY032 巴黎 → 阿布達比",
+          url: "https://www.etihad.com/",
+          stay: "09:45–19:35",
+          images: [ "https://upload.wikimedia.org/wikipedia/commons/thumb/7/77/Etihad_Boeing_787-9_A6-BNE_IAD_VA2.jpg/960px-Etihad_Boeing_787-9_A6-BNE_IAD_VA2.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/A6-BMG_Boeing_787-10_Etihad_Airways_SVO_2025-01-19_4252.jpg/960px-A6-BMG_Boeing_787-10_Etihad_Airways_SVO_2025-01-19_4252.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c0/Etihad_Airways_Airbus_A350_A6-XWB_at_Tokyo_Narita_Int%27l_Airport.jpg/960px-Etihad_Airways_Airbus_A350_A6-XWB_at_Tokyo_Narita_Int%27l_Airport.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Etihad_Airways%2C_A6-XWA%2C_Airbus_A350-1041.jpg/960px-Etihad_Airways%2C_A6-XWA%2C_Airbus_A350-1041.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/c/cf/Etihad_Airways_A380-861_A6-API_%40YYZ.jpg/960px-Etihad_Airways_A380-861_A6-API_%40YYZ.jpg" ],
+          intro: "阿提哈德航空 EY032，09:45 從 CDG T1 起飛，19:35 抵達阿布達比，飛行 6 小時 50 分。",
+          notice: {
+            ticket: "已開票（訂位代號屬敏感資料，解鎖後於基本資料頁查看）",
+            hours: "起飛 09:45（建議 07:00 前抵達機場）",
+            tips: [ "轉機約 1 小時 50 分，落地後直接跟 Connections 指標走" ]
+          }
+        },
+        {
+          name: "EY898 阿布達比 → 台北",
+          url: "https://www.etihad.com/",
+          stay: "21:25 起飛，2/14 09:00 抵台",
+          images: [ "https://upload.wikimedia.org/wikipedia/commons/thumb/4/48/Abu_Dhabi_%28UAE%29%2C_Zayed_International_Airport%2C_Terminal_A_%2801%29.jpg/960px-Abu_Dhabi_%28UAE%29%2C_Zayed_International_Airport%2C_Terminal_A_%2801%29.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/2/22/Abu_Dhabi_%28UAE%29%2C_Zayed_International_Airport%2C_Terminal_A_%2802%29.jpg/960px-Abu_Dhabi_%28UAE%29%2C_Zayed_International_Airport%2C_Terminal_A_%2802%29.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e4/Abu_Dhabi_%28UAE%29%2C_Zayed_International_Airport%2C_Terminal_A_%2808%29.jpg/960px-Abu_Dhabi_%28UAE%29%2C_Zayed_International_Airport%2C_Terminal_A_%2808%29.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/6/68/Abu_Dhabi_%28UAE%29%2C_Zayed_International_Airport%2C_Terminal_A_%2805%29.jpg/960px-Abu_Dhabi_%28UAE%29%2C_Zayed_International_Airport%2C_Terminal_A_%2805%29.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/d/da/A6-DDC_Etihad_Airways_Boeing_777-FFX%2C_takeoff_from_Schiphol_%28EHAM-AMS%29_runway_36L_pic1.JPG/960px-A6-DDC_Etihad_Airways_Boeing_777-FFX%2C_takeoff_from_Schiphol_%28EHAM-AMS%29_runway_36L_pic1.JPG" ],
+          intro: "轉機後搭 EY898 於 21:25 起飛，飛行 7 小時 35 分，2 月 14 日上午 09:00 抵達桃園機場 T2，旅程結束。",
+          notice: {
+            ticket: "已開票（訂位代號屬敏感資料，解鎖後於基本資料頁查看）",
+            hours: "AUH 21:25 → TPE 2/14 09:00（+1）",
+            tips: [ "抵台後留意起司等乳製品入境檢疫規定" ]
+          }
+        }
+      ]
+    }
+  ],
+
+  /* 交通資訊：這趟會用到的交通方式（價格為參考值，以現場公告為準） */
+  transport: {
+    intro: "整理這趟會用到的交通方式與購票建議。票價為 2027 年前後參考值，實際以現場公告為準。",
+    maps: [
+      { title: "巴黎 Metro 路線圖", images: [ "https://upload.wikimedia.org/wikipedia/commons/thumb/5/51/Carte_M%C3%A9tro_de_Paris.svg/1280px-Carte_M%C3%A9tro_de_Paris.svg.png" ] },
+      { title: "RER 路線圖", images: [ "https://upload.wikimedia.org/wikipedia/commons/thumb/0/08/Carte_Transilien_RER_sch%C3%A9matique.svg/1280px-Carte_Transilien_RER_sch%C3%A9matique.svg.png" ] }
+    ],
+    modes: [
+      {
+        name: "Metro 地鐵", icon: "train",
+        when: "每天市區移動（第一天～第十天，行程各點幾乎都在地鐵沿線）",
+        ticket: "單程 t+ 票約 €2.5；建議 Navigo Easy 卡（空卡 €2）儲值 10 次回數票約 €22。密集移動可評估 Navigo Découverte 週卡約 €31（週一～週日效期、需一張大頭照）；本行程 2/3–2/13 橫跨兩個計價週，買前先試算，以現場為準",
+        hours: "約 05:30–00:45（週五、六與節日前夕約到 01:45）",
+        tips: [ "車廂內與手扶梯注意扒手，背包背前面", "晚歸日（蒙馬特、澀谷式夜景行程）先查該線末班車", "進站刷卡後中途出站票即失效" ],
+        images: [ "https://upload.wikimedia.org/wikipedia/commons/thumb/e/eb/Abbesses_Metro_March_3%2C_2010.jpg/960px-Abbesses_Metro_March_3%2C_2010.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/8/82/Metro_station_entrance_%28%C3%A9dicule_Guimard%29_Porte_Dauphine_Paris_16e_002.jpg/960px-Metro_station_entrance_%28%C3%A9dicule_Guimard%29_Porte_Dauphine_Paris_16e_002.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/b/bf/Carte_Navigo_D%C3%A9couverte.jpg/960px-Carte_Navigo_D%C3%A9couverte.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/5/51/Navigo_Easy_card.jpg/960px-Navigo_Easy_card.jpg" ]
+      },
+      {
+        name: "RER B（機場往返）", icon: "train",
+        when: "第一天 CDG→市區、第十一天 市區→CDG（車程約 35–50 分）",
+        ticket: "CDG 機場段單程約 €11.8（機場段不含在一般 t+ 票；Navigo 週卡全區版可直接搭），以現場為準",
+        hours: "約 04:50–23:50，清晨班距 10–20 分鐘",
+        tips: [ "購票認明「Paris–CDG」機場專用票", "月台與車廂顧好行李", "第十一天清晨出發，前一晚先查首班車時刻" ],
+        images: [ "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5a/D%C3%A9part_d%27une_MI_79_du_RER_B_de_la_voie_43_de_la_gare_souterraine_de_Paris-Nord.jpg/960px-D%C3%A9part_d%27une_MI_79_du_RER_B_de_la_voie_43_de_la_gare_souterraine_de_Paris-Nord.jpg" ]
+      },
+      {
+        name: "RER C（凡爾賽）", icon: "train",
+        when: "第五天 凡爾賽宮一日往返",
+        ticket: "巴黎市區–凡爾賽單程約 €4（Navigo 週卡涵蓋），以現場為準",
+        hours: "約 05:30–00:30，往凡爾賽方向約 15 分鐘一班",
+        tips: [ "搭往 Versailles Château Rive Gauche 方向，下車步行約 10 分鐘到宮殿", "RER C 分支多，上車前確認列車終點站顯示" ],
+        images: []
+      },
+      {
+        name: "步行", icon: "walk",
+        when: "每天：景點之間的短程移動（節點圖上的「步行」段）",
+        ticket: "免費",
+        hours: "—",
+        tips: [ "石板路與坡道多（蒙馬特、瑪黑），穿好走防滑的鞋", "冬天約 18:00 天黑，傍晚步行注意保暖與照明" ],
+        images: []
+      },
+      {
+        name: "Roissybus／計程車（機場備案）", icon: "taxi",
+        when: "第一天／第十一天 機場往返的替代方案",
+        ticket: "Roissybus 機場–Opéra 約 €16.6（車程 60–75 分）；計程車機場–右岸定額約 €56，兩人以上分攤可考慮，以現場為準",
+        hours: "Roissybus 約 05:15–00:30；計程車 24 小時（清晨建議前一晚預約）",
+        tips: [ "第十一天 06:30 出發若擔心 RER B 清晨班距，預約計程車最穩", "只搭排班計程車，不理會航廈內攬客司機" ],
+        images: []
+      },
+      {
+        name: "市區公車（補充）", icon: "bus",
+        when: "想邊移動邊看街景時替代 Metro",
+        ticket: "與 Metro 同票制（t+ 票、Navigo 皆可），上車由前門刷卡",
+        hours: "大多 07:00–22:30，深夜另有 Noctilien 夜間巴士",
+        tips: [ "72 路沿塞納河右岸行駛，沿途風景好", "尖峰時段會塞車，趕時間仍以 Metro 為主" ],
+        images: [ "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b0/Irisbus_Cit%C3%A9lis_12_8804_RATP%2C_ligne_92%2C_Paris.jpg/960px-Irisbus_Cit%C3%A9lis_12_8804_RATP%2C_ligne_92%2C_Paris.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Bus_RATP_Ligne_39_sur_Boulevard_des_Italiens_%C3%A0_Paris_%28juillet_2025%29.JPG/960px-Bus_RATP_Ligne_39_sur_Boulevard_des_Italiens_%C3%A0_Paris_%28juillet_2025%29.JPG" ]
+      }
+    ]
+  },
+
+  /* 記帳：status 建議值：已付款 / 待付款 / 已退款。Notion 記帳表尚無本次旅程資料，待補 */
+  expenses: []
+};
+</script>
+
+<header class="hero">
+  <div class="eyebrow">Travel Journal</div>
+  <h1 id="trip-title"></h1>
+  <div class="sub" id="trip-sub"></div>
+  <button id="lock-btn" class="lock-btn" type="button"></button>
+</header>
+
+<nav class="tabbar" id="tabbar"></nav>
+<main id="main"></main>
+
+<script>
+/* ==========================================================================
+   以下為渲染引擎：讀取 TRIP_DATA 動態產生整個頁面，不需修改
+   ========================================================================== */
+(function () {
+  const $  = (sel, el) => (el || document).querySelector(sel);
+  const $$ = (sel, el) => Array.from((el || document).querySelectorAll(sel));
+  const esc = s => String(s == null ? "" : s)
+    .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+
+  const CN_NUM = ["零","一","二","三","四","五","六","七","八","九","十"];
+  const cnDay = n => {
+    if (n <= 10) return CN_NUM[n];
+    if (n < 20) return "十" + (n % 10 ? CN_NUM[n % 10] : "");
+    return String(n); // 超過 19 天直接用阿拉伯數字
+  };
+  const WEEK = ["日","一","二","三","四","五","六"];
+  const fmtDate = iso => {
+    if (!iso) return "";
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(iso)) return iso; // 非 ISO 日期（如「待補」）原樣顯示
+    const d = new Date(iso + "T00:00:00");
+    return (d.getMonth() + 1) + "/" + d.getDate() + "（" + WEEK[d.getDay()] + "）";
+  };
+  const fmtMoney = n => Number(n).toLocaleString("zh-Hant-TW");
+  const pad2 = n => String(n).padStart(2, "0");
+
+  /* 單色線條 icon（Feather 風格：24x24、stroke=currentColor、無填色） */
+  const ICONS = {
+    calendar: '<rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>',
+    clock: '<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>',
+    idcard: '<rect x="2" y="5" width="20" height="14" rx="2"/><circle cx="8" cy="11" r="2"/><path d="M5 16c.5-1.5 1.6-2.2 3-2.2s2.5.7 3 2.2"/><line x1="14" y1="9" x2="19" y2="9"/><line x1="14" y1="13" x2="19" y2="13"/>',
+    plane: '<line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>',
+    takeoff: '<line x1="3" y1="21" x2="21" y2="21"/><path d="M4 16L20 8"/><polyline points="14 5.5 20 8 17.5 14"/>',
+    landing: '<line x1="3" y1="21" x2="21" y2="21"/><path d="M4 8l16 8"/><polyline points="17.5 10 20 16 14 18.5"/>',
+    luggage: '<rect x="6" y="7" width="12" height="14" rx="2"/><path d="M9 7V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v3"/><line x1="9" y1="11" x2="9" y2="17"/><line x1="15" y1="11" x2="15" y2="17"/>',
+    home: '<path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>',
+    cloudrain: '<path d="M20 16.58A5 5 0 0 0 18 7h-1.26A8 8 0 1 0 4 15.25"/><line x1="8" y1="15" x2="8" y2="19"/><line x1="12" y1="17" x2="12" y2="21"/><line x1="16" y1="15" x2="16" y2="19"/>',
+    cloud: '<path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/>',
+    sun: '<circle cx="12" cy="12" r="4"/><line x1="12" y1="2" x2="12" y2="4"/><line x1="12" y1="20" x2="12" y2="22"/><line x1="4.9" y1="4.9" x2="6.3" y2="6.3"/><line x1="17.7" y1="17.7" x2="19.1" y2="19.1"/><line x1="2" y1="12" x2="4" y2="12"/><line x1="20" y1="12" x2="22" y2="12"/><line x1="4.9" y1="19.1" x2="6.3" y2="17.7"/><line x1="17.7" y1="6.3" x2="19.1" y2="4.9"/>',
+    sunrise: '<path d="M17 18a5 5 0 0 0-10 0"/><line x1="12" y1="4" x2="12" y2="9"/><line x1="4.9" y1="10.9" x2="6.3" y2="12.3"/><line x1="1" y1="18" x2="3" y2="18"/><line x1="21" y1="18" x2="23" y2="18"/><line x1="17.7" y1="12.3" x2="19.1" y2="10.9"/><line x1="23" y1="22" x2="1" y2="22"/><polyline points="8 7 12 3 16 7"/>',
+    shirt: '<path d="M20.4 3.5 16 2a4 4 0 0 1-8 0L3.6 3.5a2 2 0 0 0-1.3 2.2l.5 3.5a1 1 0 0 0 1 .8H6v10a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1V10h2.2a1 1 0 0 0 1-.8l.5-3.5a2 2 0 0 0-1.3-2.2z"/>',
+    ticket: '<path d="M2 9V7a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v2a3 3 0 0 0 0 6v2a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-2a3 3 0 0 0 0-6z"/><line x1="13" y1="6" x2="13" y2="8"/><line x1="13" y1="11" x2="13" y2="13"/><line x1="13" y1="16" x2="13" y2="18"/>',
+    book: '<path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>',
+    calcheck: '<rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><polyline points="9 15 11 17 15 13"/>',
+    list: '<line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/>',
+    train: '<rect x="4" y="3" width="16" height="13" rx="2"/><line x1="4" y1="10" x2="20" y2="10"/><line x1="8" y1="13.5" x2="8.01" y2="13.5"/><line x1="16" y1="13.5" x2="16.01" y2="13.5"/><path d="M8 16l-2 5"/><path d="M16 16l2 5"/>',
+    bus: '<rect x="4" y="3" width="16" height="14" rx="2"/><line x1="4" y1="10" x2="20" y2="10"/><line x1="4" y1="14" x2="20" y2="14"/><circle cx="8" cy="19.5" r="1.5"/><circle cx="16" cy="19.5" r="1.5"/>',
+    taxi: '<path d="M5.5 11 7 6.8A2 2 0 0 1 8.9 5.5h6.2A2 2 0 0 1 17 6.8L18.5 11"/><rect x="3" y="11" width="18" height="6" rx="1.5"/><circle cx="7.5" cy="18.5" r="1.5"/><circle cx="16.5" cy="18.5" r="1.5"/><line x1="10.5" y1="5.5" x2="10.5" y2="3.5"/><line x1="13.5" y1="5.5" x2="13.5" y2="3.5"/>',
+    walk: '<circle cx="13" cy="4" r="1.7"/><path d="M13 7.5l-1.6 4.8 2.4 2.7v6"/><path d="M11.4 12.3 9 14l-1.2 3.2"/><path d="M13 9l2.6 2 2.4.6"/><path d="M11.8 16.5 9.8 19l-1 2.5"/>',
+    alert: '<circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>',
+    extlink: '<path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/>',
+    wallet: '<path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4z"/>',
+    user: '<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>',
+    tag: '<path d="M20.6 13.4l-7.2 7.2a2 2 0 0 1-2.8 0L2 12V2h10l8.6 8.6a2 2 0 0 1 0 2.8z"/><line x1="7" y1="7" x2="7.01" y2="7"/>',
+    info: '<circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/>',
+    checksq: '<polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>',
+    map: '<polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/>',
+    lock: '<rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>',
+    unlock: '<rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/>'
+  };
+  const ic = (name, cls) =>
+    '<svg class="ic' + (cls ? ' ' + cls : '') + '" viewBox="0 0 24 24" aria-hidden="true">' + (ICONS[name] || '') + '</svg>';
+  /* 依提醒文字挑 icon（交通/步行/一般提醒） */
+  const tipIcon = t =>
+    /Metro|RER|地鐵|纜車|計程車|Roissybus|機場|交通：|回程：/.test(t) ? 'train'
+    : /步行/.test(t) ? 'walk' : 'alert';
+  /* 依天氣描述挑 icon */
+  const wxIcon = d => /雨/.test(d) ? 'cloudrain' : /雪|雲/.test(d) ? 'cloud' : 'sun';
+  /* 行前準備分類 icon */
+  const catIcon = c => /簽證/.test(c) ? 'book' : /票/.test(c) ? 'ticket' : /預約/.test(c) ? 'calcheck' : 'list';
+  /* 區塊標題：icon＋小編號＋中文＋英文小標 */
+  const secTitle = (no, zh, en, icon) =>
+    (icon ? ic(icon) : '') + '<span class="no">(' + no + ')</span>' + zh + (en ? '<span class="en">' + en + '</span>' : '');
+
+  /* ---------- 敏感資料（TRIP_DATA.secure）：PBKDF2 + AES-GCM 解密 ---------- */
+  const SEC = { data: null };
+  const SS_KEY = "trip::" + TRIP_DATA.id + "::secure";
+  try { const s = sessionStorage.getItem(SS_KEY); if (s) SEC.data = JSON.parse(s); } catch (e) { /* 私密模式 */ }
+
+  const b64d = s => Uint8Array.from(atob(s), c => c.charCodeAt(0));
+  async function deriveKey(pass, salt) {
+    const km = await crypto.subtle.importKey("raw", new TextEncoder().encode(pass), "PBKDF2", false, ["deriveKey"]);
+    return crypto.subtle.deriveKey(
+      { name: "PBKDF2", salt: salt, iterations: 310000, hash: "SHA-256" },
+      km, { name: "AES-GCM", length: 256 }, false, ["encrypt", "decrypt"]);
+  }
+  async function decryptBlob(blob, pass) {
+    const key = await deriveKey(pass, b64d(blob.salt));
+    const pt = await crypto.subtle.decrypt({ name: "AES-GCM", iv: b64d(blob.iv) }, key, b64d(blob.ciphertext));
+    return JSON.parse(new TextDecoder().decode(pt));
+  }
+  window.__tripDecrypt = decryptBlob; // encrypt.html round-trip 測試用
+
+  const secGet = path => path.split(".").reduce((o, k) => (o == null ? o : o[k]), SEC.data);
+  const secDisplay = path => {
+    if (SEC.data) { const v = secGet(path); return v == null ? "—" : esc(String(v)); }
+    if (!TRIP_DATA.secure) return '<span class="sec-locked unset">' + ic("lock", "sm") + ' 未設定（本機用 encrypt.html 產生）</span>';
+    return '<span class="sec-locked" title="點擊解鎖">' + ic("lock", "sm") + '<span class="dots">••••••</span></span>';
+  };
+  const secHTML = path => '<span class="sec" data-sec="' + path + '">' + secDisplay(path) + '</span>';
+
+  /* ---------- 頁籤 ---------- */
+  const tabs = [
+    { id: "info", label: "基本資料", icon: "info" },
+    { id: "overview", label: "旅程總覽", icon: "map" },
+    { id: "transport", label: "交通資訊", icon: "train" },
+    { id: "prep", label: "行前準備", icon: "checksq" }
+  ];
+  TRIP_DATA.days.forEach((d, i) => tabs.push({ id: "day" + i, label: "第" + cnDay(i + 1) + "天" }));
+  tabs.push({ id: "money", label: "記帳", icon: "wallet" });
+
+  const tabbar = $("#tabbar");
+  const main = $("#main");
+  tabs.forEach(t => {
+    const b = document.createElement("button");
+    b.innerHTML = (t.icon ? ic(t.icon, "sm") : "") + t.label;
+    b.dataset.target = t.id;
+    b.addEventListener("click", () => activate(t.id));
+    tabbar.appendChild(b);
+  });
+  function activate(id) {
+    $$("button", tabbar).forEach(b => b.classList.toggle("active", b.dataset.target === id));
+    $$("section.panel", main).forEach(p => p.classList.toggle("active", p.id === "panel-" + id));
+    const btn = $$("button", tabbar).find(b => b.dataset.target === id);
+    if (btn && btn.scrollIntoView) btn.scrollIntoView({ block: "nearest", inline: "center", behavior: "smooth" });
+  }
+  const panel = id => {
+    const s = document.createElement("section");
+    s.className = "panel";
+    s.id = "panel-" + id;
+    main.appendChild(s);
+    return s;
+  };
+
+  /* ---------- 標題 ---------- */
+  $("#trip-title").textContent = TRIP_DATA.title;
+  $("#trip-sub").textContent = (TRIP_DATA.subtitle ? TRIP_DATA.subtitle + "　·　" : "")
+    + fmtDate(TRIP_DATA.dates.start) + " – " + fmtDate(TRIP_DATA.dates.end);
+
+  /* ==================== 1. 基本資料（雜誌式版面） ==================== */
+  (function renderInfo() {
+    const p = panel("info");
+    const D = TRIP_DATA;
+    let html = "";
+
+    /* --- Hero：出發倒數＋日期＋雙時鐘 --- */
+    const today = new Date(); today.setHours(0, 0, 0, 0);
+    const dStart = new Date(D.dates.start + "T00:00:00");
+    const dEnd = new Date(D.dates.end + "T00:00:00");
+    const diff = Math.round((dStart - today) / 86400000);
+    let countHTML;
+    if (diff > 0) countHTML = '<span class="ih-num">' + diff + '</span><span class="ih-unit">天後出發</span>';
+    else if (today <= dEnd) countHTML = '<span class="ih-num">Bon voyage</span><span class="ih-unit">旅程進行中</span>';
+    else countHTML = '<span class="ih-num">Fin</span><span class="ih-unit">旅程已結束</span>';
+
+    html += '<div class="card info-hero">'
+      + '<div class="ih-left">'
+      + '<div class="ih-count">' + countHTML + '</div>'
+      + '<div class="ih-dates">' + fmtDate(D.dates.start) + ' – ' + fmtDate(D.dates.end)
+      + '　<span class="muted">當地行程 ' + D.days.length + ' 天</span></div>'
+      + '</div>'
+      + '<div class="ih-clocks clocks">'
+      + '<div class="clock"><div class="zone">台灣 Taipei</div><div class="time" id="clk-tw">--:--:--</div><div class="date" id="clkd-tw"></div></div>'
+      + '<div class="clock"><div class="zone">' + esc(D.timezoneLabel) + ' Local</div><div class="time" id="clk-local">--:--:--</div><div class="date" id="clkd-local"></div></div>'
+      + '</div></div>';
+
+    /* --- 不對稱兩欄：左＝航班時間軸（寬），右＝護照＋飯店（窄） --- */
+    const fl = (Array.isArray(D.flights) ? D.flights : [D.flights.outbound, D.flights.inbound]).filter(Boolean);
+    const splitTime = t => {
+      const m = String(t).match(/^(\d{4})-(\d{2})-(\d{2})\s+(.+)$/);
+      return m ? { d: (+m[2]) + "/" + (+m[3]), t: m[4] } : { d: "", t: String(t) };
+    };
+    const flNode = (pt, icon) => {
+      const s = splitTime(pt.time);
+      return '<div class="fl-node"><span class="fl-time">' + esc(s.t) + '</span>'
+        + (s.d ? '<span class="fl-date">' + esc(s.d) + '</span>' : '') + ic(icon, "sm")
+        + '<div class="fl-ap">' + esc(pt.airport) + '</div></div>';
+    };
+    const flGroup = name => {
+      const g = fl.filter(f => (f.label || "").indexOf(name) === 0);
+      if (!g.length) return "";
+      let h = '<div class="fl-dir">' + ic("plane", "sm") + name + '</div><div class="fl-tl">';
+      g.forEach(f => {
+        h += flNode(f.depart, "takeoff")
+          + '<div class="fl-meta">' + esc(f.airline) + ' ' + esc(f.flightNo)
+          + (f.note ? '　·　' + esc(f.note) : '')
+          + '<br>' + [f.baggage ? esc(f.baggage) : "", '訂位代號 ' + secHTML("bookingRef")].filter(Boolean).join('　·　')
+          + '</div>'
+          + flNode(f.arrive, "landing");
+      });
+      return h + '</div>';
+    };
+
+    html += '<div class="info-grid"><div class="ig-main">'
+      + '<div class="card"><h3>' + secTitle("01", "航班時間軸", "Flights", "plane") + '</h3>'
+      + flGroup("去程") + flGroup("回程") + '</div>'
+      + '</div><aside class="ig-side">';
+
+    html += '<div class="card"><h3>' + secTitle("02", "護照資訊", "Passport", "idcard") + '</h3>'
+      + '<div id="travelers-box"></div></div>';
+
+    html += '<div class="card"><h3>' + secTitle("03", "飯店資訊", "Hotel", "home") + '</h3>';
+    D.hotels.forEach((h, hi) => {
+      const nm = h.url
+        ? '<a href="' + esc(h.url) + '" target="_blank" rel="noopener">' + esc(h.name) + '</a>'
+        : esc(h.name);
+      html += '<div style="padding:6px 0;">'
+        + '<div style="font-weight:600;">' + nm + '</div>'
+        + '<div class="kv"><span class="k">地址</span><span class="v">' + esc(h.address) + '</span></div>'
+        + '<div class="kv"><span class="k">入住／退房</span><span class="v">' + fmtDate(h.checkIn) + ' → ' + fmtDate(h.checkOut) + '</span></div>'
+        + '<div class="kv"><span class="k">訂房編號</span><span class="v">' + secHTML("hotelBookingRefs." + hi) + '</span></div></div>';
+    });
+    html += '</div></aside></div>';
+
+    /* --- 天氣：橫向一排 11 天小卡 --- */
+    html += '<div class="card"><h3>' + secTitle("04", "天氣與濕度", "Weather", wxIcon(D.weather.overall)) + '</h3>'
+      + '<p style="font-size:.9rem;margin-bottom:14px;">' + esc(D.weather.overall) + '</p><div class="wx-grid">';
+    D.weather.daily.forEach(w => {
+      const wi = wxIcon(w.desc);
+      html += '<div class="wx-day"><div class="d">' + fmtDate(w.date) + '</div>'
+        + '<div class="muted">' + ic(wi, "sm " + (wi === "sun" ? "ic-gold" : "ic-blue")) + ' ' + esc(w.desc) + '</div>'
+        + '<div class="t">' + w.tempMin + '–' + w.tempMax + '°C</div>'
+        + '<div class="muted">濕度 ' + esc(w.humidity) + '｜降雨 ' + esc(w.rain) + '</div></div>';
+    });
+    html += '</div></div>';
+
+    /* --- 日出日落＋建議穿著：一條橫向資訊帶 --- */
+    html += '<div class="card"><h3>' + secTitle("05", "日出日落・建議穿著", "Sun & Dress", "sunrise") + '</h3>'
+      + '<div class="sun-strip">'
+      + '<div class="ss-sun">'
+      + '<div>' + ic("sunrise", "sm ic-gold") + ' 日出<b>' + esc(D.sun.sunrise) + '</b></div>'
+      + '<div>' + ic("sun", "sm ic-terra") + ' 日落<b>' + esc(D.sun.sunset) + '</b></div>'
+      + '<div class="muted">當地時間</div>'
+      + '</div>'
+      + '<div class="ss-dress">' + ic("shirt", "sm ic-blue") + ' ' + esc(D.clothing) + '</div>'
+      + '</div></div>';
+
+    p.innerHTML = html;
+
+    /* 雙時鐘即時更新 */
+    function clockParts(tz) {
+      const parts = new Intl.DateTimeFormat("zh-Hant-TW", {
+        timeZone: tz, hour12: false,
+        year: "numeric", month: "2-digit", day: "2-digit",
+        hour: "2-digit", minute: "2-digit", second: "2-digit", weekday: "short"
+      }).formatToParts(new Date());
+      const g = t => (parts.find(x => x.type === t) || {}).value || "";
+      return {
+        time: pad2(g("hour") === "24" ? "00" : g("hour")) + ":" + g("minute") + ":" + g("second"),
+        date: g("month") + "/" + g("day") + "（" + g("weekday").replace("週", "") + "）"
+      };
+    }
+    function tick() {
+      const tw = clockParts("Asia/Taipei"), lo = clockParts(TRIP_DATA.timezone);
+      $("#clk-tw").textContent = tw.time;   $("#clkd-tw").textContent = tw.date;
+      $("#clk-local").textContent = lo.time; $("#clkd-local").textContent = lo.date;
+    }
+    tick();
+    setInterval(tick, 1000);
+  })();
+
+  /* ==================== 1b. 旅程總覽 ==================== */
+  (function renderOverview() {
+    const D = TRIP_DATA;
+    const p = panel("overview");
+
+    let html = '<div class="card"><h3>' + secTitle("01", "旅程摘要", "Summary", "map") + '</h3>'
+      + '<div class="ov-summary">' + esc(D.timezoneLabel) + ' ' + D.days.length + ' 天　'
+      + fmtDate(D.dates.start) + ' – ' + fmtDate(D.dates.end) + '</div>'
+      + (D.subtitle ? '<div class="muted">' + esc(D.subtitle) + '</div>' : '')
+      + '</div>';
+
+    /* 航班一行式摘要（去程/回程各一行，多段轉機自動合併） */
+    const fl = (Array.isArray(D.flights) ? D.flights : [D.flights.outbound, D.flights.inbound]).filter(Boolean);
+    const codeOf = s => { const m = String(s).match(/[A-Z]{3}/); return m ? m[0] : esc(s); };
+    const groupLine = name => {
+      const g = fl.filter(f => (f.label || "").indexOf(name) === 0);
+      if (!g.length) return "";
+      const via = g.length > 1 ? "，經 " + codeOf(g[0].arrive.airport) + " 轉機" : "";
+      return '<div class="ov-flight">' + ic("plane", "sm") + '<b>' + name + '</b>　'
+        + codeOf(g[0].depart.airport) + ' → ' + codeOf(g[g.length - 1].arrive.airport)
+        + '｜' + esc(g[0].depart.time) + ' 出發 → ' + esc(g[g.length - 1].arrive.time) + ' 抵達'
+        + '（' + g.map(f => esc(f.flightNo)).join("＋") + via + '）</div>';
+    };
+    html += '<div class="card"><h3>' + secTitle("02", "航班摘要", "Flights", "plane") + '</h3>'
+      + groupLine("去程") + groupLine("回程") + '</div>';
+
+    /* 每日一列總覽，點擊跳該天頁籤 */
+    html += '<div class="card"><h3>' + secTitle("03", "每日總覽", "Day by Day", "calendar") + '</h3>';
+    D.days.forEach((day, i) => {
+      const zone = String(day.theme || "").split("（")[0];
+      const dep = String(day.theme || "").match(/([0-9]{1,2}:[0-9]{2})\s*出發/);
+      const chain = day.spots.map(s => s.name).join(" → ");
+      html += '<button type="button" class="ov-row" data-day="' + i + '">'
+        + '<span class="ov-top"><span class="ov-day">Day ' + (i + 1) + '</span>'
+        + '<span class="ov-date">' + fmtDate(day.date) + (dep ? '　' + dep[1] + ' 出發' : '') + '</span>'
+        + '<span class="ov-theme">' + esc(zone) + '</span></span>'
+        + '<span class="ov-spots">' + ic("walk", "sm") + esc(chain) + '</span>'
+        + '</button>';
+    });
+    html += '<p class="muted" style="margin-top:10px;">點任一天可直接跳到該天的行程頁</p></div>';
+
+    /* 統計 */
+    const allSpots = D.days.reduce((a, d) => a.concat(d.spots), []);
+    const paid = allSpots.filter(s => /需門票|需購票/.test(((s.notice || {}).ticket) || "")).length;
+    const resv = allSpots.filter(s => /預約/.test(((s.notice || {}).ticket) || "")).length;
+    html += '<div class="card"><h3>' + secTitle("04", "統計", "Stats", "tag") + '</h3>'
+      + '<div class="ov-stats">'
+      + '<span class="st"><b>' + allSpots.length + '</b>個行程節點</span>'
+      + '<span class="st"><b>' + paid + '</b>處需購票</span>'
+      + '<span class="st"><b>' + resv + '</b>處需預約／時段票</span>'
+      + '</div></div>';
+
+    p.innerHTML = html;
+    $$(".ov-row", p).forEach(r => r.addEventListener("click", () => activate("day" + r.dataset.day)));
+  })();
+
+  /* ==================== 1c. 交通資訊 ==================== */
+  (function renderTransport() {
+    const T = TRIP_DATA.transport;
+    if (!T) return;
+    const p = panel("transport");
+    const lbImg = (u, alt) =>
+      '<img src="' + esc(u) + '" alt="' + esc(alt) + '" loading="lazy" class="lb" '
+      + 'onerror="this.onerror=null;this.classList.remove(\'lb\');this.src=phFallback(this.alt);">';
+
+    let html = '<div class="card"><h3>' + secTitle("01", "路線圖", "Network Maps", "map") + '</h3>'
+      + (T.intro ? '<p style="font-size:.92rem;margin-bottom:10px;">' + esc(T.intro) + '</p>' : '')
+      + '<div class="tr-imgs">'
+      + (T.maps || []).map(m => (Array.isArray(m.images) ? m.images : []).map(u => lbImg(u, m.title)).join('')).join('')
+      + '</div><div class="tr-map-hint">點路線圖可放大檢視，再點一下關閉</div></div>';
+
+    (T.modes || []).forEach((m, i) => {
+      const imgs = Array.isArray(m.images) ? m.images : [];
+      html += '<div class="card"><h3>' + secTitle(pad2(i + 2), m.name, "", m.icon || "train") + '</h3>'
+        + '<div class="tr-when">' + esc(m.when) + '</div>'
+        + '<div class="kv"><span class="k">' + ic("ticket", "sm") + '票怎麼買</span><span class="v">' + esc(m.ticket) + '</span></div>'
+        + '<div class="kv"><span class="k">' + ic("clock", "sm") + '營運時間</span><span class="v">' + esc(m.hours) + '</span></div>'
+        + (m.tips || []).map(t => '<div class="kv"><span class="k">' + ic("alert", "sm") + '注意</span><span class="v">' + esc(t) + '</span></div>').join('')
+        + (imgs.length ? '<div class="tr-imgs">' + imgs.map(u => lbImg(u, m.name)).join('') + '</div>' : '')
+        + '</div>';
+    });
+    p.innerHTML = html;
+  })();
+
+  /* ---------- 敏感資料 UI：鎖定顯示／解鎖 modal／sessionStorage ---------- */
+  function renderTravelers() {
+    const box = $("#travelers-box");
+    if (!box) return;
+    if (SEC.data && Array.isArray(SEC.data.travelers) && SEC.data.travelers.length) {
+      box.innerHTML = SEC.data.travelers.map(t =>
+        '<div style="padding:6px 0;border-bottom:1px solid var(--line-soft);">'
+        + '<div style="font-weight:600;">' + esc(t.name || "") + ' <span class="muted">' + esc(t.passportName || "") + '</span></div>'
+        + '<div class="muted">護照號碼 ' + esc(t.passportNo || "") + '　效期至 ' + esc(t.expiry || "") + '</div></div>').join("");
+    } else if (TRIP_DATA.secure) {
+      box.innerHTML = '<div class="sec-block sec-locked" title="點擊解鎖">' + ic("lock", "sm")
+        + ' 旅伴護照資料已加密，點擊解鎖查看'
+        + '<div class="dots">●●●　●●●●●●●●●　●●●●／●●／●●</div></div>';
+    } else {
+      box.innerHTML = '<div class="sec-block">' + ic("lock", "sm")
+        + ' 敏感資料尚未設定 — 在本機開啟 encrypt.html，輸入護照與訂位資料並設定密碼產生密文，貼入 TRIP_DATA.secure 即可。</div>';
+    }
+  }
+
+  function refreshSecure() {
+    $$("[data-sec]").forEach(el => { el.innerHTML = secDisplay(el.dataset.sec); });
+    renderTravelers();
+    const btn = $("#lock-btn");
+    if (btn) {
+      if (!TRIP_DATA.secure) btn.innerHTML = ic("lock", "sm") + ' 敏感資料未設定';
+      else if (SEC.data) btn.innerHTML = ic("unlock", "sm") + ' 已解鎖・點此鎖定';
+      else btn.innerHTML = ic("lock", "sm") + ' 解鎖敏感資料';
+    }
+  }
+
+  function openSecModal() {
+    if (!TRIP_DATA.secure || SEC.data || $(".sec-modal")) return;
+    const box = document.createElement("div");
+    box.className = "sec-modal";
+    box.innerHTML = '<div class="sec-card">'
+      + '<h4>' + ic("lock", "sm") + ' 解鎖敏感資料</h4>'
+      + '<p class="muted">輸入密碼顯示護照、訂位代號等資料。僅本分頁有效，關閉分頁自動上鎖。</p>'
+      + '<input type="password" id="sec-pass" placeholder="密碼" autocomplete="current-password">'
+      + '<div class="sec-err" id="sec-err"></div>'
+      + '<div class="sec-actions"><button type="button" class="sec-cancel">取消</button><button type="button" class="sec-ok">解鎖</button></div>'
+      + '</div>';
+    document.body.appendChild(box);
+    const input = $("#sec-pass", box), err = $("#sec-err", box);
+    input.focus();
+    const tryUnlock = async () => {
+      err.textContent = "";
+      try {
+        const data = await decryptBlob(TRIP_DATA.secure, input.value);
+        SEC.data = data;
+        try { sessionStorage.setItem(SS_KEY, JSON.stringify(data)); } catch (e) {}
+        box.remove();
+        refreshSecure();
+      } catch (e) { err.textContent = "密碼錯誤，請再試一次"; input.select(); }
+    };
+    $(".sec-ok", box).addEventListener("click", tryUnlock);
+    $(".sec-cancel", box).addEventListener("click", () => box.remove());
+    input.addEventListener("keydown", e => { if (e.key === "Enter") tryUnlock(); });
+    box.addEventListener("click", e => { if (e.target === box) box.remove(); });
+  }
+
+  const lockBtn = $("#lock-btn");
+  if (lockBtn) lockBtn.addEventListener("click", () => {
+    if (!TRIP_DATA.secure) return;
+    if (SEC.data) {
+      SEC.data = null;
+      try { sessionStorage.removeItem(SS_KEY); } catch (e) {}
+      refreshSecure();
+    } else openSecModal();
+  });
+  document.addEventListener("click", e => {
+    const t = e.target && e.target.closest ? e.target.closest(".sec-locked") : null;
+    if (t && !t.classList.contains("unset")) openSecModal();
+  });
+  refreshSecure();
+
+  /* ---------- Lightbox：點 .lb 圖片全螢幕放大，再點關閉 ---------- */
+  document.addEventListener("click", e => {
+    const t = e.target;
+    if (!t || !t.classList || !t.classList.contains("lb")) return;
+    const box = document.createElement("div");
+    box.className = "lightbox";
+    box.innerHTML = '<span class="lb-close" aria-hidden="true">×</span>';
+    const im = document.createElement("img");
+    im.src = t.src;
+    im.alt = t.alt || "";
+    box.appendChild(im);
+    box.addEventListener("click", () => box.remove());
+    document.body.appendChild(box);
+  });
+
+  /* ==================== 2. 行前準備 ==================== */
+  (function renderPrep() {
+    const p = panel("prep");
+    const storeKey = (ci, ii) => "trip::" + TRIP_DATA.id + "::prep::" + ci + "::" + ii;
+    const total = TRIP_DATA.prep.reduce((n, c) => n + c.items.length, 0);
+
+    let html = '<div class="card"><h3>' + secTitle("01", "行前準備清單", "Checklist", "checksq") + '</h3>'
+      + '<div class="progress-wrap"><div style="display:flex;justify-content:space-between;font-size:.82rem;margin-bottom:6px;">'
+      + '<span class="muted" style="letter-spacing:.2em;">PROGRESS</span><b id="prep-count" style="font-weight:500;"></b></div>'
+      + '<div class="progress-bar"><div id="prep-bar" style="width:0%"></div></div></div>';
+
+    TRIP_DATA.prep.forEach((cat, ci) => {
+      html += '<div class="prep-cat c' + (ci % 4) + '"><h4>' + ic(catIcon(cat.category), "sm") + '<span class="no">(' + pad2(ci + 1) + ')</span>' + esc(cat.category) + '</h4>';
+      cat.items.forEach((it, ii) => {
+        html += '<label class="prep-item" data-key="' + storeKey(ci, ii) + '">'
+          + '<input type="checkbox">'
+          + '<span class="txt"><span class="name">' + esc(it.name) + '</span>'
+          + (it.deadline ? '<span class="deadline">截止 ' + fmtDate(it.deadline) + '</span>' : "")
+          + (it.note ? '<br><span class="muted">' + esc(it.note) + '</span>' : "")
+          + '</span></label>';
+      });
+      html += '</div>';
+    });
+    html += '</div>';
+    p.innerHTML = html;
+
+    function refresh() {
+      const done = $$("label.prep-item input", p).filter(c => c.checked).length;
+      $("#prep-count").textContent = done + "/" + total + " 已完成";
+      $("#prep-bar").style.width = (total ? Math.round(done / total * 100) : 0) + "%";
+    }
+    $$("label.prep-item", p).forEach(lb => {
+      const cb = $("input", lb), key = lb.dataset.key;
+      let saved = null;
+      try { saved = localStorage.getItem(key); } catch (e) { /* 私密模式可能不可用 */ }
+      cb.checked = saved === "1";
+      lb.classList.toggle("done", cb.checked);
+      cb.addEventListener("change", () => {
+        try { localStorage.setItem(key, cb.checked ? "1" : "0"); } catch (e) {}
+        lb.classList.toggle("done", cb.checked);
+        refresh();
+      });
+    });
+    refresh();
+  })();
+
+  /* ==================== 3. 每日行程 ==================== */
+  function flowHTML(day) {
+    let h = '<div class="flow-scroll"><div class="flow">';
+    day.spots.forEach((s, i) => {
+      if (i > 0) h += '<div class="flow-link"></div>';
+      h += '<div class="flow-node"><div class="dot">' + (i + 1) + '</div>'
+        + '<div class="nm">' + esc(s.name) + '</div>'
+        + '<div class="st">' + esc(s.stay) + '</div></div>';
+    });
+    return h + '</div></div>';
+  }
+
+  function carouselHTML(imgs, alt) {
+    let h = '<div class="carousel"><div class="car-track">';
+    imgs.forEach(u => {
+      h += '<img src="' + esc(u) + '" alt="' + esc(alt) + '" loading="lazy" '
+        + 'onerror="this.onerror=null;this.src=phFallback(this.alt);">';
+    });
+    h += '</div>';
+    if (imgs.length > 1) {
+      h += '<button class="car-btn prev" type="button" aria-label="上一張">‹</button>'
+        + '<button class="car-btn next" type="button" aria-label="下一張">›</button>'
+        + '<div class="car-dots">' + imgs.map((_, i) => '<span' + (i === 0 ? ' class="on"' : '') + '></span>').join('') + '</div>';
+    }
+    return h + '</div>';
+  }
+
+  function initCarousels(scope) {
+    $$(".carousel", scope).forEach(c => {
+      const track = $(".car-track", c), dots = $$(".car-dots span", c);
+      if (!dots.length) return;
+      const idx = () => Math.round(track.scrollLeft / track.clientWidth);
+      const go = i => track.scrollTo({ left: i * track.clientWidth, behavior: "smooth" });
+      $(".car-btn.prev", c).addEventListener("click", () => go(Math.max(0, idx() - 1)));
+      $(".car-btn.next", c).addEventListener("click", () => go(Math.min(dots.length - 1, idx() + 1)));
+      track.addEventListener("scroll", () => {
+        const i = idx();
+        dots.forEach((d, j) => d.classList.toggle("on", j === i));
+      }, { passive: true });
+    });
+  }
+
+  TRIP_DATA.days.forEach((day, di) => {
+    const p = panel("day" + di);
+    let html = '<div class="card"><h3>' + secTitle("Route", "今日節點圖", "", "map")
+      + '<span class="en">' + fmtDate(day.date) + (day.theme ? '｜' + esc(day.theme) : '') + '</span></h3>'
+      + flowHTML(day) + '</div>';
+
+    day.spots.forEach((s, si) => {
+      const title = s.url
+        ? '<a href="' + esc(s.url) + '" target="_blank" rel="noopener">' + esc(s.name) + ic("extlink") + '</a>'
+        : esc(s.name);
+      html += '<div class="card spot">'
+        + '<div class="spot-head"><span class="order-badge">No.' + (si + 1) + '　第 ' + (si + 1) + ' 站</span>'
+        + '<h3>' + title + '</h3><div class="stay">' + ic("clock", "sm") + esc(s.stay) + '</div></div>'
+        + carouselHTML(s.images || [], s.name)
+        + '<div class="body"><p class="intro">' + esc(s.intro) + '</p>'
+        + '<div class="notice"><div class="nt-title">' + ic("alert", "sm ic-terra") + ' Notes ・ 注意提醒</div><ul>'
+        + '<li>' + ic("ticket", "sm ic-blue") + '<span>票券：' + esc(s.notice.ticket) + '</span></li>'
+        + '<li>' + ic("clock", "sm ic-gold") + '<span>開放時間：' + esc(s.notice.hours) + '</span></li>'
+        + (s.notice.tips || []).map(t => {
+            const ti = tipIcon(t);
+            const tc = ti === "alert" ? "ic-terra" : ti === "walk" ? "ic-sage" : "ic-blue";
+            return '<li>' + ic(ti, "sm " + tc) + '<span>' + esc(t) + '</span></li>';
+          }).join('')
+        + '</ul></div></div></div>';
+    });
+
+    /* 明天去哪 */
+    const next = TRIP_DATA.days[di + 1];
+    if (next) {
+      html += '<div class="card tomorrow"><h3>' + secTitle("Next", "明天去哪", "", "sunrise")
+        + '<span class="en">' + fmtDate(next.date) + (next.theme ? '｜' + esc(next.theme) : '') + '</span></h3>'
+        + flowHTML(next) + '</div>';
+    } else {
+      html += '<div class="card tomorrow"><h3>' + secTitle("Home", "回程", "", "home") + '</h3>'
+        + '<p style="font-size:.88rem;">這是本次旅程的最後一天，收拾行李準備回家囉！記得檢查護照、伴手禮與退稅單。</p></div>';
+    }
+
+    p.innerHTML = html;
+    initCarousels(p);
+  });
+
+  /* ==================== 4. 記帳 ==================== */
+  (function renderMoney() {
+    const p = panel("money");
+    const exp = TRIP_DATA.expenses;
+
+    const badgeCls = s => s === "已付款" ? "paid" : s === "待付款" ? "pending" : s === "已退款" ? "refund" : "other";
+    const addTo = (map, key, e) => {
+      if (!map[key]) map[key] = {};
+      map[key][e.currency] = (map[key][e.currency] || 0) + e.amount;
+    };
+    const moneyStr = obj => Object.entries(obj).map(([cur, amt]) => cur + " " + fmtMoney(amt)).join("　+　") || "—";
+
+    const totals = {}, byPayer = {}, byCat = {};
+    exp.forEach(e => {
+      if (e.status === "已退款") return; // 已退款不計入統計
+      totals[e.currency] = (totals[e.currency] || 0) + e.amount;
+      addTo(byPayer, e.payer, e);
+      addTo(byCat, e.category, e);
+    });
+
+    let html = '<div class="stats">';
+    html += '<div class="stat-card"><div class="t">' + ic("wallet", "sm ic-blue") + '總花費（不含已退款）</div><div class="big">' + moneyStr(totals) + '</div></div>';
+    html += '<div class="stat-card"><div class="t">' + ic("user", "sm ic-terra") + '依「誰付的」小計</div>'
+      + (Object.keys(byPayer).length
+        ? Object.entries(byPayer).map(([k, v]) => '<div class="row"><span>' + esc(k) + '</span><b>' + moneyStr(v) + '</b></div>').join('')
+        : '<div class="muted">尚無資料</div>')
+      + '</div>';
+    html += '<div class="stat-card"><div class="t">' + ic("tag", "sm ic-sage") + '依分類小計</div>'
+      + (Object.keys(byCat).length
+        ? Object.entries(byCat).map(([k, v]) => '<div class="row"><span>' + esc(k) + '</span><b>' + moneyStr(v) + '</b></div>').join('')
+        : '<div class="muted">尚無資料</div>')
+      + '</div>';
+    html += '</div>';
+
+    html += '<div class="table-wrap"><table class="expense"><thead><tr>'
+      + '<th>項目名稱</th><th>金額</th><th>Status</th><th>分類</th><th>誰付的</th><th>備註</th>'
+      + '</tr></thead><tbody>';
+    if (exp.length) {
+      exp.forEach(e => {
+        html += '<tr><td>' + esc(e.name) + '</td>'
+          + '<td class="amt">' + esc(e.currency) + ' ' + fmtMoney(e.amount) + '</td>'
+          + '<td><span class="badge ' + badgeCls(e.status) + '">' + esc(e.status) + '</span></td>'
+          + '<td><span class="chip">' + esc(e.category) + '</span></td>'
+          + '<td>' + ic("user", "sm ic-terra") + ' ' + esc(e.payer) + '</td>'
+          + '<td class="muted">' + esc(e.note) + '</td></tr>';
+      });
+    } else {
+      html += '<tr><td colspan="6" class="muted" style="text-align:center;padding:26px;white-space:normal;">尚無記帳資料，開始記錄第一筆吧！</td></tr>';
+    }
+    html += '</tbody></table></div>'
+      + '<p class="muted" style="margin-top:10px;">＊表格可左右滑動；「已退款」項目不計入上方統計。</p>';
+
+    p.innerHTML = html;
+  })();
+
+  activate("info");
+})();
+</script>
+</body>
+</html>
