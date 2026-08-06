@@ -8,6 +8,8 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600&family=Noto+Sans+TC:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://accounts.google.com/gsi/client" async></script>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" defer></script>
 <style>
   :root{
     --bg:#F2F1EF;
@@ -535,6 +537,25 @@
   .sec-actions .sec-ok{border-color:var(--blue);color:var(--blue);}
   .sec-actions .sec-ok:hover{background:var(--blue);color:#fff;}
 
+  /* ===== Day mini map（Leaflet） ===== */
+  .day-map-wrap{position:relative;margin-top:8px;}
+  .day-map{height:200px;width:100%;max-width:100%;border:1px solid var(--line);background:#e9e6e1;z-index:0;}
+  .day-map-label{
+    position:absolute;top:10px;left:10px;z-index:600;pointer-events:none;
+    background:rgba(242,241,239,.92);border:1px solid var(--line);
+    font-size:.72rem;letter-spacing:.1em;color:var(--ink);padding:1px 10px;font-weight:600;
+  }
+  .map-dot-wrap{background:none;border:none;}
+  .map-dot{
+    width:26px;height:26px;line-height:24px;border-radius:50%;text-align:center;
+    background:var(--bg);border:1px solid var(--blue);color:var(--blue);
+    font-size:.78rem;font-weight:600;font-family:var(--sans);
+    box-shadow:0 0 0 2px rgba(242,241,239,.65);
+  }
+  .day-map.day-map-fallback{height:auto;padding:12px 16px;font-size:.9rem;color:var(--soft);background:transparent;}
+  .leaflet-container{font-family:var(--sans);font-size:.8rem;}
+  @media(min-width:640px){.day-map{height:220px;}}
+
   /* ===== Lightbox ===== */
   .lightbox{
     position:fixed;inset:0;z-index:200;background:rgba(24,23,22,.93);
@@ -750,6 +771,7 @@ const TRIP_DATA = {
           url: "https://www.notredamedeparis.fr/",
           mapQuery: "Cathédrale Notre-Dame de Paris",
           stay: "11:30–13:00",
+          coords: [48.853, 2.3499],
           images: [ "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b4/Cath%C3%A9drale_Notre-Dame_de_Paris%2C_20_March_2014.jpg/960px-Cath%C3%A9drale_Notre-Dame_de_Paris%2C_20_March_2014.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7a/Paris%2C_Notre_Dame_--_2014_--_1477.jpg/960px-Paris%2C_Notre_Dame_--_2014_--_1477.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d8/North_rose_window_of_Notre-Dame_de_Paris%2C_Aug_2010.jpg/960px-North_rose_window_of_Notre-Dame_de_Paris%2C_Aug_2010.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d0/Notre-Dame_de_Paris_and_%C3%8Ele_de_la_Cit%C3%A9_at_dusk_140516_1.jpg/960px-Notre-Dame_de_Paris_and_%C3%8Ele_de_la_Cit%C3%A9_at_dusk_140516_1.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/1/18/Cathedrale_Notre-Dame_de_Paris_nef_nouvelles_cloches.jpg/960px-Cathedrale_Notre-Dame_de_Paris_nef_nouvelles_cloches.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c2/Cath%C3%A9drale_Notre-Dame_de_Paris_-_15.jpg/960px-Cath%C3%A9drale_Notre-Dame_de_Paris_-_15.jpg" ],
           intro: [
             "西堤島上的哥德式大教堂，巴黎的心臟",
@@ -767,6 +789,7 @@ const TRIP_DATA = {
           url: "https://www.sainte-chapelle.fr/",
           mapQuery: "Sainte-Chapelle Paris",
           stay: "13:15–14:15",
+          coords: [48.8554, 2.345],
           images: [ "https://upload.wikimedia.org/wikipedia/commons/thumb/3/36/Sainte_Chapelle_Interior_Stained_Glass.jpg/960px-Sainte_Chapelle_Interior_Stained_Glass.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Santa_Capilla%2C_Par%C3%ADs%2C_Francia%2C_2022-11-01%2C_DD_80-82_HDR.jpg/960px-Santa_Capilla%2C_Par%C3%ADs%2C_Francia%2C_2022-11-01%2C_DD_80-82_HDR.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/7/79/Sainte-Chapelle%2C_Paris%2C_upper_chapel_rose.jpg/960px-Sainte-Chapelle%2C_Paris%2C_upper_chapel_rose.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/1/12/Sainte-Chapelle_%28Upper_chapel%29.jpg/960px-Sainte-Chapelle_%28Upper_chapel%29.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/1/18/Stained_Glass_%40_Chapelle_Haute_%40_Sainte-Chapelle_%40_Paris_%2829435839634%29.jpg/960px-Stained_Glass_%40_Chapelle_Haute_%40_Sainte-Chapelle_%40_Paris_%2829435839634%29.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d5/Paris%2C_Sainte-Chapelle%2C_Obere_Kapelle%2C_Innenansicht_%2817%29.jpg/960px-Paris%2C_Sainte-Chapelle%2C_Obere_Kapelle%2C_Innenansicht_%2817%29.jpg" ],
           intro: [
             "13 世紀的皇家禮拜堂",
@@ -784,6 +807,7 @@ const TRIP_DATA = {
           url: "",
           mapQuery: "Île Saint-Louis Paris",
           stay: "14:15–17:00",
+          coords: [48.8517, 2.3567],
           images: [ "https://upload.wikimedia.org/wikipedia/commons/thumb/6/68/Bouquinistes_in_Paris_%2822890464511%29.jpg/960px-Bouquinistes_in_Paris_%2822890464511%29.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c2/Paris_75005_Quai_de_Montebello_Bouquinistes_20071014.jpg/960px-Paris_75005_Quai_de_Montebello_Bouquinistes_20071014.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/Ile_Saint-Louis_from_Pont_Sully%40_Paris_%2829769949642%29.jpg/960px-Ile_Saint-Louis_from_Pont_Sully%40_Paris_%2829769949642%29.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2d/Paris_ile_Cite_ile_Saint_Louis_pont_Tournelle.jpg/960px-Paris_ile_Cite_ile_Saint_Louis_pont_Tournelle.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/8/87/Pont_de_la_Tournelle%2C_Paris_3_April_2016.jpg/960px-Pont_de_la_Tournelle%2C_Paris_3_April_2016.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/9/99/Pont_de_la_Tournelle_%2850299826243%29.jpg/960px-Pont_de_la_Tournelle_%2850299826243%29.jpg" ],
           intro: [
             "沿塞納河邊逛 Bouquinistes 綠色舊書攤",
@@ -807,6 +831,7 @@ const TRIP_DATA = {
           url: "",
           mapQuery: "Marché des Enfants Rouges Paris",
           stay: "10:00–12:00",
+          coords: [48.8629, 2.3623],
           images: [ "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b5/March%C3%A9_des_Enfants-Rouges%2C_Paris_July_2014.jpg/960px-March%C3%A9_des_Enfants-Rouges%2C_Paris_July_2014.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2e/March%C3%A9_des_Enfants-Rouges%2C_Paris_May_2016.jpg/960px-March%C3%A9_des_Enfants-Rouges%2C_Paris_May_2016.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a9/Vegetables_at_the_March%C3%A9_des_Enfants_Rouges.jpg/960px-Vegetables_at_the_March%C3%A9_des_Enfants_Rouges.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4b/Paris_III-March%C3%A9_des_Enfants_rouges-Entr%C3%A9e_Nord_Est.jpg/960px-Paris_III-March%C3%A9_des_Enfants_rouges-Entr%C3%A9e_Nord_Est.jpg" ],
           intro: [
             "巴黎現存最老的室內市集（1615 年）",
@@ -824,6 +849,7 @@ const TRIP_DATA = {
           url: "",
           mapQuery: "Marché des Enfants Rouges Paris",
           stay: "12:00–13:30",
+          coords: [48.8627, 2.362],
           images: [ "https://upload.wikimedia.org/wikipedia/commons/thumb/5/50/Dijon_Covered_Market_%288%29.jpg/960px-Dijon_Covered_Market_%288%29.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a6/Fromagerie_Murand_-_March%C3%A9_Saint-Pierre_%28Caen%29_2025-03-30.jpg/960px-Fromagerie_Murand_-_March%C3%A9_Saint-Pierre_%28Caen%29_2025-03-30.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b2/Green_and_white_asparagus_on_a_market_stall_in_France_%2854479163981%29.jpg/960px-Green_and_white_asparagus_on_a_market_stall_in_France_%2854479163981%29.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/0/03/Fresh_fish_displayed_on_a_market_stall_at_the_port_in_Antibes%2C_France_%2854479363589%29.jpg/960px-Fresh_fish_displayed_on_a_market_stall_at_the_port_in_Antibes%2C_France_%2854479363589%29.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/8/81/Paris_street_market_stall_-_charcuterie_counter_2.jpg/960px-Paris_street_market_stall_-_charcuterie_counter_2.jpg" ],
           intro: [
             "直接在紅孩兒市集裡挑一攤吃午餐",
@@ -840,6 +866,7 @@ const TRIP_DATA = {
           url: "",
           mapQuery: "Place des Vosges Paris",
           stay: "13:30–17:30",
+          coords: [48.8555, 2.3654],
           images: [ "https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/Plaza_de_los_Vosgos%2C_Par%C3%ADs%2C_Francia%2C_2022-10-30%2C_DD_58.jpg/960px-Plaza_de_los_Vosgos%2C_Par%C3%ADs%2C_Francia%2C_2022-10-30%2C_DD_58.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7e/Paris_3e_Place_des_Vosges_Arcades_896.jpg/960px-Paris_3e_Place_des_Vosges_Arcades_896.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fa/P1140395_Paris_IV_place_des_Vosges_arcades_Est_rwk.JPG/960px-P1140395_Paris_IV_place_des_Vosges_arcades_Est_rwk.JPG", "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7e/H%C3%B4tel_H%C3%A9rouet%2C_Le_Marais%2C_Paris_May_2017.jpg/960px-H%C3%B4tel_H%C3%A9rouet%2C_Le_Marais%2C_Paris_May_2017.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/b/bb/H%C3%B4tel_de_Sully_07-2.jpg/960px-H%C3%B4tel_de_Sully_07-2.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/1/12/Sully_Garten.JPG/960px-Sully_Garten.JPG" ],
           intro: [
             "巴黎最有味道的老街區",
@@ -863,6 +890,7 @@ const TRIP_DATA = {
           url: "https://www.musee-orsay.fr/",
           mapQuery: "Musée d'Orsay Paris",
           stay: "09:30–12:30",
+          coords: [48.86, 2.3266],
           images: [ "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6f/Horloge_mus%C3%A9e_d%27Orsay.jpg/960px-Horloge_mus%C3%A9e_d%27Orsay.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Musee_d_Orsay_main_hall_Paris_2023_dllu.jpg/960px-Musee_d_Orsay_main_hall_Paris_2023_dllu.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/1/11/Mus%C3%A9e_d%27Orsay_clock%2C_Paris_May_2015.jpg/960px-Mus%C3%A9e_d%27Orsay_clock%2C_Paris_May_2015.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/Paris_75007_Mus%C3%A9e_d%27Orsay_Grande_nef_centrale_20180704.jpg/960px-Paris_75007_Mus%C3%A9e_d%27Orsay_Grande_nef_centrale_20180704.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1c/North_side_of_Orsay_Museum_building%2C_4_August_2007.jpg/960px-North_side_of_Orsay_Museum_building%2C_4_August_2007.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0c/Musee_d%27Orsay_and_Pont_Royal%2C_North-West_view_140402_1.jpg/960px-Musee_d%27Orsay_and_Pont_Royal%2C_North-West_view_140402_1.jpg" ],
           intro: [
             "由火車站改建的美術館",
@@ -880,6 +908,7 @@ const TRIP_DATA = {
           url: "",
           mapQuery: "Saint-Germain-des-Prés Paris",
           stay: "12:30–14:00",
+          coords: [48.8546, 2.3325],
           images: [ "https://upload.wikimedia.org/wikipedia/commons/thumb/6/69/Caf%C3%A9_de_Flore%2C_172_boulevard_Saint-Germain%2C_Paris_6e.jpg/960px-Caf%C3%A9_de_Flore%2C_172_boulevard_Saint-Germain%2C_Paris_6e.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/2/26/Caf%C3%A9_de_Flore%2C_Paris_25_September_2019_02.jpg/960px-Caf%C3%A9_de_Flore%2C_Paris_25_September_2019_02.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/Caf%C3%A9_de_Flore%2C_Paris_25_September_2019_01.jpg/960px-Caf%C3%A9_de_Flore%2C_Paris_25_September_2019_01.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c8/Les_Deux_Magots%2C_25_September_2019.jpg/960px-Les_Deux_Magots%2C_25_September_2019.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/8/82/Les_Deux_Magots%2C_Paris_March_2009.jpg/960px-Les_Deux_Magots%2C_Paris_March_2009.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7d/Cafe_de_Flore%2C_Paris_4_June_2015.jpg/960px-Cafe_de_Flore%2C_Paris_4_June_2015.jpg" ],
           intro: [
             "奧賽附近或過河到聖日耳曼區用餐",
@@ -896,6 +925,7 @@ const TRIP_DATA = {
           url: "",
           mapQuery: "Saint-Germain-des-Prés Paris",
           stay: "14:00–17:30",
+          coords: [48.8538, 2.3335],
           images: [ "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2f/Abad%C3%ADa_de_Saint-Germain-des-Pr%C3%A9s%2C_Par%C3%ADs%2C_Francia%2C_2022-11-01%2C_DD_20-22_HDR.jpg/960px-Abad%C3%ADa_de_Saint-Germain-des-Pr%C3%A9s%2C_Par%C3%ADs%2C_Francia%2C_2022-11-01%2C_DD_20-22_HDR.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/4/47/Nave_of_Abbaye_de_Saint-Germain-des-Pr%C3%A9s%2C_Paris%2C_France_-_Diliff.jpg/960px-Nave_of_Abbaye_de_Saint-Germain-des-Pr%C3%A9s%2C_Paris%2C_France_-_Diliff.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/9/96/Th%C3%A9%C3%A2tre_de_l%27Od%C3%A9on%2C_place_Paul-Claudel%2C_Paris_6e_2.jpg/960px-Th%C3%A9%C3%A2tre_de_l%27Od%C3%A9on%2C_place_Paul-Claudel%2C_Paris_6e_2.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fa/Rue_de_Buci%2C_Paris_6_October_2017_01.jpg/960px-Rue_de_Buci%2C_Paris_6_October_2017_01.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/6/67/Terrace_cafe%2C_Rue_de_Buci%2C_Paris_July_2010.jpg/960px-Terrace_cafe%2C_Rue_de_Buci%2C_Paris_July_2010.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/6/60/Boulevard_Saint-Germain%2C_Paris_5e_1.jpg/960px-Boulevard_Saint-Germain%2C_Paris_5e_1.jpg" ],
           intro: [
             "左岸文人區",
@@ -919,6 +949,7 @@ const TRIP_DATA = {
           url: "",
           mapQuery: "Marché d'Aligre Paris",
           stay: "08:30–11:00",
+          coords: [48.849, 2.3785],
           images: [ "https://upload.wikimedia.org/wikipedia/commons/thumb/4/49/March%C3%A9_dAligre_3.jpg/960px-March%C3%A9_dAligre_3.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b1/March%C3%A9_dAligre_4.jpg/960px-March%C3%A9_dAligre_4.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2f/March%C3%A9_Couvert_Beauvau_-_Paris_XII_%28FR75%29_-_2021-05-23_-_1.jpg/960px-March%C3%A9_Couvert_Beauvau_-_Paris_XII_%28FR75%29_-_2021-05-23_-_1.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/8/89/March%C3%A9_Beauvau_int%C3%A9rieur.jpg/960px-March%C3%A9_Beauvau_int%C3%A9rieur.jpg" ],
           intro: [
             "巴黎在地人氣早市",
@@ -937,6 +968,7 @@ const TRIP_DATA = {
           url: "",
           mapQuery: "Marché d'Aligre Paris",
           stay: "11:00–12:00",
+          coords: [48.8487, 2.379],
           images: [ "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8f/Paris-Rue_Mouffetard-106-Fromagerie-2017-gje.jpg/960px-Paris-Rue_Mouffetard-106-Fromagerie-2017-gje.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/5/58/Pezenas_Market_-_Cheese_stall_-_Flickr_-_MajiksBox_-_resting.jpg/960px-Pezenas_Market_-_Cheese_stall_-_Flickr_-_MajiksBox_-_resting.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b2/Paris_-_Fromagerie_Laurent_Dubois.jpg/960px-Paris_-_Fromagerie_Laurent_Dubois.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/2/26/Vitrine_dans_une_fromagerie_%2834051774134%29.jpg/960px-Vitrine_dans_une_fromagerie_%2834051774134%29.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c7/Paris_10e_Rue_Beaurepaire_Boulangerie_653.jpg/960px-Paris_10e_Rue_Beaurepaire_Boulangerie_653.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/4/46/Boulangerie_de_Saint-Maurice-de-Beynost_%28Ain%2C_France%29_-_des_baguettes_de_pain.JPG/960px-Boulangerie_de_Saint-Maurice-de-Beynost_%28Ain%2C_France%29_-_des_baguettes_de_pain.JPG" ],
           intro: [
             "在市場採買起司、長棍麵包、火腿與水果",
@@ -953,6 +985,7 @@ const TRIP_DATA = {
           url: "",
           mapQuery: "Place de la Bastille Paris",
           stay: "12:00–17:00",
+          coords: [48.8532, 2.3692],
           images: [ "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7e/Place_de_la_Bastille%2C_avril_2021.jpg/960px-Place_de_la_Bastille%2C_avril_2021.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5f/Place_de_la_Bastille_depuis_l%27Op%C3%A9ra.jpg/960px-Place_de_la_Bastille_depuis_l%27Op%C3%A9ra.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c6/Side_View_of_the_Op%C3%A9ra_Bastille.jpg/960px-Side_View_of_the_Op%C3%A9ra_Bastille.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/5/55/Column_of_Place_de_la_Bastille%2C_Port_de_l%27Arsenal%2C_Paris_January_2017.jpg/960px-Column_of_Place_de_la_Bastille%2C_Port_de_l%27Arsenal%2C_Paris_January_2017.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/0/07/Paris_port_Arsenal.jpg/960px-Paris_port_Arsenal.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a3/Paris_port_jardin_Arsenal.jpg/960px-Paris_port_jardin_Arsenal.jpg" ],
           intro: [
             "用剛買的食材簡單午餐",
@@ -976,6 +1009,7 @@ const TRIP_DATA = {
           url: "https://www.chateauversailles.fr/",
           mapQuery: "Château de Versailles",
           stay: "09:30–12:30",
+          coords: [48.8049, 2.1204],
           images: [ "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f1/Chateau_Versailles_Galerie_des_Glaces.jpg/960px-Chateau_Versailles_Galerie_des_Glaces.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/2/23/Garden_facade_of_the_Palace_of_Versailles_2.jpg/960px-Garden_facade_of_the_Palace_of_Versailles_2.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8a/Parterre_du_Midi_Garden_pond_and_Palace_of_Versailles_at_golden_hour_with_blue_sky_in_France.jpg/960px-Parterre_du_Midi_Garden_pond_and_Palace_of_Versailles_at_golden_hour_with_blue_sky_in_France.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/2/23/Palace_of_Versailles_Royal_Chapel_%2828281918971%29.jpg/960px-Palace_of_Versailles_Royal_Chapel_%2828281918971%29.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/3/37/Versailles_Chapel_-_July_2006_edit.jpg/960px-Versailles_Chapel_-_July_2006_edit.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/8/82/Salon_de_Mars_-_Grand_appartement_du_roi_%2824276158816%29.jpg/960px-Salon_de_Mars_-_Grand_appartement_du_roi_%2824276158816%29.jpg" ],
           intro: [
             "路易十四的太陽王宮殿",
@@ -993,6 +1027,7 @@ const TRIP_DATA = {
           url: "",
           mapQuery: "Versailles France",
           stay: "12:30–13:30",
+          coords: [48.8017, 2.1287],
           images: [ "https://upload.wikimedia.org/wikipedia/commons/thumb/0/04/Ch%C3%A2teau_de_Versailles_au_lever_du_soleil_en_2013_13.jpg/960px-Ch%C3%A2teau_de_Versailles_au_lever_du_soleil_en_2013_13.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/2/29/Golden_Gate_%2846596387111%29.jpg/960px-Golden_Gate_%2846596387111%29.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f2/Statue_of_Louis_XIV_in_place_d%27armes_of_Versailles%2C_April_2011.jpg/960px-Statue_of_Louis_XIV_in_place_d%27armes_of_Versailles%2C_April_2011.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/9/90/Palace_of_Versailles_Gate.jpg/960px-Palace_of_Versailles_Gate.jpg" ],
           intro: [
             "宮殿周邊與凡爾賽鎮上有不少小館與麵包店",
@@ -1009,6 +1044,7 @@ const TRIP_DATA = {
           url: "https://www.chateauversailles.fr/",
           mapQuery: "Grand Trianon Versailles",
           stay: "13:30–17:00",
+          coords: [48.8149, 2.1043],
           images: [ "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4b/Parc_de_Versailles%2C_parterre_de_Latone%2C_bassin_de_Latone_05.jpg/960px-Parc_de_Versailles%2C_parterre_de_Latone%2C_bassin_de_Latone_05.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/7/74/Ch%C3%A2teau_de_Versailles_%28Orangerie%29.jpg/960px-Ch%C3%A2teau_de_Versailles_%28Orangerie%29.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/5/51/Water_reflection_of_the_Orangerie_garden_and_Palace_of_Versailles_with_blue_sky_in_France.jpg/960px-Water_reflection_of_the_Orangerie_garden_and_Palace_of_Versailles_with_blue_sky_in_France.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7f/West_facade_of_Petit_Trianon_002.JPG/960px-West_facade_of_Petit_Trianon_002.JPG", "https://upload.wikimedia.org/wikipedia/commons/thumb/3/37/Salon_of_mirrors_with_royal_chandelier_in_the_Grand_Trianon_Domain_of_Versailles_France.jpg/960px-Salon_of_mirrors_with_royal_chandelier_in_the_Grand_Trianon_Domain_of_Versailles_France.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/0/05/Hameau_de_la_Reine_in_July_2022.jpg/960px-Hameau_de_la_Reine_in_July_2022.jpg" ],
           intro: [
             "下午逛幾何式大花園",
@@ -1032,6 +1068,7 @@ const TRIP_DATA = {
           url: "https://www.toureiffel.paris/",
           mapQuery: "Tour Eiffel Paris",
           stay: "09:30–12:00",
+          coords: [48.8584, 2.2945],
           images: [ "https://upload.wikimedia.org/wikipedia/commons/thumb/5/53/Eiffel_tower_from_trocadero.jpg/960px-Eiffel_tower_from_trocadero.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/a/af/Tour_eiffel_at_sunrise_from_the_trocadero.jpg/960px-Tour_eiffel_at_sunrise_from_the_trocadero.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/d/de/Eiffel_Tower_and_Pont_Alexandre_III_at_night.jpg/960px-Eiffel_Tower_and_Pont_Alexandre_III_at_night.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b7/Paris_-_The_Eiffel_Tower_in_spring_-_2307.jpg/960px-Paris_-_The_Eiffel_Tower_in_spring_-_2307.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/b/bd/Sous_la_Tour_Eiffel_1.jpg/960px-Sous_la_Tour_Eiffel_1.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/6/68/Details_of_Eiffel_Tower_structure%2C_south_pillar.jpg/960px-Details_of_Eiffel_Tower_structure%2C_south_pillar.jpg" ],
           intro: [
             "巴黎的代名詞",
@@ -1049,6 +1086,7 @@ const TRIP_DATA = {
           url: "",
           mapQuery: "Rue Cler Paris",
           stay: "12:00–13:30",
+          coords: [48.8558, 2.306],
           images: [ "https://upload.wikimedia.org/wikipedia/commons/thumb/0/00/Fruit_shop%2C_Rue_Cler%2C_Paris_18_August_2016.jpg/960px-Fruit_shop%2C_Rue_Cler%2C_Paris_18_August_2016.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4b/March%C3%A9%2C_Rue_Cler%2C_75007_Paris%2C_France_2014.jpg/960px-March%C3%A9%2C_Rue_Cler%2C_75007_Paris%2C_France_2014.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/6/67/Terrace_cafe%2C_Rue_de_Buci%2C_Paris_July_2010.jpg/960px-Terrace_cafe%2C_Rue_de_Buci%2C_Paris_July_2010.jpg" ],
           intro: [
             "鐵塔周邊 7 區用餐",
@@ -1065,6 +1103,7 @@ const TRIP_DATA = {
           url: "",
           mapQuery: "Champ de Mars Paris",
           stay: "13:30–17:00",
+          coords: [48.8556, 2.2986],
           images: [ "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8b/Eiffel_Tower_from_Champ-de-Mars%2C_7_August_2017.jpg/960px-Eiffel_Tower_from_Champ-de-Mars%2C_7_August_2017.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d2/Pont-Alexandre-III-et-Invalides.jpg/960px-Pont-Alexandre-III-et-Invalides.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/b/bd/Pont_Alexandre_III_-_01.jpg/960px-Pont_Alexandre_III_-_01.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5c/Pont_Alexandre_III_seen_from_the_Pont_des_Invalides_001.jpg/960px-Pont_Alexandre_III_seen_from_the_Pont_des_Invalides_001.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/7/75/Paris%2C_Pont_des_Arts_--_2014_--_1404.jpg/960px-Paris%2C_Pont_des_Arts_--_2014_--_1404.jpg" ],
           intro: [
             "從戰神廣場草坪回望鐵塔",
@@ -1088,6 +1127,7 @@ const TRIP_DATA = {
           url: "https://www.operadeparis.fr/",
           mapQuery: "Palais Garnier Paris",
           stay: "10:00–11:30",
+          coords: [48.872, 2.3316],
           images: [ "https://upload.wikimedia.org/wikipedia/commons/thumb/2/28/Monumental_stairway_of_the_palais_Garnier_opera_in_Paris.jpg/960px-Monumental_stairway_of_the_palais_Garnier_opera_in_Paris.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fb/Ceilings_of_the_palais_Garnier_opera_in_Paris%2C_05.jpg/960px-Ceilings_of_the_palais_Garnier_opera_in_Paris%2C_05.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/7/78/Palais_Garnier%27s_grand_salon%2C_12_February_2008.jpg/960px-Palais_Garnier%27s_grand_salon%2C_12_February_2008.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ef/Paris_Op%C3%A9ra_Garnier_Innen_Grand_Foyer_06.jpg/960px-Paris_Op%C3%A9ra_Garnier_Innen_Grand_Foyer_06.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/0/06/Palais_Garnier_auditorium_and_stage.jpg/960px-Palais_Garnier_auditorium_and_stage.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/1/12/West_facade_of_Palais_Garnier%2C_Paris_2017.jpg/960px-West_facade_of_Palais_Garnier%2C_Paris_2017.jpg" ],
           intro: [
             "《歌劇魅影》的舞台原型",
@@ -1105,6 +1145,7 @@ const TRIP_DATA = {
           url: "https://haussmann.galerieslafayette.com/",
           mapQuery: "Galeries Lafayette Haussmann Paris",
           stay: "11:45–14:00",
+          coords: [48.8737, 2.332],
           images: [ "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c3/Galer%C3%ADas_Lafayette_Haussmann%2C_Par%C3%ADs%2C_Francia%2C_2022-10-31%2C_DD_11-13_HDR.jpg/960px-Galer%C3%ADas_Lafayette_Haussmann%2C_Par%C3%ADs%2C_Francia%2C_2022-10-31%2C_DD_11-13_HDR.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/9/95/Galeries_Lafayette_Paris_Dome_Detail.jpg/960px-Galeries_Lafayette_Paris_Dome_Detail.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d6/Galeries_Lafayette_Paris_Dome.jpg/960px-Galeries_Lafayette_Paris_Dome.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c7/Galeries_Lafayette_dome%2C_Paris.jpg/960px-Galeries_Lafayette_dome%2C_Paris.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6b/Galerie_Lafayette_Haussmann_Dome.jpg/960px-Galerie_Lafayette_Haussmann_Dome.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/5/59/Galeries_Lafayette_Haussmann_Inside.jpg/960px-Galeries_Lafayette_Haussmann_Inside.jpg" ],
           intro: [
             "巴黎最著名的百貨公司",
@@ -1123,6 +1164,7 @@ const TRIP_DATA = {
           url: "",
           mapQuery: "Printemps Haussmann Paris",
           stay: "14:00–17:30",
+          coords: [48.874, 2.328],
           images: [ "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0d/Paris_9_-_Printemps_cupola_%281%29.jpg/960px-Paris_9_-_Printemps_cupola_%281%29.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/6/66/Paris_9_-_Printemps_cupola_%283%29.jpg/960px-Paris_9_-_Printemps_cupola_%283%29.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/1/18/Printemps-Paris.JPG/960px-Printemps-Paris.JPG", "https://upload.wikimedia.org/wikipedia/commons/thumb/4/45/Paris_Printemps_Haussmann_%2830890126292%29.jpg/960px-Paris_Printemps_Haussmann_%2830890126292%29.jpg" ],
           intro: [
             "沿奧斯曼大道逛春天百貨（Printemps）與周邊",
@@ -1146,6 +1188,7 @@ const TRIP_DATA = {
           url: "https://www.louvre.fr/",
           mapQuery: "Musée du Louvre Paris",
           stay: "09:30–14:00",
+          coords: [48.8606, 2.3376],
           images: [ "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a2/Louvre_Courtyard%2C_Looking_West.jpg/960px-Louvre_Courtyard%2C_Looking_West.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/6/66/Louvre_Museum_Wikimedia_Commons.jpg/960px-Louvre_Museum_Wikimedia_Commons.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/2/28/Cour_Napol%C3%A9on_at_night_-_Louvre.jpg/960px-Cour_Napol%C3%A9on_at_night_-_Louvre.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/Grande_Galerie%2C_Louvre_Museum%2C_25_September_2019_01.jpg/960px-Grande_Galerie%2C_Louvre_Museum%2C_25_September_2019_01.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/b/bf/Victoire_de_Samothrace_-_Musee_du_Louvre_-_20190812.jpg/960px-Victoire_de_Samothrace_-_Musee_du_Louvre_-_20190812.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6a/Mona_Lisa.jpg/960px-Mona_Lisa.jpg" ],
           intro: [
             "世界最大博物館",
@@ -1163,6 +1206,7 @@ const TRIP_DATA = {
           url: "",
           mapQuery: "Palais-Royal Paris",
           stay: "14:00–15:00",
+          coords: [48.8635, 2.335],
           images: [ "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a9/Librairie_Galignani%2C_au_224_rue_de_Rivoli%2C_Paris._.jpg/960px-Librairie_Galignani%2C_au_224_rue_de_Rivoli%2C_Paris._.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5d/Galignani_001.jpg/960px-Galignani_001.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/Rue_de_Rivoli_as_seen_from_the_Tour_Saint-Jacques%2C_11_August_2013.jpg/960px-Rue_de_Rivoli_as_seen_from_the_Tour_Saint-Jacques%2C_11_August_2013.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e4/Arcades%2C_Rue_de_Rivoli%2C_Paris_26_December_2016_001.jpg/960px-Arcades%2C_Rue_de_Rivoli%2C_Paris_26_December_2016_001.jpg" ],
           intro: [
             "羅浮宮周邊或 Rue de Rivoli 沿線用餐",
@@ -1179,6 +1223,7 @@ const TRIP_DATA = {
           url: "",
           mapQuery: "Jardin des Tuileries Paris",
           stay: "15:00–17:30",
+          coords: [48.8641, 2.3268],
           images: [ "https://upload.wikimedia.org/wikipedia/commons/thumb/0/00/Grand_bassin_octogonal_Jardin_des_Tuileries_003.jpg/960px-Grand_bassin_octogonal_Jardin_des_Tuileries_003.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7b/Paris_Chaises_jardin_des_Tuileries_2014.jpg/960px-Paris_Chaises_jardin_des_Tuileries_2014.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/d/da/Pavillon_de_Flore_from_the_Tuileries_Garden%2C_Paris_5_November_2019.jpg/960px-Pavillon_de_Flore_from_the_Tuileries_Garden%2C_Paris_5_November_2019.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c5/Paris_Jardin_des_Tuileries_printemps_2014.jpg/960px-Paris_Jardin_des_Tuileries_printemps_2014.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6d/Paris_-_Place_de_la_Concorde_-_3119.jpg/960px-Paris_-_Place_de_la_Concorde_-_3119.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/5/52/Luxor_Obelisk%2C_Place_de_la_Concorde%2C_Paris_2014.jpg/960px-Luxor_Obelisk%2C_Place_de_la_Concorde%2C_Paris_2014.jpg" ],
           intro: [
             "從羅浮宮沿杜樂麗花園的林蔭大道散步到協和廣場",
@@ -1202,6 +1247,7 @@ const TRIP_DATA = {
           url: "",
           mapQuery: "Montmartre Paris",
           stay: "10:00–12:30",
+          coords: [48.885, 2.338],
           images: [ "https://upload.wikimedia.org/wikipedia/commons/thumb/2/22/Rue_de_l%27Abreuvoir%2C_Montmartre%2C_Paris_9_July_2015.jpg/960px-Rue_de_l%27Abreuvoir%2C_Montmartre%2C_Paris_9_July_2015.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/2/24/2022-04-11-La_Maison_Rose-8379.jpg/960px-2022-04-11-La_Maison_Rose-8379.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/2/23/La_Maison_Rose_in_Montmartre%2C_2_May_2018.jpg/960px-La_Maison_Rose_in_Montmartre%2C_2_May_2018.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/2022-04-12-Le_mur_des_je_t%27aime-8493.jpg/960px-2022-04-12-Le_mur_des_je_t%27aime-8493.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/2/22/Windmill%2C_Montmartre%2C_Paris_23_April_2017.jpg/960px-Windmill%2C_Montmartre%2C_Paris_23_April_2017.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/5/59/Montmartre_stairs%2C_Paris_26_May_2014.jpg/960px-Montmartre_stairs%2C_Paris_26_May_2014.jpg" ],
           intro: [
             "巴黎最有波希米亞氣息的山丘街區",
@@ -1219,6 +1265,7 @@ const TRIP_DATA = {
           url: "https://www.sacre-coeur-montmartre.com/",
           mapQuery: "Basilique du Sacré-Cœur Montmartre Paris",
           stay: "12:30–14:00",
+          coords: [48.8867, 2.3431],
           images: [ "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Basilique_du_Sacr%C3%A9-C%C5%93ur_de_Montmartre_-_Paris_-_GT-01_-_2024.jpg/960px-Basilique_du_Sacr%C3%A9-C%C5%93ur_de_Montmartre_-_Paris_-_GT-01_-_2024.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d0/Paris_-_Basilique_du_Sacr%C3%A9-C%C5%93ur_de_Montmartre_-_2025-09-30_23-31-57_001.jpg/960px-Paris_-_Basilique_du_Sacr%C3%A9-C%C5%93ur_de_Montmartre_-_2025-09-30_23-31-57_001.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a9/Sacre_Coeur_cor_Jesu-DSC_1455w.jpg/960px-Sacre_Coeur_cor_Jesu-DSC_1455w.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Basilique_du_Sacr%C3%A9-C%C5%93ur_mosaic_of_the_Jesuit_Chapel_2026-01-03-2.jpg/960px-Basilique_du_Sacr%C3%A9-C%C5%93ur_mosaic_of_the_Jesuit_Chapel_2026-01-03-2.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9b/Paris_View_from_Sacr%C3%A9-C%C5%93ur_-20140603-RM-162815.jpg/960px-Paris_View_from_Sacr%C3%A9-C%C5%93ur_-20140603-RM-162815.jpg" ],
           intro: [
             "白色圓頂的羅馬拜占庭式教堂",
@@ -1236,6 +1283,7 @@ const TRIP_DATA = {
           url: "",
           mapQuery: "Place du Tertre Paris",
           stay: "14:00–17:30",
+          coords: [48.8865, 2.3407],
           images: [ "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fd/Artist_at_Place_du_Tertre_in_November_2019.jpg/960px-Artist_at_Place_du_Tertre_in_November_2019.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/5/52/Paris_75018_Place_du_Tertre_20160907_Caf%C3%A9_Restaurant.jpg/960px-Paris_75018_Place_du_Tertre_20160907_Caf%C3%A9_Restaurant.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/0/07/Restaurants%2C_Place_du_Tertre%2C_Paris_30_September_2019.jpg/960px-Restaurants%2C_Place_du_Tertre%2C_Paris_30_September_2019.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/2/29/La_Cr%C3%A9maill%C3%A8re_1900%2C_Place_du_Tertre%2C_Paris_12_May_2014.jpg/960px-La_Cr%C3%A9maill%C3%A8re_1900%2C_Place_du_Tertre%2C_Paris_12_May_2014.jpg" ],
           intro: [
             "Place du Tertre 聚集現場作畫的街頭畫家",
@@ -1259,6 +1307,7 @@ const TRIP_DATA = {
           url: "https://www.paris-arc-de-triomphe.fr/",
           mapQuery: "Arc de Triomphe Paris",
           stay: "10:30–12:30",
+          coords: [48.8738, 2.295],
           images: [ "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e7/Arc_de_Triomphe_de_l%27%C3%89toile_in_July_2011.jpg/960px-Arc_de_Triomphe_de_l%27%C3%89toile_in_July_2011.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d2/1002_Arc_de_Triomphe_in_Paris_at_night_Photo_by_Giles_Laurent.jpg/960px-1002_Arc_de_Triomphe_in_Paris_at_night_Photo_by_Giles_Laurent.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/1/15/Arc_de_Triomphe_at_sunset.jpg/960px-Arc_de_Triomphe_at_sunset.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/5/53/Avenue_des_Champs-%C3%89lys%C3%A9es_from_the_Arc_de_Triomphe%2C_Paris_8_December_2014.jpg/960px-Avenue_des_Champs-%C3%89lys%C3%A9es_from_the_Arc_de_Triomphe%2C_Paris_8_December_2014.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a5/Paris_-_Arc_de_Triomphe_at_dusk1.jpg/960px-Paris_-_Arc_de_Triomphe_at_dusk1.jpg" ],
           intro: [
             "拿破崙的勝利之門",
@@ -1276,6 +1325,7 @@ const TRIP_DATA = {
           url: "",
           mapQuery: "Avenue des Champs-Élysées Paris",
           stay: "12:30–14:00",
+          coords: [48.8698, 2.3079],
           images: [ "https://upload.wikimedia.org/wikipedia/commons/thumb/3/35/Ladur%C3%A9e_aux_Champs-%C3%89lys%C3%A9es.jpg/960px-Ladur%C3%A9e_aux_Champs-%C3%89lys%C3%A9es.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c5/Macarons_from_Ladur%C3%A9e_on_display.jpg/960px-Macarons_from_Ladur%C3%A9e_on_display.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/9/95/Colorful_Macarons_%28Unsplash%29.jpg/960px-Colorful_Macarons_%28Unsplash%29.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f9/A_rainbow_of_macarons_%28part_deux%29.jpg/960px-A_rainbow_of_macarons_%28part_deux%29.jpg" ],
           intro: [
             "香榭麗舍周邊用餐",
@@ -1292,6 +1342,7 @@ const TRIP_DATA = {
           url: "",
           mapQuery: "Avenue des Champs-Élysées Paris",
           stay: "14:00–17:30",
+          coords: [48.8718, 2.302],
           images: [ "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6e/Arc_de_Triomphe%2C_Avenue_des_Champs-%C3%89lys%C3%A9es%2C_Paris%2C_France_%28_Ank_Kumar_%2C_Infosys_Limited_%29_01.jpg/960px-Arc_de_Triomphe%2C_Avenue_des_Champs-%C3%89lys%C3%A9es%2C_Paris%2C_France_%28_Ank_Kumar_%2C_Infosys_Limited_%29_01.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/5/55/The_Avenue_des_Champs-%C3%89lys%C3%A9es_and_the_Arc_de_Triomphe%2C_Paris_27_December_2021.jpg/960px-The_Avenue_des_Champs-%C3%89lys%C3%A9es_and_the_Arc_de_Triomphe%2C_Paris_27_December_2021.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a9/Christmas_Illumination_Champs-Elys%C3%A9es%2C_Paris_%282011%29.jpg/960px-Christmas_Illumination_Champs-Elys%C3%A9es%2C_Paris_%282011%29.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/2/22/Avenue_des_Champs-Elys%C3%A9es%2C_Paris_12_December_2020.jpg/960px-Avenue_des_Champs-Elys%C3%A9es%2C_Paris_12_December_2020.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/5/51/Illuminations_de_No%C3%ABl_2024_des_Champs-%C3%89lys%C3%A9es.jpg/960px-Illuminations_de_No%C3%ABl_2024_des_Champs-%C3%89lys%C3%A9es.jpg" ],
           intro: [
             "從凱旋門一路逛到圓點廣場",
@@ -1316,6 +1367,7 @@ const TRIP_DATA = {
           url: "",
           mapQuery: "Paris Charles de Gaulle Airport Terminal 1",
           stay: "約 06:30 出發",
+          coords: [49.0097, 2.5479],
           images: [ "https://upload.wikimedia.org/wikipedia/commons/thumb/d/de/Paris_Charles_de_Gaulle_Airport_Terminal_1.jpg/960px-Paris_Charles_de_Gaulle_Airport_Terminal_1.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/8/83/Paris-Charles_de_Gaulle_Airport_Terminal_1%2C_16_June_2013.jpg/960px-Paris-Charles_de_Gaulle_Airport_Terminal_1%2C_16_June_2013.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/9/92/Charles_de_Gaulle_Airport_Terminal_Interior.jpg/960px-Charles_de_Gaulle_Airport_Terminal_Interior.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d8/Paris_CDG_International_Airport_January_8%2C_2011.jpg/960px-Paris_CDG_International_Airport_January_8%2C_2011.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9d/Charles_de_Gaulle_Airport_terminal_2E.jpg/960px-Charles_de_Gaulle_Airport_terminal_2E.jpg" ],
           intro: [
             "一早退房，搭 RER B 或計程車前往戴高樂機場第一航廈",
@@ -1333,6 +1385,7 @@ const TRIP_DATA = {
           url: "https://www.etihad.com/",
           mapQuery: "Paris Charles de Gaulle Airport Terminal 1",
           stay: "09:45–19:35",
+          coords: [49.0104, 2.549],
           images: [ "https://upload.wikimedia.org/wikipedia/commons/thumb/7/77/Etihad_Boeing_787-9_A6-BNE_IAD_VA2.jpg/960px-Etihad_Boeing_787-9_A6-BNE_IAD_VA2.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/A6-BMG_Boeing_787-10_Etihad_Airways_SVO_2025-01-19_4252.jpg/960px-A6-BMG_Boeing_787-10_Etihad_Airways_SVO_2025-01-19_4252.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c0/Etihad_Airways_Airbus_A350_A6-XWB_at_Tokyo_Narita_Int%27l_Airport.jpg/960px-Etihad_Airways_Airbus_A350_A6-XWB_at_Tokyo_Narita_Int%27l_Airport.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Etihad_Airways%2C_A6-XWA%2C_Airbus_A350-1041.jpg/960px-Etihad_Airways%2C_A6-XWA%2C_Airbus_A350-1041.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/c/cf/Etihad_Airways_A380-861_A6-API_%40YYZ.jpg/960px-Etihad_Airways_A380-861_A6-API_%40YYZ.jpg" ],
           intro: [
             "阿提哈德航空 EY032",
@@ -1350,6 +1403,7 @@ const TRIP_DATA = {
           url: "https://www.etihad.com/",
           mapQuery: "Zayed International Airport Abu Dhabi",
           stay: "21:25 起飛，2/14 09:00 抵台",
+          coords: [24.433, 54.6511],
           images: [ "https://upload.wikimedia.org/wikipedia/commons/thumb/4/48/Abu_Dhabi_%28UAE%29%2C_Zayed_International_Airport%2C_Terminal_A_%2801%29.jpg/960px-Abu_Dhabi_%28UAE%29%2C_Zayed_International_Airport%2C_Terminal_A_%2801%29.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/2/22/Abu_Dhabi_%28UAE%29%2C_Zayed_International_Airport%2C_Terminal_A_%2802%29.jpg/960px-Abu_Dhabi_%28UAE%29%2C_Zayed_International_Airport%2C_Terminal_A_%2802%29.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e4/Abu_Dhabi_%28UAE%29%2C_Zayed_International_Airport%2C_Terminal_A_%2808%29.jpg/960px-Abu_Dhabi_%28UAE%29%2C_Zayed_International_Airport%2C_Terminal_A_%2808%29.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/6/68/Abu_Dhabi_%28UAE%29%2C_Zayed_International_Airport%2C_Terminal_A_%2805%29.jpg/960px-Abu_Dhabi_%28UAE%29%2C_Zayed_International_Airport%2C_Terminal_A_%2805%29.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/d/da/A6-DDC_Etihad_Airways_Boeing_777-FFX%2C_takeoff_from_Schiphol_%28EHAM-AMS%29_runway_36L_pic1.JPG/960px-A6-DDC_Etihad_Airways_Boeing_777-FFX%2C_takeoff_from_Schiphol_%28EHAM-AMS%29_runway_36L_pic1.JPG" ],
           intro: [
             "轉機後搭 EY898，21:25 起飛",
@@ -1587,6 +1641,7 @@ const TRIP_DATA = {
   function activate(id) {
     $$("button", tabbar).forEach(b => b.classList.toggle("active", b.dataset.target === id));
     $$("section.panel", main).forEach(p => p.classList.toggle("active", p.id === "panel-" + id));
+    if (id.indexOf("day") === 0) initDayMap(+id.slice(3)); // 小地圖 lazy 初始化：切到該天才 init
     const btn = $$("button", tabbar).find(b => b.dataset.target === id);
     if (btn && btn.scrollIntoView) btn.scrollIntoView({ block: "nearest", inline: "center", behavior: "smooth" });
   }
@@ -2239,6 +2294,53 @@ const TRIP_DATA = {
   })();
 
   /* ==================== 3. 每日行程 ==================== */
+  /* ---------- 每日小地圖：Leaflet ＋ CARTO Positron 淺色底圖 ----------
+     切到該天頁籤才初始化（lazy、一次 init 後保留），避免載入頁面就抓全部圖磚；
+     Leaflet CDN 載入失敗（斷網）→ 降級成「今日活動區域」文字卡，不破版。 */
+  const DAY_MAPS = {}, MAP_TRIES = {};
+  const dayZone = day => String(day.theme || "").split("（")[0];
+  const dayMapHTML = (di, day) =>
+    '<div class="day-map-wrap"><div class="day-map" id="day-map-' + di + '"></div>'
+    + '<span class="day-map-label">' + esc(dayZone(day)) + '</span></div>';
+  function dayMapFallback(el, di, zone) {
+    DAY_MAPS[di] = "fallback";
+    el.classList.add("day-map-fallback");
+    el.innerHTML = ic("map", "sm") + ' 今日活動區域：<b>' + esc(zone) + '</b>　'
+      + '<span class="muted">（離線或地圖元件未載入，改以文字顯示）</span>';
+    const lb = el.parentElement.querySelector(".day-map-label");
+    if (lb) lb.remove();
+  }
+  function initDayMap(di) {
+    const day = TRIP_DATA.days[di];
+    const el = document.getElementById("day-map-" + di);
+    if (!el || DAY_MAPS[di] || !day) return;
+    const zone = dayZone(day);
+    const pts = (day.spots || [])
+      .map((s, i) => ({ name: s.name, coords: s.coords, no: i + 1 }))
+      .filter(x => Array.isArray(x.coords) && x.coords.length === 2);
+    if (!pts.length) { dayMapFallback(el, di, zone); return; }
+    if (!(window.L && L.map)) {
+      /* Leaflet 以 defer 載入，可能還沒好：短暫重試幾次，仍失敗才降級 */
+      MAP_TRIES[di] = (MAP_TRIES[di] || 0) + 1;
+      if (MAP_TRIES[di] <= 6) setTimeout(() => { if (!DAY_MAPS[di]) initDayMap(di); }, 500);
+      else dayMapFallback(el, di, zone);
+      return;
+    }
+    const map = L.map(el, { scrollWheelZoom: false, zoomControl: false });
+    L.control.zoom({ position: "bottomright" }).addTo(map);
+    L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png", {
+      subdomains: "abcd", maxZoom: 19,
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> &copy; <a href="https://carto.com/attributions">CARTO</a>'
+    }).addTo(map);
+    pts.forEach(x => {
+      L.marker(x.coords, {
+        icon: L.divIcon({ className: "map-dot-wrap", html: '<div class="map-dot">' + x.no + '</div>', iconSize: [26, 26], iconAnchor: [13, 13] })
+      }).addTo(map).bindPopup(esc(x.name));
+    });
+    map.fitBounds(pts.map(x => x.coords), { padding: [34, 34], maxZoom: 15 });
+    DAY_MAPS[di] = map;
+  }
+
   function flowHTML(day) {
     let h = '<div class="flow-scroll"><div class="flow">';
     day.spots.forEach((s, i) => {
@@ -2284,7 +2386,7 @@ const TRIP_DATA = {
     const p = panel("day" + di);
     let html = '<div class="card"><h3>' + secTitle("Route", "今日節點圖", "", "map")
       + '<span class="en">' + fmtDate(day.date) + (day.theme ? '｜' + esc(day.theme) : '') + '</span></h3>'
-      + flowHTML(day) + '</div>';
+      + flowHTML(day) + dayMapHTML(di, day) + '</div>';
 
     day.spots.forEach((s, si) => {
       /* 標題連結：mapQuery → Google Maps 定位（官網連結移至下方注意提醒） */
