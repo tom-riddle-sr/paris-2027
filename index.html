@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>我的旅遊手冊</title>
+<title>2027法國</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600&family=Noto+Sans+TC:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -552,6 +552,12 @@
     font-size:.78rem;font-weight:600;font-family:var(--sans);
     box-shadow:0 0 0 2px rgba(242,241,239,.65);
   }
+  .map-dot-b{width:22px;height:22px;line-height:20px;}
+  .map-dot-b .ic{width:11px;height:11px;vertical-align:-1px;}
+  .map-dot-hotel{border-color:var(--terra);color:var(--terra);}
+  .map-dot-air{border-color:var(--gold);color:var(--gold);}
+  .map-dot.map-dot-base{width:12px;height:12px;}
+  .map-dot-base{border-color:var(--soft);color:var(--soft);}
   .day-map.day-map-fallback{height:auto;padding:12px 16px;font-size:.9rem;color:var(--soft);background:transparent;}
   .leaflet-container{font-family:var(--sans);font-size:.8rem;}
   @media(min-width:640px){.day-map{height:220px;}}
@@ -1368,6 +1374,7 @@ const TRIP_DATA = {
           mapQuery: "Paris Charles de Gaulle Airport Terminal 1",
           stay: "約 06:30 出發",
           coords: [49.0097, 2.5479],
+          base: "airport",  // 出發/返程點：照常顯示但不參與 fitBounds
           images: [ "https://upload.wikimedia.org/wikipedia/commons/thumb/d/de/Paris_Charles_de_Gaulle_Airport_Terminal_1.jpg/960px-Paris_Charles_de_Gaulle_Airport_Terminal_1.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/8/83/Paris-Charles_de_Gaulle_Airport_Terminal_1%2C_16_June_2013.jpg/960px-Paris-Charles_de_Gaulle_Airport_Terminal_1%2C_16_June_2013.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/9/92/Charles_de_Gaulle_Airport_Terminal_Interior.jpg/960px-Charles_de_Gaulle_Airport_Terminal_Interior.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d8/Paris_CDG_International_Airport_January_8%2C_2011.jpg/960px-Paris_CDG_International_Airport_January_8%2C_2011.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9d/Charles_de_Gaulle_Airport_terminal_2E.jpg/960px-Charles_de_Gaulle_Airport_terminal_2E.jpg" ],
           intro: [
             "一早退房，搭 RER B 或計程車前往戴高樂機場第一航廈",
@@ -1386,6 +1393,7 @@ const TRIP_DATA = {
           mapQuery: "Paris Charles de Gaulle Airport Terminal 1",
           stay: "09:45–19:35",
           coords: [49.0104, 2.549],
+          base: "airport",  // 出發/返程點：照常顯示但不參與 fitBounds
           images: [ "https://upload.wikimedia.org/wikipedia/commons/thumb/7/77/Etihad_Boeing_787-9_A6-BNE_IAD_VA2.jpg/960px-Etihad_Boeing_787-9_A6-BNE_IAD_VA2.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/A6-BMG_Boeing_787-10_Etihad_Airways_SVO_2025-01-19_4252.jpg/960px-A6-BMG_Boeing_787-10_Etihad_Airways_SVO_2025-01-19_4252.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c0/Etihad_Airways_Airbus_A350_A6-XWB_at_Tokyo_Narita_Int%27l_Airport.jpg/960px-Etihad_Airways_Airbus_A350_A6-XWB_at_Tokyo_Narita_Int%27l_Airport.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Etihad_Airways%2C_A6-XWA%2C_Airbus_A350-1041.jpg/960px-Etihad_Airways%2C_A6-XWA%2C_Airbus_A350-1041.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/c/cf/Etihad_Airways_A380-861_A6-API_%40YYZ.jpg/960px-Etihad_Airways_A380-861_A6-API_%40YYZ.jpg" ],
           intro: [
             "阿提哈德航空 EY032",
@@ -1403,7 +1411,8 @@ const TRIP_DATA = {
           url: "https://www.etihad.com/",
           mapQuery: "Zayed International Airport Abu Dhabi",
           stay: "21:25 起飛，2/14 09:00 抵台",
-          coords: [24.433, 54.6511],
+          coords: [24.4409, 54.6377],
+          base: "airport",  // 出發/返程點：照常顯示但不參與 fitBounds
           images: [ "https://upload.wikimedia.org/wikipedia/commons/thumb/4/48/Abu_Dhabi_%28UAE%29%2C_Zayed_International_Airport%2C_Terminal_A_%2801%29.jpg/960px-Abu_Dhabi_%28UAE%29%2C_Zayed_International_Airport%2C_Terminal_A_%2801%29.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/2/22/Abu_Dhabi_%28UAE%29%2C_Zayed_International_Airport%2C_Terminal_A_%2802%29.jpg/960px-Abu_Dhabi_%28UAE%29%2C_Zayed_International_Airport%2C_Terminal_A_%2802%29.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e4/Abu_Dhabi_%28UAE%29%2C_Zayed_International_Airport%2C_Terminal_A_%2808%29.jpg/960px-Abu_Dhabi_%28UAE%29%2C_Zayed_International_Airport%2C_Terminal_A_%2808%29.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/6/68/Abu_Dhabi_%28UAE%29%2C_Zayed_International_Airport%2C_Terminal_A_%2805%29.jpg/960px-Abu_Dhabi_%28UAE%29%2C_Zayed_International_Airport%2C_Terminal_A_%2805%29.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/d/da/A6-DDC_Etihad_Airways_Boeing_777-FFX%2C_takeoff_from_Schiphol_%28EHAM-AMS%29_runway_36L_pic1.JPG/960px-A6-DDC_Etihad_Airways_Boeing_777-FFX%2C_takeoff_from_Schiphol_%28EHAM-AMS%29_runway_36L_pic1.JPG" ],
           intro: [
             "轉機後搭 EY898，21:25 起飛",
@@ -1495,6 +1504,9 @@ const TRIP_DATA = {
 
   /* 記帳資料存於 Firebase Firestore（trips/{id}/expenses），登入 Google 後即時同步；
      repo 根目錄的 expenses.json 僅保留作歷史備份，頁面不再寫入。 */
+  /* 城市邊界（巴黎市，Nominatim/OSM 簡化 GeoJSON，內嵌避免 runtime 外抓；day 小地圖淡虛線描邊用） */
+  cityBoundary: {"type":"Polygon","coordinates":[[[2.2241,48.8542],[2.2525,48.8456],[2.2516,48.8389],[2.2552,48.8348],[2.27,48.833],[2.2673,48.8316],[2.2678,48.8278],[2.2727,48.8279],[2.2791,48.8324],[2.2922,48.8271],[2.3445,48.8156],[2.3524,48.8185],[2.3559,48.816],[2.3634,48.8161],[2.4025,48.8296],[2.4108,48.8251],[2.4298,48.8236],[2.4373,48.8182],[2.4586,48.817],[2.4628,48.819],[2.4662,48.8273],[2.4652,48.8312],[2.4697,48.8356],[2.4627,48.8424],[2.4408,48.8459],[2.4379,48.8446],[2.4372,48.8409],[2.4248,48.8418],[2.4221,48.8445],[2.4194,48.8425],[2.4222,48.8358],[2.4112,48.8339],[2.4164,48.8488],[2.4125,48.8764],[2.4093,48.8803],[2.4001,48.8838],[2.3955,48.8983],[2.3844,48.9022],[2.3204,48.9008],[2.2857,48.8866],[2.281,48.8829],[2.28,48.8787],[2.2589,48.8803],[2.2548,48.8741],[2.2456,48.8764],[2.2405,48.8719],[2.2321,48.8695],[2.2241,48.8542]]]},
+
   expenses: null
 };
 </script>
@@ -2298,6 +2310,14 @@ const TRIP_DATA = {
      切到該天頁籤才初始化（lazy、一次 init 後保留），避免載入頁面就抓全部圖磚；
      Leaflet CDN 載入失敗（斷網）→ 降級成「今日活動區域」文字卡，不破版。 */
   const DAY_MAPS = {}, MAP_TRIES = {};
+  let BOUNDARY_BB = null; // 城界 bbox 快取（fitBounds 出城判斷用）
+  function boundaryBB() {
+    if (BOUNDARY_BB !== null || !TRIP_DATA.cityBoundary || !(window.L && L.latLngBounds)) return BOUNDARY_BB;
+    const arr = [];
+    (function walk(c) { typeof c[0] === "number" ? arr.push([c[1], c[0]]) : c.forEach(walk); })(TRIP_DATA.cityBoundary.coordinates);
+    BOUNDARY_BB = L.latLngBounds(arr);
+    return BOUNDARY_BB;
+  }
   const dayZone = day => String(day.theme || "").split("（")[0];
   const dayMapHTML = (di, day) =>
     '<div class="day-map-wrap"><div class="day-map" id="day-map-' + di + '"></div>'
@@ -2316,7 +2336,7 @@ const TRIP_DATA = {
     if (!el || DAY_MAPS[di] || !day) return;
     const zone = dayZone(day);
     const pts = (day.spots || [])
-      .map((s, i) => ({ name: s.name, coords: s.coords, no: i + 1 }))
+      .map((s, i) => ({ name: s.name, coords: s.coords, base: s.base, no: i + 1 }))
       .filter(x => Array.isArray(x.coords) && x.coords.length === 2);
     if (!pts.length) { dayMapFallback(el, di, zone); return; }
     if (!(window.L && L.map)) {
@@ -2332,12 +2352,30 @@ const TRIP_DATA = {
       subdomains: "abcd", maxZoom: 19,
       attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> &copy; <a href="https://carto.com/attributions">CARTO</a>'
     }).addTo(map);
-    pts.forEach(x => {
-      L.marker(x.coords, {
-        icon: L.divIcon({ className: "map-dot-wrap", html: '<div class="map-dot">' + x.no + '</div>', iconSize: [26, 26], iconAnchor: [13, 13] })
-      }).addTo(map).bindPopup(esc(x.name));
-    });
-    map.fitBounds(pts.map(x => x.coords), { padding: [34, 34], maxZoom: 15 });
+    /* 城市邊界描邊：淡虛線、主色 30% 透明（內嵌簡化 GeoJSON，不外抓） */
+    if (TRIP_DATA.cityBoundary) {
+      const mainCol = (getComputedStyle(document.documentElement).getPropertyValue("--blue") || "#767676").trim();
+      L.geoJSON(TRIP_DATA.cityBoundary, {
+        interactive: false,
+        style: { color: mainCol, opacity: .3, weight: 1.2, dashArray: "5 5", fill: false }
+      }).addTo(map);
+    }
+    /* marker：一般＝主色編號圓點；base 點照常顯示但不參與 fitBounds
+       （飯店＝陶土色小家、機場＝芥末金小飛機、交通出發點＝小空心點） */
+    const dotIcon = x => {
+      if (!x.base) return L.divIcon({ className: "map-dot-wrap", html: '<div class="map-dot">' + x.no + '</div>', iconSize: [26, 26], iconAnchor: [13, 13] });
+      const t = x.base === "hotel" ? " map-dot-hotel" : x.base === "airport" ? " map-dot-air" : " map-dot-base";
+      const inner = x.base === "hotel" ? ic("home", "sm") : x.base === "airport" ? ic("plane", "sm") : "";
+      const size = inner ? 22 : 12;
+      return L.divIcon({ className: "map-dot-wrap", html: '<div class="map-dot map-dot-b' + t + '">' + inner + '</div>', iconSize: [size, size], iconAnchor: [size / 2, size / 2] });
+    };
+    pts.forEach(x => { L.marker(x.coords, { icon: dotIcon(x) }).addTo(map).bindPopup(esc(x.name)); });
+    const focus = pts.filter(x => !x.base);
+    let fit = L.latLngBounds((focus.length ? focus : pts).map(x => x.coords));
+    /* 出城日：聚焦點跑出城界時，把城界一起框進來，看得出「今天跑出框外」 */
+    const bb = boundaryBB();
+    if (bb && focus.length && focus.some(x => !bb.contains(L.latLng(x.coords)))) fit = fit.extend(bb);
+    map.fitBounds(fit, { padding: [34, 34], maxZoom: 15 });
     DAY_MAPS[di] = map;
   }
 
