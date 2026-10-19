@@ -416,6 +416,8 @@
   .fl-date{color:var(--soft);font-size:.85rem;margin-right:8px;font-variant-numeric:tabular-nums;font-weight:500;}
   .fl-ap{font-size:.9rem;font-weight:500;}
   .fl-meta{font-size:.8rem;color:var(--soft);padding:8px 0 14px;line-height:1.6;}
+  .fl-status{display:inline-flex;align-items:center;gap:2px;margin-left:6px;font-size:.78rem;color:var(--blue);text-decoration:none;border-bottom:1px dashed var(--blue);}
+  .fl-status .ic{margin-right:1px;}
   .sun-strip{display:flex;flex-wrap:wrap;gap:16px 44px;align-items:flex-start;}
   .ss-sun{flex:0 0 auto;font-size:.95rem;}
   .ss-sun b{font-weight:700;margin-left:4px;}
@@ -1971,8 +1973,10 @@ const TRIP_DATA = {
       if (!g.length) return "";
       let h = '<div class="fl-dir">' + ic("plane", "sm") + name + '</div><div class="fl-tl">';
       g.forEach(f => {
+        const statusUrl = "https://www.google.com/search?q=" + encodeURIComponent(f.flightNo + " flight status");
         h += flNode(f.depart, "takeoff")
           + '<div class="fl-meta">' + esc(f.airline) + ' ' + esc(f.flightNo)
+          + ' <a class="fl-status" href="' + esc(statusUrl) + '" target="_blank" rel="noopener" title="開新分頁查詢 Google 即時航班動態，非本頁自動更新">' + ic("extlink", "sm ic-blue") + '查詢即時動態</a>'
           + (f.note ? '　·　' + esc(f.note) : '')
           + '<br>' + [f.baggage ? esc(f.baggage) : "", '訂位代號 ' + secHTML("bookingRef")].filter(Boolean).join('　·　')
           + '</div>'
