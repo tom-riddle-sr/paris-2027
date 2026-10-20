@@ -662,6 +662,15 @@
   .map-dot-base{border-color:var(--soft);color:var(--soft);}
   .day-map.day-map-fallback{height:auto;padding:12px 16px;font-size:.9rem;color:var(--soft);background:transparent;}
   .leaflet-container{font-family:var(--sans);font-size:.8rem;}
+
+  /* ===== 住宿周邊機能地圖：飯店＋藥局／超市／警局／消防局，類別用顏色＋icon區分 ===== */
+  .map-dot-pharm{border-color:var(--sage);color:var(--sage);}
+  .map-dot-market{border-color:var(--gold);color:var(--gold);}
+  .map-dot-police{border-color:var(--blue);color:var(--blue);}
+  .map-dot-fire{border-color:var(--ink);color:var(--ink);}
+  .nb-map-legend{display:flex;flex-wrap:wrap;gap:6px 16px;margin-top:8px;font-size:.78rem;color:var(--soft);}
+  .nb-map-legend span{display:inline-flex;align-items:center;gap:5px;}
+  .nb-map-legend i{display:inline-block;width:9px;height:9px;border-radius:50%;flex:0 0 auto;}
   @media(min-width:640px){.day-map{height:220px;}}
 
   /* ===== Lightbox ===== */
@@ -783,6 +792,17 @@ const TRIP_DATA = {
         "若為公寓式住宿，入住方式／鑰匙領取請依訂房平台（Airbnb／Booking 等）指示辦理，不一定有櫃台"
       ]
       /* 訂房編號屬敏感資訊，已移入 secure 加密區（hotelBookingRefs） */
+    }
+  ],
+
+  /* 機場固定標示用座標統一來源，跟 hotels 同一套結構，供每天地圖畫機場 icon。
+     座標查證：Wikipedia 基礎設施資訊框 49°00′35″N 002°32′52″E（換算 49.00972, 2.54778）
+     與 SkyVector 刊載值（約 49.0098, 2.5478）相互印證；比 Nominatim 整個機場範圍（含跑道，
+     偏東）多邊形重心 49.0069, 2.5711 更貼近機場參考點，故採用 Wikipedia/SkyVector 版本 */
+  airports: [
+    {
+      name: "巴黎戴高樂機場 CDG",
+      coords: [49.0097, 2.5479]
     }
   ],
 
@@ -1685,6 +1705,7 @@ const TRIP_DATA = {
    以下為渲染引擎：讀取 TRIP_DATA 動態產生整個頁面，不需修改
    ========================================================================== */
 (function () {
+  let NEARBY_MAP = null, NEARBY_TRIES = 0; // 住宿周邊機能地圖狀態，renderInfo（預設分頁）會立即呼叫 initNearbyMap，須先於此宣告避免 TDZ
   const $  = (sel, el) => (el || document).querySelector(sel);
   const $$ = (sel, el) => Array.from((el || document).querySelectorAll(sel));
   const esc = s => String(s == null ? "" : s)
@@ -1791,7 +1812,10 @@ const TRIP_DATA = {
     trash: '<polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>',
     sync: '<polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>',
     key: '<path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.78 7.78 5.5 5.5 0 0 1 7.78-7.78zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3"/>',
-    check: '<polyline points="20 6 9 17 4 12"/>'
+    check: '<polyline points="20 6 9 17 4 12"/>',
+    cart: '<circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>',
+    shield: '<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>',
+    flame: '<path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/>'
   };
   const ic = (name, cls) =>
     '<svg class="ic' + (cls ? ' ' + cls : '') + '" viewBox="0 0 24 24" aria-hidden="true">' + (ICONS[name] || '') + '</svg>';
@@ -2105,19 +2129,28 @@ const TRIP_DATA = {
     };
     if (D.nearby) {
       html += '<div class="card"><h3>' + secTitle("07", "住宿周邊機能", "Nearby Essentials", "map") + '</h3>'
-        + '<div class="emg-box"><div class="nt-title">' + ic("alert", "sm") + ' 緊急電話・真正遇到狀況請優先撥打</div>'
+        + '<div style="margin-top:4px;"><div class="day-map" id="nearby-map"></div></div>'
+        + '<div class="nb-map-legend">'
+          + '<span><i style="background:var(--terra)"></i>飯店</span>'
+          + '<span><i style="background:var(--sage)"></i>藥局</span>'
+          + '<span><i style="background:var(--gold)"></i>超市</span>'
+          + '<span><i style="background:var(--blue)"></i>警局</span>'
+          + '<span><i style="background:var(--ink)"></i>消防局</span>'
+        + '</div>'
+        + '<div class="emg-box" style="margin-top:14px;"><div class="nt-title">' + ic("alert", "sm") + ' 緊急電話・真正遇到狀況請優先撥打</div>'
         + '<div class="emg-grid">' + (D.nearby.emergency || []).map(e =>
             '<div class="emg-item"><span class="emg-num">' + esc(e.num) + '</span><span class="emg-label">' + esc(e.label) + '</span></div>'
           ).join('') + '</div></div>'
         + nbGroup("藥局 Pharmacie", "plus", D.nearby.pharmacies)
-        + nbGroup("超市 Supermarché", "tag", D.nearby.supermarkets)
-        + nbGroup("警局 Police", "lock", D.nearby.police)
-        + nbGroup("消防局 Pompiers", "alert", D.nearby.fire)
+        + nbGroup("超市 Supermarché", "cart", D.nearby.supermarkets)
+        + nbGroup("警局 Police", "shield", D.nearby.police)
+        + nbGroup("消防局 Pompiers", "flame", D.nearby.fire)
         + '<p class="muted" style="margin-top:10px;">距離為住宿與地點座標的直線距離換算估計步行時間，非實際路徑規劃，僅供參考。</p>'
         + '</div>';
     }
 
     p.innerHTML = html;
+    initNearbyMap(); // 基本資料是預設分頁，直接初始化，不用等切頁
 
     /* 雙時鐘即時更新 */
     function clockParts(tz) {
@@ -2690,6 +2723,12 @@ const TRIP_DATA = {
       const dup = pts.some(x => x.base === "hotel" && x.coords[0] === hotel.coords[0] && x.coords[1] === hotel.coords[1]);
       if (!dup) pts.push({ name: hotel.name, coords: hotel.coords, base: "hotel", no: null });
     }
+    /* 機場固定標示：邏輯同飯店，來源統一為 TRIP_DATA.airports[0]，當天若已有 base:"airport" 的 spot（如第1、11天）就不重複疊加 */
+    const airport = (TRIP_DATA.airports || [])[0];
+    if (airport && Array.isArray(airport.coords) && airport.coords.length === 2) {
+      const dup = pts.some(x => x.base === "airport");
+      if (!dup) pts.push({ name: airport.name, coords: airport.coords, base: "airport", no: null });
+    }
     if (!pts.length) { dayMapFallback(el, di, zone); return; }
     if (!(window.L && L.map)) {
       /* Leaflet 以 defer 載入，可能還沒好：短暫重試幾次，仍失敗才降級 */
@@ -2729,6 +2768,45 @@ const TRIP_DATA = {
     if (bb && focus.length && focus.some(x => !bb.contains(L.latLng(x.coords)))) fit = fit.extend(bb);
     map.fitBounds(fit, { padding: [34, 34], maxZoom: 15 });
     DAY_MAPS[di] = map;
+  }
+
+  /* ---------- 住宿周邊機能地圖：獨立於每日行程地圖，飯店＋藥局／超市／警局／消防局全部參與 fitBounds ----------
+     目的跟 day map 不同：day map 聚焦單一景點不框飯店/機場，這張圖的重點就是「飯店跟周邊機能的相對距離」，
+     所以飯店這次要參與 fitBounds。預設分頁（基本資料）一載入就會呼叫，Leaflet 若還沒載好（defer）比照 day map 做法重試幾次。 */
+  function initNearbyMap() {
+    const D = TRIP_DATA;
+    const el = document.getElementById("nearby-map");
+    if (!el || NEARBY_MAP || !D.nearby) return;
+    const hotel = (D.hotels || [])[0];
+    const pts = [];
+    if (hotel && Array.isArray(hotel.coords) && hotel.coords.length === 2) pts.push({ name: hotel.name, coords: hotel.coords, cat: "hotel" });
+    (D.nearby.pharmacies || []).forEach(x => { if (Array.isArray(x.coords)) pts.push({ name: x.name, coords: x.coords, cat: "pharm" }); });
+    (D.nearby.supermarkets || []).forEach(x => { if (Array.isArray(x.coords)) pts.push({ name: x.name, coords: x.coords, cat: "market" }); });
+    (D.nearby.police || []).forEach(x => { if (Array.isArray(x.coords)) pts.push({ name: x.name, coords: x.coords, cat: "police" }); });
+    (D.nearby.fire || []).forEach(x => { if (Array.isArray(x.coords)) pts.push({ name: x.name, coords: x.coords, cat: "fire" }); });
+    if (!pts.length) return;
+    if (!(window.L && L.map)) {
+      NEARBY_TRIES++;
+      if (NEARBY_TRIES <= 6) setTimeout(() => { if (!NEARBY_MAP) initNearbyMap(); }, 500);
+      return;
+    }
+    const map = L.map(el, { scrollWheelZoom: false, zoomControl: false });
+    L.control.zoom({ position: "bottomright" }).addTo(map);
+    L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png", {
+      subdomains: "abcd", maxZoom: 19,
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> &copy; <a href="https://carto.com/attributions">CARTO</a>'
+    }).addTo(map);
+    const CAT_ICON = { hotel: "home", pharm: "plus", market: "cart", police: "shield", fire: "flame" };
+    pts.forEach(x => {
+      const icon = L.divIcon({
+        className: "map-dot-wrap",
+        html: '<div class="map-dot map-dot-b map-dot-' + x.cat + '">' + ic(CAT_ICON[x.cat], "sm") + '</div>',
+        iconSize: [22, 22], iconAnchor: [11, 11]
+      });
+      L.marker(x.coords, { icon }).addTo(map).bindPopup(esc(x.name));
+    });
+    map.fitBounds(L.latLngBounds(pts.map(x => x.coords)), { padding: [30, 30], maxZoom: 16 });
+    NEARBY_MAP = map;
   }
 
   function flowHTML(day) {
