@@ -260,6 +260,28 @@
   .notice li{padding:3px 0;display:flex;gap:9px;}
   .notice li .ic{flex:0 0 auto;margin-top:7px;color:var(--soft);}
 
+  /* ===== Emergency block（緊急電話，比照 notice 但用主色強調） ===== */
+  .emg-box{
+    background:var(--terra-soft);
+    border:1px solid var(--terra);border-left:4px solid var(--terra);
+    border-radius:0;padding:12px 16px;margin-bottom:16px;font-size:.9rem;
+  }
+  .emg-box .nt-title{
+    font-weight:700;color:var(--terra);margin-bottom:8px;
+    font-size:.74rem;letter-spacing:.14em;text-transform:uppercase;
+  }
+  .emg-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:6px 14px;}
+  .emg-item{display:flex;align-items:baseline;gap:8px;}
+  .emg-num{font-size:1.25rem;font-weight:700;color:var(--terra);font-variant-numeric:tabular-nums;}
+  .emg-label{font-size:.82rem;color:var(--ink);}
+  .nb-group{margin-top:12px;}
+  .nb-group .nb-h{font-size:.74rem;color:var(--soft);letter-spacing:.1em;text-transform:uppercase;font-weight:600;margin-bottom:4px;}
+  .nb-item{padding:6px 0;border-bottom:1px solid var(--line-soft);}
+  .nb-item:last-child{border-bottom:none;}
+  .nb-item .nb-name{font-weight:600;}
+  .nb-item .nb-meta{font-size:.82rem;color:var(--soft);margin-top:2px;}
+  .nb-uncertain{color:var(--terra);font-size:.82rem;margin-top:4px;line-height:1.55;}
+
   /* ===== Tomorrow preview ===== */
   .tomorrow{
     background:transparent;
@@ -751,13 +773,53 @@ const TRIP_DATA = {
 
   hotels: [
     {
-      name: "待補：巴黎住宿尚未提供",
+      name: "巴黎住宿（地址：1 Rue du Commandant Schloesing）",
       url: "",
-      address: "待補（行程以 Metro 移動，建議選 1–7 區地鐵沿線）",
-      checkIn: "2027-02-03", checkOut: "2027-02-13"
+      address: "1 Rue du Commandant Schloesing, Paris, Île-de-France 75016",
+      coords: [48.8617249, 2.2846998], // Nominatim geocoding 查證，16區La Muette/Trocadéro一帶，靠近艾菲爾鐵塔
+      checkIn: "2027-02-03", checkOut: "2027-02-13",
+      tips: [
+        "門牌查無對應的連鎖飯店名稱，很可能是公寓式住宿（Airbnb／服務式公寓），而非飯店",
+        "若為公寓式住宿，入住方式／鑰匙領取請依訂房平台（Airbnb／Booking 等）指示辦理，不一定有櫃台"
+      ]
       /* 訂房編號屬敏感資訊，已移入 secure 加密區（hotelBookingRefs） */
     }
   ],
+
+  /* ============================================================
+     住宿周邊機能：藥局／超市／警局／消防局
+     - 座標皆為 Nominatim geocoding 查證值，distKmTo() 於渲染時即時算直線距離估算步行時間
+     - 警局採 service-public.gouv.fr 官方名錄（Commissariat de police de Paris 16e arrondissement），其餘目錄網站列出的不同地址不採用
+     - 消防局無單一官方來源可直接確認門牌，見 fire[0].note 的查證過程與保留的不確定性
+     ============================================================ */
+  nearby: {
+    emergency: [
+      { num: "112", label: "歐盟通用緊急號碼（可轉接警察／消防）" },
+      { num: "15", label: "SAMU 醫療救護" },
+      { num: "17", label: "警察 Police" },
+      { num: "18", label: "消防 Pompiers" }
+    ],
+    pharmacies: [
+      { name: "Pharmacie Franklin", address: "8 Rue de Passy, 75016 Paris", coords: [48.8584527, 2.2836828], hours: "約週一至五 9:00–20:00、週六 9:30–19:30，週日公休（各目錄網站時段略有出入，建議去電 01 42 88 22 32 確認）" },
+      { name: "Pharmacie du Trocadéro", address: "106 Avenue Kléber, 75116 Paris", coords: [48.8650763, 2.2884537], hours: "約週一至五 8:30–20:00、週六 9:30–20:00，週日多公休（來源時段不一致，建議去電 01 47 27 84 60 確認）" }
+    ],
+    supermarkets: [
+      { name: "Monoprix Passy Plaza", address: "53 Rue de Passy, 75016 Paris", coords: [48.8576089, 2.2796377], hours: "約週一至六 9:00–21:00，週日多公休或縮短營業（各來源時段不一致，以店內公告為準）" }
+    ],
+    police: [
+      { name: "Commissariat de police de Paris 16e arrondissement", address: "62 Avenue Mozart, 75016 Paris", coords: [48.8543409, 2.2690232], hours: "24 小時運作（service-public.gouv.fr 官方名錄資料）" }
+    ],
+    fire: [
+      {
+        name: "Centre de secours Dauphine（巴黎消防隊 16 區分隊）",
+        address: "8 Rue Mesnil, 75016 Paris",
+        coords: [48.8685555, 2.2841375],
+        hours: "消防隊通常 24 小時值勤（確切對外服務時段未查得官方公告）",
+        uncertain: true,
+        note: "地址來源未能從單一官方管道（如 BSPP 官網）直接確認：此處依歷史建築資料交叉比對採信——該址由建築師 Robert Mallet-Stevens 於1935–37年興建、列為法國歷史古蹟（monument historique），資料顯示目前仍實際作為消防分隊使用。另有目錄網站列出 4 Rue François Millet 作為消防局地址，但查無官方佐證、且距住宿較遠，故不採用。如遇真正緊急狀況，請優先撥打 18 或 112，或自行查詢巴黎消防隊（BSPP）官方網站／電話確認最新地址。"
+      }
+    ]
+  },
 
   /* ============================================================
      secure：敏感資料加密區（護照、訂位代號、訂房編號）
@@ -2005,9 +2067,55 @@ const TRIP_DATA = {
         + '<div style="font-weight:600;">' + nm + '</div>'
         + '<div class="kv"><span class="k">地址</span><span class="v">' + esc(h.address) + '</span></div>'
         + '<div class="kv"><span class="k">入住／退房</span><span class="v">' + fmtDate(h.checkIn) + ' → ' + fmtDate(h.checkOut) + '</span></div>'
-        + '<div class="kv"><span class="k">訂房編號</span><span class="v">' + secHTML("hotelBookingRefs." + hi) + '</span></div></div>';
+        + '<div class="kv"><span class="k">訂房編號</span><span class="v">' + secHTML("hotelBookingRefs." + hi) + '</span></div>'
+        + (h.tips && h.tips.length ? '<ul style="list-style:none;margin-top:6px;">' + h.tips.map(t =>
+            '<li style="padding:2px 0;display:flex;gap:7px;"><span style="flex:0 0 auto;">' + ic("alert", "sm ic-terra") + '</span><span class="muted">' + esc(t) + '</span></li>'
+          ).join('') + '</ul>' : '')
+        + '</div>';
     });
     html += '</div></aside></div>';
+
+    /* --- 住宿周邊機能：緊急電話＋藥局／超市／警局／消防局（距離為住宿座標直線距離換算估計步行時間，非精確路徑） --- */
+    const distKmTo = (c1, c2) => {
+      if (!Array.isArray(c1) || !Array.isArray(c2)) return null;
+      const R = 6371, toRad = d => d * Math.PI / 180;
+      const dLat = toRad(c2[0] - c1[0]), dLon = toRad(c2[1] - c1[1]);
+      const a = Math.sin(dLat / 2) ** 2 + Math.cos(toRad(c1[0])) * Math.cos(toRad(c2[0])) * Math.sin(dLon / 2) ** 2;
+      return R * 2 * Math.asin(Math.sqrt(a));
+    };
+    const hotelCoords = D.hotels[0] && D.hotels[0].coords;
+    const distLabel = coords => {
+      const km = distKmTo(hotelCoords, coords);
+      if (km == null) return "";
+      const m = km * 1000;
+      const walkMin = Math.max(1, Math.round(m / 80)); // 約 80 公尺／分鐘的步行速度粗估
+      return '直線約 ' + Math.round(m) + ' 公尺・步行約 ' + walkMin + ' 分鐘';
+    };
+    const nbGroup = (title, icon, arr) => {
+      if (!arr || !arr.length) return "";
+      let h = '<div class="nb-group"><div class="nb-h">' + ic(icon, "sm") + ' ' + title + '</div>';
+      arr.forEach(x => {
+        h += '<div class="nb-item"><div class="nb-name">' + esc(x.name) + '</div>'
+          + '<div class="nb-meta">' + esc(x.address) + (hotelCoords ? '　·　' + distLabel(x.coords) : '') + '</div>'
+          + (x.hours ? '<div class="nb-meta">營業時間：' + esc(x.hours) + '</div>' : '')
+          + (x.uncertain && x.note ? '<div class="nb-uncertain">' + ic("alert", "sm ic-terra") + ' ' + esc(x.note) + '</div>' : '')
+          + '</div>';
+      });
+      return h + '</div>';
+    };
+    if (D.nearby) {
+      html += '<div class="card"><h3>' + secTitle("07", "住宿周邊機能", "Nearby Essentials", "map") + '</h3>'
+        + '<div class="emg-box"><div class="nt-title">' + ic("alert", "sm") + ' 緊急電話・真正遇到狀況請優先撥打</div>'
+        + '<div class="emg-grid">' + (D.nearby.emergency || []).map(e =>
+            '<div class="emg-item"><span class="emg-num">' + esc(e.num) + '</span><span class="emg-label">' + esc(e.label) + '</span></div>'
+          ).join('') + '</div></div>'
+        + nbGroup("藥局 Pharmacie", "plus", D.nearby.pharmacies)
+        + nbGroup("超市 Supermarché", "tag", D.nearby.supermarkets)
+        + nbGroup("警局 Police", "lock", D.nearby.police)
+        + nbGroup("消防局 Pompiers", "alert", D.nearby.fire)
+        + '<p class="muted" style="margin-top:10px;">距離為住宿與地點座標的直線距離換算估計步行時間，非實際路徑規劃，僅供參考。</p>'
+        + '</div>';
+    }
 
     p.innerHTML = html;
 
@@ -2575,6 +2683,13 @@ const TRIP_DATA = {
     const pts = (day.spots || [])
       .map((s, i) => ({ name: s.name, coords: s.coords, base: s.base, no: i + 1 }))
       .filter(x => Array.isArray(x.coords) && x.coords.length === 2);
+    /* 飯店固定標示：每天都畫，來源統一為 TRIP_DATA.hotels[0]，
+       跟當天流程裡若剛好已有同座標的 base:"hotel" spot 時不重複疊加 */
+    const hotel = (TRIP_DATA.hotels || [])[0];
+    if (hotel && Array.isArray(hotel.coords) && hotel.coords.length === 2) {
+      const dup = pts.some(x => x.base === "hotel" && x.coords[0] === hotel.coords[0] && x.coords[1] === hotel.coords[1]);
+      if (!dup) pts.push({ name: hotel.name, coords: hotel.coords, base: "hotel", no: null });
+    }
     if (!pts.length) { dayMapFallback(el, di, zone); return; }
     if (!(window.L && L.map)) {
       /* Leaflet 以 defer 載入，可能還沒好：短暫重試幾次，仍失敗才降級 */
